@@ -1,0 +1,3699 @@
+<style>
+
+.monaco-action-bar {
+	height: 100%;
+	white-space: nowrap
+}
+
+.monaco-action-bar .actions-container {
+	align-items: center;
+	display: flex;
+	height: 100%;
+	margin: 0 auto;
+	padding: 0;
+	width: 100%
+}
+
+.monaco-action-bar.vertical .actions-container {
+	display: inline-block
+}
+
+.monaco-action-bar .action-item {
+	align-items: center;
+	cursor: pointer;
+	display: block;
+	justify-content: center;
+	position: relative
+}
+
+.monaco-action-bar .action-item.disabled {
+	cursor: default
+}
+
+.monaco-action-bar .action-item .codicon,
+.monaco-action-bar .action-item .icon {
+	display: block
+}
+
+.monaco-action-bar .action-item .codicon {
+	align-items: center;
+	display: flex;
+	height: 16px;
+	width: 16px
+}
+
+.monaco-action-bar .action-label {
+	border-radius: 5px;
+	display: flex;
+	font-size: 11px;
+	padding: 3px
+}
+
+.monaco-action-bar .action-item.disabled .action-label,
+.monaco-action-bar .action-item.disabled .action-label:before,
+.monaco-action-bar .action-item.disabled .action-label:hover {
+	color: var(--vscode-disabledForeground)
+}
+
+.monaco-action-bar.vertical {
+	text-align: left
+}
+
+.monaco-action-bar.vertical .action-item {
+	display: block
+}
+
+.monaco-action-bar.vertical .action-label.separator {
+	border-bottom: 1px solid #bbb;
+	display: block;
+	margin-left: .8em;
+	margin-right: .8em;
+	padding-top: 1px
+}
+
+.monaco-action-bar .action-item .action-label.separator {
+	background-color: #bbb;
+	cursor: default;
+	height: 16px;
+	margin: 5px 4px !important;
+	min-width: 1px;
+	padding: 0;
+	width: 1px
+}
+
+.secondary-actions .monaco-action-bar .action-label {
+	margin-left: 6px
+}
+
+.monaco-action-bar .action-item.select-container {
+	align-items: center;
+	display: flex;
+	flex: 1;
+	justify-content: center;
+	margin-right: 10px;
+	max-width: 170px;
+	min-width: 60px;
+	overflow: hidden
+}
+
+.monaco-action-bar .action-item.action-dropdown-item {
+	display: flex
+}
+
+.monaco-action-bar .action-item.action-dropdown-item>.action-dropdown-item-separator {
+	align-items: center;
+	cursor: default;
+	display: flex
+}
+
+.monaco-action-bar .action-item.action-dropdown-item>.action-dropdown-item-separator>div {
+	width: 1px
+}
+
+.monaco-text-button {
+	align-items: center;
+	border: 1px solid var(--vscode-button-border, transparent);
+	border-radius: 2px;
+	box-sizing: border-box;
+	cursor: pointer;
+	display: flex;
+	justify-content: center;
+	line-height: 18px;
+	padding: 4px;
+	text-align: center;
+	width: 100%
+}
+
+.monaco-text-button:focus {
+	outline-offset: 2px !important
+}
+
+.monaco-text-button:hover {
+	text-decoration: none !important
+}
+
+.monaco-button.disabled,
+.monaco-button.disabled:focus {
+	cursor: default;
+	opacity: .4 !important
+}
+
+.monaco-text-button .codicon {
+	color: inherit !important;
+	margin: 0 .2em
+}
+
+.monaco-text-button.monaco-text-button-with-short-label {
+	flex-direction: row;
+	flex-wrap: wrap;
+	height: 28px;
+	overflow: hidden;
+	padding: 0 4px
+}
+
+.monaco-text-button.monaco-text-button-with-short-label>.monaco-button-label {
+	flex-basis: 100%
+}
+
+.monaco-text-button.monaco-text-button-with-short-label>.monaco-button-label-short {
+	flex-grow: 1;
+	overflow: hidden;
+	width: 0
+}
+
+.monaco-text-button.monaco-text-button-with-short-label>.monaco-button-label,
+.monaco-text-button.monaco-text-button-with-short-label>.monaco-button-label-short {
+	align-items: center;
+	display: flex;
+	font-style: inherit;
+	font-weight: 400;
+	justify-content: center;
+	padding: 4px 0
+}
+
+
+.monaco-button.default-colors {
+	background-color: var(--vscode-button-background);
+	color: var(--vscode-button-foreground)
+}
+
+.monaco-button.default-colors:hover {
+	background-color: var(--vscode-button-hoverBackground)
+}
+
+.monaco-button.default-colors.secondary {
+	background-color: var(--vscode-button-secondaryBackground);
+	color: var(--vscode-button-secondaryForeground)
+}
+
+.monaco-button.default-colors.secondary:hover {
+	background-color: var(--vscode-button-secondaryHoverBackground)
+}
+
+@font-face {
+	font-display: block;
+	font-family: codicon;
+	src: url(../base/browser/ui/codicons/codicon/codicon.ttf?5d4d76ab2ce5108968ad644d591a16a6) format("truetype")
+}
+
+.codicon[class*=codicon-] {
+	display: inline-block;
+	font: normal normal normal 16px/1 codicon;
+	text-align: center;
+	text-decoration: none;
+	text-rendering: auto;
+	text-transform: none;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	user-select: none;
+	-webkit-user-select: none
+}
+
+.codicon-wrench-subaction {
+	opacity: .5
+}
+
+@keyframes codicon-spin {
+	to {
+		transform: rotate(1turn)
+	}
+}
+
+.codicon-gear.codicon-modifier-spin,
+.codicon-loading.codicon-modifier-spin,
+.codicon-notebook-state-executing.codicon-modifier-spin,
+.codicon-sync.codicon-modifier-spin {
+	animation: codicon-spin 1.5s steps(30) infinite
+}
+
+.codicon-modifier-disabled {
+	opacity: .4
+}
+
+.codicon-loading,
+.codicon-tree-item-loading:before {
+	animation-duration: 1s !important;
+	animation-timing-function: cubic-bezier(.53, .21, .29, .67) !important
+}
+
+.monaco-count-badge {
+	border-radius: 11px;
+	box-sizing: border-box;
+	display: inline-block;
+	font-size: 11px;
+	font-weight: 400;
+	line-height: 11px;
+	min-height: 18px;
+	min-width: 18px;
+	padding: 3px 6px;
+	text-align: center
+}
+
+.monaco-count-badge.long {
+	border-radius: 2px;
+	line-height: normal;
+	min-height: auto;
+	padding: 2px 3px
+}
+
+.monaco-dropdown {
+	height: 100%;
+	padding: 0
+}
+
+.monaco-dropdown>.dropdown-label {
+	align-items: center;
+	cursor: pointer;
+	display: flex;
+	height: 100%;
+	justify-content: center
+}
+
+.monaco-dropdown>.dropdown-label>.action-label.disabled {
+	cursor: default
+}
+
+.monaco-dropdown-with-primary {
+	border-radius: 5px;
+	display: flex !important;
+	flex-direction: row
+}
+
+.monaco-dropdown-with-primary>.action-container>.action-label {
+	margin-right: 0
+}
+
+.monaco-dropdown-with-primary>.dropdown-action-container>.monaco-dropdown>.dropdown-label .codicon[class*=codicon-] {
+	font-size: 12px;
+	line-height: 16px;
+	margin-left: -3px;
+	padding-left: 0;
+	padding-right: 0
+}
+
+.monaco-dropdown-with-primary>.dropdown-action-container>.monaco-dropdown>.dropdown-label>.action-label {
+	background-position: 50%;
+	background-repeat: no-repeat;
+	background-size: 16px;
+	display: block
+}
+
+
+.monaco-list-row.focused.selected .label-description,
+.monaco-list-row.selected .label-description {
+	opacity: .8
+}
+
+.monaco-list {
+	height: 100%;
+	position: relative;
+	white-space: nowrap;
+	width: 100%
+}
+
+.monaco-list.mouse-support {
+	user-select: none;
+	-webkit-user-select: none
+}
+
+.monaco-list>.monaco-scrollable-element {
+	height: 100%
+}
+
+.monaco-list-rows {
+	height: 100%;
+	position: relative;
+	width: 100%
+}
+
+.monaco-list.horizontal-scrolling .monaco-list-rows {
+	min-width: 100%;
+	width: auto
+}
+
+.monaco-list-row {
+	box-sizing: border-box;
+	overflow: hidden;
+	position: absolute;
+	width: 100%
+}
+
+.monaco-list.mouse-support .monaco-list-row {
+	cursor: pointer;
+	touch-action: none
+}
+
+.monaco-list .monaco-scrollable-element>.scrollbar.vertical,
+	z-index: 14
+}
+
+.monaco-list-row.scrolling {
+	display: none !important
+}
+
+.monaco-list.element-focused,
+.monaco-list.selection-multiple,
+.monaco-list.selection-single {
+	outline: 0 !important
+}
+
+.monaco-drag-image {
+	border-radius: 10px;
+	display: inline-block;
+	font-size: 12px;
+	padding: 1px 7px;
+	position: absolute;
+	z-index: 1000
+}
+
+.monaco-list-type-filter-message {
+	box-sizing: border-box;
+	height: 100%;
+	left: 0;
+	opacity: .7;
+	padding: 40px 1em 1em;
+	pointer-events: none;
+	position: absolute;
+	text-align: center;
+	top: 0;
+	white-space: normal;
+	width: 100%
+}
+
+.monaco-list-type-filter-message:empty {
+	display: none
+}
+
+.monaco-mouse-cursor-text {
+	cursor: text
+}
+
+:root {
+	--vscode-sash-size: 4px;
+	--vscode-sash-hover-size: 4px
+}
+
+.monaco-sash {
+	position: absolute;
+	touch-action: none;
+	z-index: 35
+}
+
+.monaco-sash.disabled {
+	pointer-events: none
+}
+
+.monaco-sash.mac.vertical {
+	cursor: col-resize
+}
+
+.monaco-sash.vertical.minimum {
+	cursor: e-resize
+}
+
+.monaco-sash.vertical.maximum {
+	cursor: w-resize
+}
+
+.monaco-sash.mac.horizontal {
+	cursor: row-resize
+}
+
+.monaco-sash.horizontal.minimum {
+	cursor: s-resize
+}
+
+.monaco-sash.horizontal.maximum {
+	cursor: n-resize
+}
+
+.monaco-sash.disabled {
+	cursor: default !important;
+	pointer-events: none !important
+}
+
+.monaco-sash.vertical {
+	cursor: ew-resize;
+	height: 100%;
+	top: 0;
+	width: var(--vscode-sash-size)
+}
+
+.monaco-sash.horizontal {
+	cursor: ns-resize;
+	height: var(--vscode-sash-size);
+	left: 0;
+	width: 100%
+}
+
+.monaco-sash:not(.disabled)>.orthogonal-drag-handle {
+	content: " ";
+	cursor: all-scroll;
+	display: block;
+	height: calc(var(--vscode-sash-size)*2);
+	position: absolute;
+	width: calc(var(--vscode-sash-size)*2);
+	z-index: 100
+}
+
+.monaco-sash.horizontal.orthogonal-edge-north:not(.disabled)>.orthogonal-drag-handle.start,
+.monaco-sash.horizontal.orthogonal-edge-south:not(.disabled)>.orthogonal-drag-handle.end {
+	cursor: nwse-resize
+}
+
+.monaco-sash.horizontal.orthogonal-edge-north:not(.disabled)>.orthogonal-drag-handle.end,
+.monaco-sash.horizontal.orthogonal-edge-south:not(.disabled)>.orthogonal-drag-handle.start {
+	cursor: nesw-resize
+}
+
+.monaco-sash.vertical>.orthogonal-drag-handle.start {
+	left: calc(var(--vscode-sash-size)*-.5);
+	top: calc(var(--vscode-sash-size)*-1)
+}
+
+.monaco-sash.vertical>.orthogonal-drag-handle.end {
+	bottom: calc(var(--vscode-sash-size)*-1);
+	left: calc(var(--vscode-sash-size)*-.5)
+}
+
+.monaco-sash.horizontal>.orthogonal-drag-handle.start {
+	left: calc(var(--vscode-sash-size)*-1);
+	top: calc(var(--vscode-sash-size)*-.5)
+}
+
+.monaco-sash.horizontal>.orthogonal-drag-handle.end {
+	right: calc(var(--vscode-sash-size)*-1);
+	top: calc(var(--vscode-sash-size)*-.5)
+}
+
+.monaco-sash:before {
+	background: transparent;
+	content: "";
+	height: 100%;
+	pointer-events: none;
+	position: absolute;
+	width: 100%
+}
+
+.monaco-workbench:not(.reduce-motion) .monaco-sash:before {
+	transition: background-color .1s ease-out
+}
+
+.monaco-sash.active:before,
+.monaco-sash.hover:before {
+	background: var(--vscode-sash-hoverBorder)
+}
+
+.monaco-sash.vertical:before {
+	left: calc(50% - var(--vscode-sash-hover-size)/2);
+	width: var(--vscode-sash-hover-size)
+}
+
+.monaco-sash.horizontal:before {
+	height: var(--vscode-sash-hover-size);
+	top: calc(50% - var(--vscode-sash-hover-size)/2)
+}
+
+.pointer-events-disabled {
+	pointer-events: none !important
+}
+
+.monaco-sash.debug {
+	background: cyan
+}
+
+.monaco-sash.debug.disabled {
+	background: rgba(0, 255, 255, .2)
+}
+
+.monaco-sash.debug:not(.disabled)>.orthogonal-drag-handle {
+	background: red
+}
+
+.monaco-scrollable-element>.scrollbar>.scra {
+	cursor: pointer;
+	font-size: 11px !important
+}
+
+.monaco-scrollable-element>.visible {
+	background: transparent;
+	opacity: 1;
+	transition: opacity .1s linear;
+	z-index: 11
+}
+
+.monaco-scrollable-element>.invisible {
+	opacity: 0;
+	pointer-events: none
+}
+
+.monaco-scrollable-element>.invisible.fade {
+	transition: opacity .8s linear
+}
+
+.monaco-scrollable-element>.shadow {
+	display: none;
+	position: absolute
+}
+
+.monaco-scrollable-element>.shadow.top {
+	box-shadow: var(--vscode-scrollbar-shadow) 0 6px 6px -6px inset;
+	display: block;
+	height: 3px;
+	left: 3px;
+	top: 0;
+	width: 100%
+}
+
+.monaco-scrollable-element>.shadow.left {
+	box-shadow: var(--vscode-scrollbar-shadow) 6px 0 6px -6px inset;
+	display: block;
+	height: 100%;
+	left: 0;
+	top: 3px;
+	width: 3px
+}
+
+.monaco-scrollable-element>.shadow.top-left-corner {
+	display: block;
+	height: 3px;
+	left: 0;
+	top: 0;
+	width: 3px
+}
+
+.monaco-scrollable-element>.shadow.top.left {
+	box-shadow: var(--vscode-scrollbar-shadow) 6px 0 6px -6px inset
+}
+
+.monaco-scrollable-element>.scrollbar>.slider {
+	background: var(--vscode-scrollbarSlider-background)
+}
+
+.monaco-scrollable-element>.scrollbar>.slider:hover {
+	background: var(--vscode-scrollbarSlider-hoverBackground)
+}
+
+.monaco-scrollable-element>.scrollbar>.slider.active {
+	background: var(--vscode-scrollbarSlider-activeBackground)
+}
+
+.monaco-select-box {
+	border-radius: 2px;
+	cursor: pointer;
+	width: 100%
+}
+
+.monaco-select-box-dropdown-container {
+	font-size: 13px;
+	font-weight: 400;
+	text-transform: none
+}
+
+.monaco-action-bar .action-item.select-container {
+	cursor: default
+}
+
+.monaco-action-bar .action-item .monaco-select-box {
+	cursor: pointer;
+	min-height: 18px;
+	min-width: 100px;
+	padding: 2px 23px 2px 8px
+}
+
+.mac .monaco-action-bar .action-item .monaco-select-box {
+	border-radius: 5px;
+	font-size: 11px
+}
+
+.monaco-select-box-dropdown-padding {
+	--dropdown-padding-top: 1px;
+	--dropdown-padding-bottom: 1px
+}
+
+.monaco-select-box-dropdown-container {
+	box-sizing: border-box;
+	display: none
+}
+
+.monaco-select-box-dropdown-container>.select-box-details-pane>.select-box-description-markdown * {
+	margin: 0
+}
+
+.monaco-select-box-dropdown-container>.select-box-details-pane>.select-box-description-markdown a:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px
+}
+
+.monaco-select-box-dropdown-container>.select-box-details-pane>.select-box-description-markdown code {
+	line-height: 15px
+}
+
+.monaco-select-box-dropdown-container.visible {
+	border-bottom-left-radius: 3px;
+	border-bottom-right-radius: 3px;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	text-align: left;
+	width: 1px
+}
+
+.monaco-select-box-dropdown-container>.select-box-dropdown-list-container {
+	align-self: flex-start;
+	box-sizing: border-box;
+	flex: 0 0 auto;
+	overflow: hidden;
+	padding-bottom: var(--dropdown-padding-bottom);
+	padding-left: 1px;
+	padding-right: 1px;
+	padding-top: var(--dropdown-padding-top);
+	width: 100%
+}
+
+.monaco-select-box-dropdown-container>.select-box-details-pane {
+	padding: 5px
+}
+
+.monaco-select-box-dropdown-container>.select-box-dropdown-list-container .monaco-list .monaco-list-row {
+	cursor: pointer
+}
+
+.monaco-select-box-dropdown-container>.select-box-dropdown-list-container .monaco-list .monaco-list-row>.option-text {
+	float: left;
+	overflow: hidden;
+	padding-left: 3.5px;
+	text-overflow: ellipsis;
+	white-space: nowrap
+}
+
+.monaco-select-box-dropdown-container>.select-box-dropdown-list-container .monaco-list .monaco-list-row>.option-detail {
+	float: left;
+	opacity: .7;
+	overflow: hidden;
+	padding-left: 3.5px;
+	text-overflow: ellipsis;
+	white-space: nowrap
+}
+
+.monaco-select-box-dropdown-container>.select-box-dropdown-list-container .monaco-list .monaco-list-row>.option-decorator-right {
+	float: right;
+	overflow: hidden;
+	padding-right: 10px;
+	text-overflow: ellipsis;
+	white-space: nowrap
+}
+
+.monaco-select-box-dropdown-container>.select-box-dropdown-list-container .monaco-list .monaco-list-row>.visually-hidden {
+	height: 1px;
+	left: -10000px;
+	overflow: hidden;
+	position: absolute;
+	top: auto;
+	width: 1px
+}
+
+.monaco-select-box-dropdown-container>.select-box-dropdown-container-width-control {
+	align-self: flex-start;
+	flex: 1 1 auto;
+	opacity: 0
+}
+
+.monaco-select-box-dropdown-container>.select-box-dropdown-container-width-control>.width-control-div {
+	max-height: 0;
+	overflow: hidden
+}
+
+.monaco-select-box-dropdown-container>.select-box-dropdown-container-width-control>.width-control-div>.option-text-width-control {
+	padding-left: 4px;
+	padding-right: 8px;
+	white-space: nowrap
+}
+
+#monaco-pane-drop-overlay {
+	box-sizing: border-box;
+	height: 100%;
+	left: 0;
+	position: absolute;
+	width: 100%;
+	z-index: 10000
+}
+
+#monaco-pane-drop-overlay>.pane-overlay-indicator {
+	height: 100%;
+	min-height: 22px;
+	min-width: 19px;
+	pointer-events: none;
+	position: absolute;
+	transition: opacity .15s ease-out;
+	width: 100%
+}
+
+#monaco-pane-drop-overlay>.pane-overlay-indicator.overlay-move-transition {
+	transition: top 70ms ease-out, left 70ms ease-out, width 70ms ease-out, height 70ms ease-out, opacity .15s ease-out
+}
+
+.monaco-split-view2 {
+	height: 100%;
+	position: relative;
+	width: 100%
+}
+
+.monaco-split-view2>.sash-container {
+	height: 100%;
+	pointer-events: none;
+	position: absolute;
+	width: 100%
+}
+
+.monaco-split-view2>.sash-container>.monaco-sash {
+	pointer-events: auto
+}
+
+.monaco-split-view2>.monaco-scrollable-element {
+	height: 100%;
+	width: 100%
+}
+
+.monaco-split-view2>.monaco-scrollable-element>.split-view-container {
+	height: 100%;
+	position: relative;
+	white-space: nowrap;
+	width: 100%
+}
+
+.monaco-split-view2>.monaco-scrollable-element>.split-view-container>.split-view-view {
+	position: absolute;
+	white-space: normal
+}
+
+.monaco-split-view2>.monaco-scrollable-element>.split-view-container>.split-view-view:not(.visible) {
+	display: none
+}
+
+.monaco-split-view2.vertical>.monaco-scrollable-element>.split-view-container>.split-view-view {
+	width: 100%
+}
+
+.monaco-split-view2.horizontal>.monaco-scrollable-element>.split-view-container>.split-view-view {
+	height: 100%
+}
+
+.monaco-split-view2.separator-border>.monaco-scrollable-element>.split-view-container>.split-view-view:not(:first-child):before {
+	background-color: var(--separator-border);
+	content: " ";
+	left: 0;
+	pointer-events: none;
+	position: absolute;
+	top: 0;
+	z-index: 5
+}
+
+.monaco-split-view2.separator-border.horizontal>.monaco-scrollable-element>.split-view-container>.split-view-view:not(:first-child):before {
+	height: 100%;
+	width: 1px
+}
+
+.monaco-split-view2.separator-border.vertical>.monaco-scrollable-element>.split-view-container>.split-view-view:not(:first-child):before {
+	height: 1px;
+	width: 100%
+}
+
+.monaco-custom-toggle {
+	border: 1px solid transparent;
+	border-radius: 3px;
+	box-sizing: border-box;
+	cursor: pointer;
+	float: left;
+	height: 20px;
+	margin-left: 2px;
+	overflow: hidden;
+	padding: 1px;
+	user-select: none;
+	-webkit-user-select: none;
+	width: 20px
+}
+
+.monaco-custom-toggle:hover {
+	background-color: var(--vscode-inputOption-hoverBackground)
+}
+
+.monaco-custom-toggle.monaco-checkbox {
+	background-size: 16px !important;
+	border: 1px solid transparent;
+	border-radius: 3px;
+	height: 18px;
+	margin-left: 0;
+	margin-right: 9px;
+	opacity: 1;
+	padding: 0;
+	width: 18px
+}
+
+.monaco-action-bar .checkbox-action-item {
+	align-items: center;
+	display: flex
+}
+
+.monaco-action-bar .checkbox-action-item>.monaco-custom-toggle.monaco-checkbox {
+	margin-right: 4px
+}
+
+.monaco-action-bar .checkbox-action-item>.checkbox-label {
+	font-size: 12px
+}
+
+.monaco-custom-toggle.monaco-checkbox:not(.checked):before {
+	visibility: hidden
+}
+
+.monaco-toolbar {
+	height: 100%
+}
+
+.monaco-toolbar .toolbar-toggle-more {
+	display: inline-block;
+	padding: 0
+}
+
+.monaco-tl-row {
+	align-items: center;
+	display: flex;
+	height: 100%;
+	position: relative
+}
+
+.monaco-tl-row.disabled {
+	cursor: default
+}
+
+.monaco-tl-indent {
+	height: 100%;
+	left: 16px;
+	pointer-events: none;
+	position: absolute;
+	top: 0
+}
+
+.hide-arrows .monaco-tl-indent {
+	left: 12px
+}
+
+.monaco-tl-indent>.indent-guide {
+	border-left: 1px solid transparent;
+	box-sizing: border-box;
+	display: inline-block;
+	height: 100%
+}
+
+.monaco-workbench:not(.reduce-motion) .monaco-tl-indent>.indent-guide {
+	transition: border-color .1s linear
+}
+
+.monaco-tl-contents,
+.monaco-tl-twistie {
+	height: 100%
+}
+
+.monaco-tl-twistie {
+	align-items: center;
+	display: flex !important;
+	flex-shrink: 0;
+	font-size: 10px;
+	justify-content: center;
+	padding-right: 6px;
+	text-align: right;
+	transform: translateX(3px);
+}
+
+.monaco-tl-contents {
+	flex: 1;
+	overflow: hidden
+}
+
+.monaco-tl-twistie:before {
+	border-radius: 20px
+}
+
+.monaco-tl-twistie.collapsed:before {
+	transform: rotate(-90deg)
+}
+
+.monaco-tl-twistie.codicon-tree-item-loading:before {
+	animation: codicon-spin 1.25s steps(30) infinite
+}
+
+.monaco-tree-type-filter {
+	border: 1px solid var(--vscode-widget-border);
+	border-bottom-left-radius: 4px;
+	border-bottom-right-radius: 4px;
+	display: flex;
+	margin: 0 6px;
+	max-width: 200px;
+	padding: 3px;
+	position: absolute;
+	top: 0;
+	z-index: 100
+}
+
+.monaco-workbench:not(.reduce-motion) .monaco-tree-type-filter {
+	transition: top .3s
+}
+
+.monaco-tree-type-filter.disabled {
+	top: -40px !important
+}
+
+.monaco-tree-type-filter-input {
+	flex: 1
+}
+
+.monaco-tree-type-filter-actionbar {
+	margin-left: 4px
+}
+
+.monaco-tree-type-filter-actionbar .monaco-action-bar .action-label {
+	padding: 2px
+}
+
+.monaco-list .monaco-scrollable-element .monaco-tree-sticky-container {
+	background-color: var(--vscode-sideBar-background);
+	height: 0;
+	left: 0;
+	position: absolute;
+	top: 0;
+	width: 100%;
+	z-index: 13
+}
+
+.monaco-list .monaco-scrollable-element .monaco-tree-sticky-container .monaco-tree-sticky-row.monaco-list-row {
+	background-color: var(--vscode-sideBar-background);
+	opacity: 1 !important;
+	overflow: hidden;
+	position: absolute;
+	width: 100%
+}
+
+.monaco-list .monaco-scrollable-element .monaco-tree-sticky-container .monaco-tree-sticky-row:hover {
+	background-color: var(--vscode-list-hoverBackground) !important;
+	cursor: pointer
+}
+
+.monaco-list .monaco-scrollable-element .monaco-tree-sticky-container.empty,
+.monaco-list .monaco-scrollable-element .monaco-tree-sticky-container.empty .monaco-tree-sticky-container-shadow {
+	display: none
+}
+
+.monaco-list .monaco-scrollable-element .monaco-tree-sticky-container .monaco-tree-sticky-container-shadow {
+	bottom: -3px;
+	box-shadow: var(--vscode-scrollbar-shadow) 0 6px 6px -6px inset;
+	height: 3px;
+	left: 0;
+	position: absolute;
+	width: 100%
+}
+
+.monaco-list .monaco-scrollable-element .monaco-tree-sticky-container[tabindex="0"]:focus {
+	outline: none
+}
+
+.monaco-editor .inputarea {
+	background-color: transparent;
+	border: none;
+	color: transparent;
+	margin: 0;
+	min-height: 0;
+	min-width: 0;
+	outline: none !important;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	resize: none;
+	z-index: -10
+}
+
+.monaco-editor .blockDecorations-container {
+	pointer-events: none;
+	position: absolute;
+	top: 0
+}
+
+.monaco-editor .blockDecorations-block {
+	box-sizing: border-box;
+	position: absolute
+}
+
+.monaco-editor .margin-view-overlays .current-line,
+.monaco-editor .view-overlays .current-line {
+	box-sizing: border-box;
+	display: block;
+	left: 0;
+	position: absolute;
+	top: 0
+}
+
+.monaco-editor .margin-view-overlays .current-line.current-line-margin.current-line-margin-both {
+	border-right: 0
+}
+
+.monaco-editor .lines-content .cdr {
+	position: absolute
+}
+
+.monaco-editor .glyph-margin {
+	position: absolute;
+	top: 0
+}
+
+.monaco-editor .glyph-margin-widgets .cgmr {
+	align-items: center;
+	display: flex;
+	justify-content: center;
+	position: absolute
+}
+
+.monaco-editor .glyph-margin-widgets .cgmr.codicon-modifier-spin:before {
+	left: 50%;
+	position: absolute;
+	top: 50%;
+	transform: translate(-50%, -50%)
+}
+
+.monaco-editor.no-user-select .lines-content,
+.monaco-editor.no-user-select .view-line,
+.monaco-editor.no-user-select .view-lines {
+	user-select: none;
+	-webkit-user-select: none
+}
+
+.monaco-editor.mac .lines-content:hover,
+.monaco-editor.mac .view-line:hover,
+.monaco-editor.mac .view-lines:hover {
+	user-select: text;
+	-webkit-user-select: text;
+	-ms-user-select: text
+}
+
+.monaco-editor.enable-user-select {
+	user-select: auto;
+	-webkit-user-select: initial
+}
+
+.monaco-editor .view-lines {
+	white-space: nowrap
+}
+
+.monaco-editor .view-line {
+	position: absolute;
+	width: 100%
+}
+
+
+.monaco-editor .margin-view-overlays .cldr {
+	height: 100%;
+	position: absolute
+}
+
+.monaco-editor .margin {
+	background-color: var(--vscode-editorGutter-background)
+}
+
+.monaco-editor .margin-view-overlays .cmdr {
+	height: 100%;
+	left: 0;
+	position: absolute;
+	width: 100%
+}
+
+.monaco-editor .minimap.slider-mouseover .minimap-slider {
+	opacity: 0;
+	transition: opacity .1s linear
+}
+
+.monaco-editor .minimap.slider-mouseover .minimap-slider.active,
+.monaco-editor .minimap.slider-mouseover:hover .minimap-slider {
+	opacity: 1
+}
+
+.monaco-editor .minimap-slider .minimap-slider-horizontal {
+	background: var(--vscode-minimapSlider-background)
+}
+
+.monaco-editor .minimap-slider:hover .minimap-slider-horizontal {
+	background: var(--vscode-minimapSlider-hoverBackground)
+}
+
+.monaco-editor .minimap-slider.active .minimap-slider-horizontal {
+	background: var(--vscode-minimapSlider-activeBackground)
+}
+
+.monaco-editor .minimap-shadow-visible {
+	box-shadow: var(--vscode-scrollbar-shadow) -6px 0 6px -6px inset
+}
+
+.monaco-editor .minimap-shadow-hidden {
+	position: absolute;
+	width: 0
+}
+
+.monaco-editor .minimap-shadow-visible {
+	left: -6px;
+	position: absolute;
+	width: 6px
+}
+
+.monaco-editor.no-minimap-shadow .minimap-shadow-visible {
+	left: -1px;
+	position: absolute;
+	width: 1px
+}
+
+.minimap.autohide {
+	opacity: 0;
+	transition: opacity .5s
+}
+
+.minimap.autohide:hover {
+	opacity: 1
+}
+
+.monaco-editor .minimap {
+	z-index: 5
+}
+
+.monaco-editor .overlayWidgets {
+	left: 0;
+	position: absolute;
+	top: 0
+}
+
+.monaco-editor .view-ruler {
+	box-shadow: 1px 0 0 0 var(--vscode-editorRuler-foreground) inset;
+	position: absolute;
+	top: 0
+}
+
+.monaco-editor .lines-content .cslr {
+	position: absolute
+}
+
+.monaco-editor .top-left-radius {
+	border-top-left-radius: 3px
+}
+
+.monaco-editor .bottom-left-radius {
+	border-bottom-left-radius: 3px
+}
+
+.monaco-editor .top-right-radius {
+	border-top-right-radius: 3px
+}
+
+.monaco-editor .bottom-right-radius {
+	border-bottom-right-radius: 3px
+}
+
+.monaco-editor .cursors-layer {
+	position: absolute;
+	top: 0
+}
+
+.monaco-editor .cursors-layer>.cursor {
+	box-sizing: border-box;
+	overflow: hidden;
+	position: absolute
+}
+
+.monaco-editor .cursors-layer.cursor-smooth-caret-animation>.cursor {
+	transition: all 80ms
+}
+
+.monaco-editor .cursors-layer.cursor-block-outline-style>.cursor {
+	background: transparent !important;
+	border-style: solid;
+	border-width: 1px
+}
+
+.monaco-editor .cursors-layer.cursor-underline-style>.cursor {
+	background: transparent !important;
+	border-bottom-style: solid;
+	border-bottom-width: 2px
+}
+
+.monaco-editor .cursors-layer.cursor-underline-thin-style>.cursor {
+	background: transparent !important;
+	border-bottom-style: solid;
+	border-bottom-width: 1px
+}
+
+
+.cursor-smooth {
+	animation: monaco-cursor-smooth .5s ease-in-out 0s 20 alternate
+}
+
+.cursor-phase {
+	animation: monaco-cursor-phase .5s ease-in-out 0s 20 alternate
+}
+
+.cursor-expand>.cursor {
+	animation: monaco-cursor-expand .5s ease-in-out 0s 20 alternate
+}
+
+.monaco-editor .mwh {
+	color: var(--vscode-editorWhitespace-foreground) !important;
+	position: absolute
+}
+
+.monaco-editor .noModificationsOverlay {
+	align-items: center;
+	background: var(--vscode-editor-background);
+	display: flex;
+	justify-content: center;
+	z-index: 1
+}
+
+.monaco-editor .view-zones .view-lines .view-line span {
+	display: inline-block
+}
+
+.monaco-editor .margin-view-zones .lightbulb-glyph:hover {
+	cursor: pointer
+}
+
+::-ms-clear {
+	display: none
+}
+
+.monaco-editor .editor-widget input {
+	color: inherit
+}
+
+.monaco-editor {
+	overflow: visible;
+	position: relative;
+	-webkit-text-size-adjust: 100%;
+	color: var(--vscode-editor-foreground)
+}
+
+.monaco-editor,
+.monaco-editor-background {
+	background-color: var(--vscode-editor-background)
+}
+
+.monaco-editor .rangeHighlight {
+	background-color: var(--vscode-editor-rangeHighlightBackground);
+	border: 1px solid var(--vscode-editor-rangeHighlightBorder);
+	box-sizing: border-box
+}
+
+.monaco-editor .symbolHighlight {
+	background-color: var(--vscode-editor-symbolHighlightBackground);
+	border: 1px solid var(--vscode-editor-symbolHighlightBorder);
+	box-sizing: border-box
+}
+
+.monaco-editor .overflow-guard {
+	overflow: hidden;
+	position: relative
+}
+
+.monaco-editor .view-overlays {
+	position: absolute;
+	top: 0
+}
+
+@keyframes fadein {
+	0% {
+		opacity: 0;
+		visibility: visible
+	}
+
+	to {
+		opacity: 1
+	}
+}
+
+.monaco-editor.vs .dnd-target {
+	border-right: 2px dotted #000;
+	color: #fff
+}
+
+.monaco-editor.vs-dark .dnd-target {
+	border-right: 2px dotted #aeafad;
+	color: #51504f
+}
+
+.monaco-editor.mouse-default .view-lines,
+.monaco-editor.vs-dark.mac.mouse-default .view-lines {
+	cursor: default
+}
+
+.monaco-editor.mouse-copy .view-lines,
+.monaco-editor.vs-dark.mac.mouse-copy .view-lines {
+	cursor: copy
+}
+
+.monaco-editor .margin-view-overlays .codicon-folding-collapsed,
+.monaco-editor .margin-view-overlays .codicon-folding-expanded,
+.monaco-editor .margin-view-overlays .codicon-folding-manual-collapsed,
+.monaco-editor .margin-view-overlays .codicon-folding-manual-expanded {
+	align-items: center;
+	cursor: pointer;
+	display: flex;
+	font-size: 140%;
+	justify-content: center;
+	margin-left: 2px;
+	opacity: 0;
+	transition: opacity .5s
+}
+
+.monaco-workbench.reduce-motion .monaco-editor .margin-view-overlays .codicon-folding-collapsed,
+.monaco-workbench.reduce-motion .monaco-editor .margin-view-overlays .codicon-folding-expanded,
+.monaco-workbench.reduce-motion .monaco-editor .margin-view-overlays .codicon-folding-manual-collapsed,
+.monaco-workbench.reduce-motion .monaco-editor .margin-view-overlays .codicon-folding-manual-expanded {
+	transition: initial
+}
+
+.monaco-editor .margin-view-overlays .codicon.alwaysShowFoldIcons,
+.monaco-editor .margin-view-overlays .codicon.codicon-folding-collapsed,
+.monaco-editor .margin-view-overlays .codicon.codicon-folding-manual-collapsed,
+.monaco-editor .margin-view-overlays:hover .codicon {
+	opacity: 1
+}
+
+.monaco-editor .inline-folded:after {
+	color: grey;
+	content: "\22EF";
+	cursor: pointer;
+	display: inline;
+	line-height: 1em;
+	margin: .1em .2em 0
+}
+
+.monaco-editor .folded-background {
+	background-color: var(--vscode-editor-foldBackground)
+}
+
+.monaco-editor .cldr.codicon.codicon-folding-collapsed,
+.monaco-editor .cldr.codicon.codicon-folding-expanded,
+.monaco-editor .cldr.codicon.codicon-folding-manual-collapsed,
+.monaco-editor .cldr.codicon.codicon-folding-manual-expanded {
+	color: var(--vscode-editorGutter-foldingControlForeground) !important
+}
+
+.monaco-editor .hoverHighlight {
+	background-color: var(--vscode-editor-hoverHighlightBackground)
+}
+
+.monaco-editor.vs .valueSetReplacement {
+	outline: solid 2px var(--vscode-editorBracketMatch-border)
+}
+
+.monaco-editor .suggest-preview-additional-widget {
+	white-space: nowrap
+}
+
+.monaco-editor .suggest-preview-additional-widget .content-spacer {
+	color: transparent;
+	white-space: pre
+}
+
+.monaco-editor .suggest-preview-additional-widget .button {
+	cursor: pointer;
+	display: inline-block;
+	text-decoration: underline;
+	text-underline-position: under
+}
+
+.monaco-editor .codicon.codicon-symbol-array,
+.monaco-workbench .codicon.codicon-symbol-array {
+	color: var(--vscode-symbolIcon-arrayForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-boolean,
+.monaco-workbench .codicon.codicon-symbol-boolean {
+	color: var(--vscode-symbolIcon-booleanForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-class,
+.monaco-workbench .codicon.codicon-symbol-class {
+	color: var(--vscode-symbolIcon-classForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-method,
+.monaco-workbench .codicon.codicon-symbol-method {
+	color: var(--vscode-symbolIcon-methodForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-color,
+.monaco-workbench .codicon.codicon-symbol-color {
+	color: var(--vscode-symbolIcon-colorForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-constant,
+.monaco-workbench .codicon.codicon-symbol-constant {
+	color: var(--vscode-symbolIcon-constantForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-constructor,
+.monaco-workbench .codicon.codicon-symbol-constructor {
+	color: var(--vscode-symbolIcon-constructorForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-enum,
+.monaco-editor .codicon.codicon-symbol-value,
+.monaco-workbench .codicon.codicon-symbol-enum,
+.monaco-workbench .codicon.codicon-symbol-value {
+	color: var(--vscode-symbolIcon-enumeratorForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-enum-member,
+.monaco-workbench .codicon.codicon-symbol-enum-member {
+	color: var(--vscode-symbolIcon-enumeratorMemberForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-event,
+.monaco-workbench .codicon.codicon-symbol-event {
+	color: var(--vscode-symbolIcon-eventForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-field,
+.monaco-workbench .codicon.codicon-symbol-field {
+	color: var(--vscode-symbolIcon-fieldForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-file,
+.monaco-workbench .codicon.codicon-symbol-file {
+	color: var(--vscode-symbolIcon-fileForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-folder,
+.monaco-workbench .codicon.codicon-symbol-folder {
+	color: var(--vscode-symbolIcon-folderForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-function,
+.monaco-workbench .codicon.codicon-symbol-function {
+	color: var(--vscode-symbolIcon-functionForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-interface,
+.monaco-workbench .codicon.codicon-symbol-interface {
+	color: var(--vscode-symbolIcon-interfaceForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-key,
+.monaco-workbench .codicon.codicon-symbol-key {
+	color: var(--vscode-symbolIcon-keyForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-keyword,
+.monaco-workbench .codicon.codicon-symbol-keyword {
+	color: var(--vscode-symbolIcon-keywordForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-module,
+.monaco-workbench .codicon.codicon-symbol-module {
+	color: var(--vscode-symbolIcon-moduleForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-namespace,
+.monaco-workbench .codicon.codicon-symbol-namespace {
+	color: var(--vscode-symbolIcon-namespaceForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-null,
+.monaco-workbench .codicon.codicon-symbol-null {
+	color: var(--vscode-symbolIcon-nullForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-number,
+.monaco-workbench .codicon.codicon-symbol-number {
+	color: var(--vscode-symbolIcon-numberForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-object,
+.monaco-workbench .codicon.codicon-symbol-object {
+	color: var(--vscode-symbolIcon-objectForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-operator,
+.monaco-workbench .codicon.codicon-symbol-operator {
+	color: var(--vscode-symbolIcon-operatorForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-package,
+.monaco-workbench .codicon.codicon-symbol-package {
+	color: var(--vscode-symbolIcon-packageForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-property,
+.monaco-workbench .codicon.codicon-symbol-property {
+	color: var(--vscode-symbolIcon-propertyForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-reference,
+.monaco-workbench .codicon.codicon-symbol-reference {
+	color: var(--vscode-symbolIcon-referenceForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-snippet,
+.monaco-workbench .codicon.codicon-symbol-snippet {
+	color: var(--vscode-symbolIcon-snippetForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-string,
+.monaco-workbench .codicon.codicon-symbol-string {
+	color: var(--vscode-symbolIcon-stringForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-struct,
+.monaco-workbench .codicon.codicon-symbol-struct {
+	color: var(--vscode-symbolIcon-structForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-text,
+.monaco-workbench .codicon.codicon-symbol-text {
+	color: var(--vscode-symbolIcon-textForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-type-parameter,
+.monaco-workbench .codicon.codicon-symbol-type-parameter {
+	color: var(--vscode-symbolIcon-typeParameterForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-unit,
+.monaco-workbench .codicon.codicon-symbol-unit {
+	color: var(--vscode-symbolIcon-unitForeground)
+}
+
+.monaco-editor .codicon.codicon-symbol-variable,
+.monaco-workbench .codicon.codicon-symbol-variable {
+	color: var(--vscode-symbolIcon-variableForeground)
+}
+
+.monaco-workbench .part {
+	box-sizing: border-box;
+	overflow: hidden
+}
+
+.monaco-workbench .part>.drop-block-overlay.visible {
+	visibility: visible
+}
+
+.monaco-workbench .part>.drop-block-overlay {
+	height: 100%;
+	opacity: 0;
+	position: absolute;
+	top: 0;
+	visibility: hidden;
+	width: 100%;
+	z-index: 12
+}
+
+.monaco-workbench .part>.title {
+	box-sizing: border-box;
+	display: none;
+	display: flex;
+	height: 35px;
+	overflow: hidden;
+	padding-left: 8px;
+	padding-right: 8px
+}
+
+.monaco-workbench .part>.title>.title-label {
+	line-height: 35px;
+	overflow: hidden;
+	padding-left: 12px;
+	text-overflow: ellipsis;
+	white-space: nowrap
+}
+
+.monaco-workbench .part>.title>.title-label h2 {
+	cursor: default;
+	font-size: 11px;
+	font-weight: 400;
+	margin: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap
+}
+
+.monaco-workbench .part>.title>.title-label a {
+	cursor: default;
+	font-size: 13px;
+	text-decoration: none
+}
+
+.monaco-workbench .part>.content {
+	font-size: 13px
+}
+
+@keyframes fadeIn {
+	0% {
+		opacity: 0
+	}
+
+	to {
+		opacity: 1
+	}
+}
+
+.mac {
+	font-family: -apple-system, BlinkMacSystemFont, sans-serif
+}
+
+.mac:lang(zh-Hans) {
+	font-family: -apple-system, BlinkMacSystemFont, PingFang SC, Hiragino Sans GB, sans-serif
+}
+
+.mac:lang(zh-Hant) {
+	font-family: -apple-system, BlinkMacSystemFont, PingFang TC, sans-serif
+}
+
+.mac:lang(ja) {
+	font-family: -apple-system, BlinkMacSystemFont, Hiragino Kaku Gothic Pro, sans-serif
+}
+
+.mac:lang(ko) {
+	font-family: -apple-system, BlinkMacSystemFont, Nanum Gothic, Apple SD Gothic Neo, AppleGothic, sans-serif
+}
+
+.windows {
+	font-family: Segoe WPC, Segoe UI, sans-serif
+}
+
+.windows:lang(zh-Hans) {
+	font-family: Segoe WPC, Segoe UI, Microsoft YaHei, sans-serif
+}
+
+.windows:lang(zh-Hant) {
+	font-family: Segoe WPC, Segoe UI, Microsoft Jhenghei, sans-serif
+}
+
+.windows:lang(ja) {
+	font-family: Segoe WPC, Segoe UI, Yu Gothic UI, Meiryo UI, sans-serif
+}
+
+.windows:lang(ko) {
+	font-family: Segoe WPC, Segoe UI, Malgun Gothic, Dotom, sans-serif
+}
+
+.linux {
+	font-family: system-ui, Ubuntu, Droid Sans, sans-serif
+}
+
+.linux:lang(zh-Hans) {
+	font-family: system-ui, Ubuntu, Droid Sans, Source Han Sans SC, Source Han Sans CN, Source Han Sans, sans-serif
+}
+
+.linux:lang(zh-Hant) {
+	font-family: system-ui, Ubuntu, Droid Sans, Source Han Sans TC, Source Han Sans TW, Source Han Sans, sans-serif
+}
+
+.linux:lang(ja) {
+	font-family: system-ui, Ubuntu, Droid Sans, Source Han Sans J, Source Han Sans JP, Source Han Sans, sans-serif
+}
+
+.linux:lang(ko) {
+	font-family: system-ui, Ubuntu, Droid Sans, Source Han Sans K, Source Han Sans JR, Source Han Sans, UnDotum, FBaekmuk Gulim, sans-serif
+}
+
+.mac {
+	--monaco-monospace-font: "SF Mono", Monaco, Menlo, Courier, monospace
+}
+
+.windows {
+	--monaco-monospace-font: Consolas, "Courier New", monospace
+}
+
+.linux {
+	--monaco-monospace-font: "Ubuntu Mono", "Liberation Mono", "DejaVu Sans Mono", "Courier New", monospace
+}
+
+body.web {
+	position: fixed
+}
+
+.monaco-workbench {
+	color: var(--vscode-foreground);
+	font-size: 13px;
+	line-height: 1.4em;
+	overflow: hidden;
+	position: relative;
+	z-index: 1
+}
+
+.monaco-workbench.web {
+	touch-action: none
+}
+
+.monaco-workbench.border:not(.fullscreen) {
+	border: 1px solid var(--window-border-color);
+	box-sizing: border-box
+}
+
+.monaco-workbench.border.mac {
+	border-radius: 5px
+}
+
+.monaco-workbench.border.mac.macos-bigsur-or-newer {
+	border-radius: 10px
+}
+
+.monaco-workbench img {
+	border: 0
+}
+
+.monaco-workbench label {
+	cursor: pointer
+}
+
+.monaco-workbench a {
+	text-decoration: none
+}
+
+.monaco-workbench a:active {
+	background-color: inherit;
+	color: inherit
+}
+
+.monaco-workbench a.plain,
+.monaco-workbench a.plain.hover,
+.monaco-workbench a.plain:hover {
+	color: inherit;
+	text-decoration: none
+}
+
+.monaco-workbench input {
+	color: inherit;
+	font-family: inherit;
+	font-size: 100%
+}
+
+.monaco-workbench input::placeholder {
+	color: var(--vscode-input-placeholderForeground)
+}
+
+.monaco-workbench input::-webkit-input-placeholder {
+	color: var(--vscode-input-placeholderForeground)
+}
+
+.monaco-workbench input::-moz-placeholder {
+	color: var(--vscode-input-placeholderForeground)
+}
+
+.monaco-workbench textarea::placeholder {
+	color: var(--vscode-input-placeholderForeground)
+}
+
+.monaco-workbench textarea::-webkit-input-placeholder {
+	color: var(--vscode-input-placeholderForeground)
+}
+
+.monaco-workbench textarea::-moz-placeholder {
+	color: var(--vscode-input-placeholderForeground)
+}
+
+.monaco-workbench .pointer {
+	cursor: pointer
+}
+
+.monaco-workbench.mac.monaco-font-aliasing-antialiased {
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale
+}
+
+.monaco-workbench.mac.monaco-font-aliasing-none {
+	-webkit-font-smoothing: none;
+	-moz-osx-font-smoothing: unset
+}
+
+@media (-webkit-min-device-pixel-ratio:2),
+(min-resolution:192dpi) {
+	.monaco-workbench.mac.monaco-font-aliasing-auto {
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale
+	}
+}
+
+.monaco-workbench .codicon {
+	color: var(--vscode-icon-foreground)
+}
+
+.monaco-workbench .codicon[class*=codicon-] {
+	font-size: 16px
+}
+
+.monaco-workbench .predefined-file-icon[class*=codicon-]:before {
+	font-family: codicon;
+	padding-left: 3px;
+	padding-right: 3px;
+	width: 16px
+}
+
+.monaco-workbench:not(.file-icons-enabled) .predefined-file-icon[class*=codicon-]:before {
+	content: unset !important
+}
+
+.monaco-workbench select {
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	border: 1px solid;
+	font-family: inherit
+}
+
+.monaco-workbench .select-container {
+	position: relative
+}
+
+.monaco-workbench .select-container:after {
+	bottom: 0;
+	content: "\eab4";
+	font-family: codicon;
+	font-size: 16px;
+	height: 16px;
+	line-height: 16px;
+	margin: auto;
+	pointer-events: none;
+	position: absolute;
+	right: 6px;
+	top: 0;
+	width: 16px
+}
+
+.monaco-workbench .synthetic-focus,
+.monaco-workbench [tabindex="-1"]:focus,
+.monaco-workbench [tabindex="0"]:focus,
+.monaco-workbench button:focus,
+.monaco-workbench input[type=button]:focus,
+.monaco-workbench input[type=checkbox]:focus,
+.monaco-workbench input[type=search]:focus,
+.monaco-workbench input[type=text]:focus,
+.monaco-workbench select:focus,
+.monaco-workbench textarea:focus {
+	opacity: 1;
+	outline-color: var(--vscode-focusBorder);
+	outline-offset: -1px;
+	outline-style: solid;
+	outline-width: 1px
+}
+
+.monaco-workbench input[type=checkbox]:focus {
+	outline-offset: 2px
+}
+
+.monaco-workbench [tabindex="-1"]:active,
+.monaco-workbench [tabindex="0"]:active,
+.monaco-workbench input[type=button]:active,
+.monaco-workbench input[type=checkbox]:active,
+.monaco-workbench select:active {
+	outline: 0 !important
+}
+
+.monaco-workbench.mac select:focus {
+	border-color: transparent
+}
+
+.monaco-workbench .monaco-list:not(.element-focused):focus:before {
+	content: "";
+	height: 100%;
+	left: 0;
+	outline: 1px solid;
+	outline-color: var(--vscode-focusBorder);
+	outline-offset: -1px;
+	outline-style: solid;
+	outline-width: 1px;
+	pointer-events: none;
+	position: absolute;
+	top: 0;
+	width: 100%;
+	z-index: 15
+}
+
+.monaco-workbench .monaco-list .monaco-list-row .monaco-highlighted-label .highlight {
+	color: var(--vscode-list-highlightForeground)
+}
+
+.monaco-workbench .monaco-list .monaco-list-row.focused .monaco-highlighted-label .highlight {
+	color: var(--vscode-list-focusHighlightForeground)
+}
+
+.monaco-workbench .monaco-list:focus,
+.monaco-workbench .synthetic-focus :focus {
+	outline: 0 !important
+}
+
+.monaco-workbench .monaco-action-bar:not(.vertical) .action-label:not(.disabled):hover,
+.monaco-workbench .monaco-action-bar:not(.vertical) .monaco-dropdown-with-primary:not(.disabled):hover {
+	background-color: var(--vscode-toolbar-hoverBackground)
+}
+
+.monaco-workbench .monaco-action-bar:not(.vertical) .action-item.active .action-label:not(.disabled),
+.monaco-workbench .monaco-action-bar:not(.vertical) .monaco-dropdown.active .action-label:not(.disabled) {
+	background-color: var(--vscode-toolbar-activeBackground)
+}
+
+.monaco-workbench .monaco-action-bar:not(.vertical) .action-item .action-label:hover:not(.disabled) {
+	outline: 1px dashed var(--vscode-toolbar-hoverOutline);
+	outline-offset: -1px
+}
+
+.monaco-workbench.noauxiliarybar .part.auxiliarybar {
+	display: none !important;
+	visibility: hidden !important
+}
+
+.monaco-workbench .part.editor>.content .grid-view-container {
+	height: 100%;
+	width: 100%
+}
+
+.monaco-workbench.nopanel .part.panel {
+	display: none !important;
+	visibility: hidden !important
+}
+
+.monaco-workbench .part.panel.right {
+	border-left-style: solid;
+	border-left-width: 1px
+}
+
+.monaco-workbench .part.panel.left {
+	border-right-style: solid;
+	border-right-width: 1px
+}
+
+.monaco-workbench .part.panel>.content .monaco-editor,
+.monaco-workbench .part.panel>.content .monaco-editor .margin,
+.monaco-workbench .part.panel>.content .monaco-editor .monaco-editor-background {
+	background-color: var(--vscode-panel-background)
+}
+
+.monaco-workbench .part.panel>.content .suggest-input-container .monaco-editor,
+.monaco-workbench .part.panel>.content .suggest-input-container .monaco-editor .margin,
+.monaco-workbench .part.panel>.content .suggest-input-container .monaco-editor .monaco-editor-background {
+	background-color: inherit
+}
+
+.monaco-tl-contents .monaco-highlighted-label .highlight {
+	background-color: var(--vscode-list-filterMatchBackground);
+	color: unset !important;
+	outline: 1px dotted var(--vscode-list-filterMatchBorder);
+	outline-offset: -1px
+}
+
+.suggest-input-container {
+	border-radius: 2px;
+	padding: 2px 6px
+}
+
+.suggest-input-container .monaco-editor,
+.suggest-input-container .monaco-editor-background,
+.suggest-input-container .mtk1 {
+	color: inherit
+}
+
+.suggest-input-container .suggest-input-placeholder {
+	margin-top: 1px;
+	overflow: hidden;
+	pointer-events: none;
+	position: absolute;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	z-index: 1
+}
+
+.suggest-input-container .monaco-editor,
+.suggest-input-container .monaco-editor .lines-content {
+	background: none !important
+}
+
+
+
+.webview.modified {
+	box-shadow: -6px 0 5px -5px var(--vscode-scrollbar-shadow)
+}
+
+.find-filter-button .monaco-action-bar .action-label {
+	padding: 0
+}
+
+.settings-tabs-widget>.monaco-action-bar .action-item.disabled {
+	display: none
+}
+
+.settings-tabs-widget>.monaco-action-bar .action-item {
+	max-width: 300px;
+	overflow: hidden;
+	text-overflow: ellipsis
+}
+
+.settings-tabs-widget>.monaco-action-bar .action-item .action-label {
+	cursor: pointer;
+	display: flex;
+	font-size: 11px;
+	margin-right: 5px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-transform: uppercase
+}
+
+.settings-tabs-widget>.monaco-action-bar .action-item .action-label {
+	background: none !important;
+	border-radius: initial;
+	display: block;
+	padding: 0
+}
+
+.settings-tabs-widget>.monaco-action-bar .action-item .action-label.folder-settings {
+	display: flex
+}
+
+.settings-tabs-widget>.monaco-action-bar .action-item {
+	padding: 3px 0
+}
+
+.settings-tabs-widget>.monaco-action-bar .action-item .action-title {
+	overflow: hidden;
+	text-overflow: ellipsis
+}
+
+.settings-tabs-widget>.monaco-action-bar .action-item .action-details {
+	font-size: 10px;
+	margin-left: .5em;
+	opacity: .7;
+	text-transform: none
+}
+
+.settings-tabs-widget .monaco-action-bar .action-item .dropdown-icon {
+	font-size: 12px;
+	padding-left: .3em;
+	padding-top: 8px
+}
+
+.settings-tabs-widget .monaco-action-bar .action-item .dropdown-icon.hide {
+	display: none
+}
+
+.settings-tabs-widget>.monaco-action-bar .action-item .action-label {
+	color: var(--vscode-panelTitle-inactiveForeground)
+}
+
+.settings-tabs-widget>.monaco-action-bar .action-item .action-label.checked,
+.settings-tabs-widget>.monaco-action-bar .action-item .action-label:hover {
+	border-bottom: 1px solid var(--vscode-panelTitle-activeBorder);
+	color: var(--vscode-panelTitle-activeForeground);
+	outline: 1px solid var(--vscode-contrastActiveBorder, transparent);
+	outline-offset: -1px
+}
+
+.settings-tabs-widget>.monaco-action-bar .action-item .action-label:focus {
+	border-bottom: 1px solid var(--vscode-focusBorder);
+	outline: 1px solid transparent;
+	outline-offset: -1px
+}
+
+.settings-tabs-widget>.monaco-action-bar .action-item .action-label:not(.checked):hover {
+	outline-style: dashed
+}
+
+.preferences-header>.settings-header-widget {
+	align-self: stretch;
+	display: flex;
+	flex: 1;
+	position: relative
+}
+
+.settings-header-widget>.settings-search-controls>.settings-count-widget {
+	border-radius: 2px;
+	float: left;
+	margin: 6px 0;
+	padding: 0 8px
+}
+
+.settings-header-widget>.settings-search-controls {
+	position: absolute;
+	right: 10px
+}
+
+.settings-header-widget>.settings-search-controls>.settings-count-widget.hide {
+	display: none
+}
+
+.settings-header-widget>.settings-search-container {
+	flex: 1
+}
+
+.settings-header-widget>.settings-search-container>.settings-search-input {
+	vertical-align: middle
+}
+
+
+.monaco-editor .view-zones>.settings-header-widget {
+	z-index: 1
+}
+
+.monaco-editor .settings-header-widget .title-container {
+	display: flex;
+	user-select: none;
+	-webkit-user-select: none
+}
+
+.monaco-editor .settings-header-widget .title-container .title {
+	font-weight: 700;
+	text-transform: uppercase;
+	white-space: nowrap
+}
+
+.monaco-editor .settings-header-widget .title-container .message {
+	white-space: nowrap
+}
+
+.monaco-editor .settings-group-title-widget {
+	z-index: 1
+}
+
+.monaco-editor .settings-group-title-widget .title-container {
+	cursor: pointer;
+	display: flex;
+	font-weight: 700;
+	user-select: none;
+	-webkit-user-select: none;
+	width: 100%
+}
+
+.monaco-editor .settings-group-title-widget .title-container .title {
+	overflow: hidden;
+	white-space: nowrap
+}
+
+.monaco-editor.vs .settings-group-title-widget .title-container.focused,
+.monaco-editor.vs-dark .settings-group-title-widget .title-container.focused {
+	outline: none !important
+}
+
+.monaco-editor .settings-group-title-widget .title-container.focused,
+.monaco-editor .settings-group-title-widget .title-container:hover {
+	background-color: hsla(0, 0%, 60%, .2)
+}
+
+.monaco-editor .settings-group-title-widget .title-container .codicon {
+	align-items: center;
+	display: flex;
+	height: 100%;
+	justify-content: center;
+	margin: 0 2px;
+	width: 16px
+}
+
+.codicon-settings-edit:hover {
+	cursor: pointer
+}
+
+.editor-instance#workbench\.editor\.settings2:focus {
+	outline: none
+}
+
+.settings-editor {
+	height: 100%;
+	margin: auto;
+	max-width: 1200px;
+	overflow: hidden
+}
+
+.settings-editor:focus {
+	outline: none !important
+}
+
+.settings-editor>.settings-header {
+	box-sizing: border-box;
+	margin: 11px auto auto;
+	max-width: 1200px;
+	overflow: hidden;
+	padding-left: 24px;
+	padding-right: 24px;
+	padding-top: 3px
+}
+
+.settings-editor>.settings-header>.search-container {
+	position: relative
+}
+
+.monaco-workbench.vs .settings-editor>.settings-header>.search-container>.suggest-input-container {
+	border: 1px solid #ddd
+}
+
+.settings-editor>.settings-header>.search-container>.settings-count-widget {
+	margin: 4px 0;
+	position: absolute;
+	right: 46px;
+	top: 0
+}
+
+.settings-editor>.settings-header>.search-container>.settings-count-widget:empty {
+	visibility: hidden
+}
+
+.settings-editor>.settings-header>.search-container>.settings-clear-widget {
+	align-items: center;
+	display: flex;
+	height: 100%;
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 43px
+}
+
+.settings-editor>.settings-header>.search-container>.settings-clear-widget .action-label {
+	padding: 2px
+}
+
+.settings-editor>.settings-header>.settings-header-controls {
+	border-bottom: 1px solid;
+	display: flex;
+	height: 32px;
+	margin-top: 10px
+}
+
+.settings-editor>.settings-header>.settings-header-controls .settings-target-container {
+	flex: auto
+}
+
+.settings-editor>.settings-header>.settings-header-controls .settings-tabs-widget .action-label {
+	border-radius: 0;
+	color: var(--vscode-foreground);
+	opacity: .9
+}
+
+.settings-editor>.settings-header>.settings-header-controls .last-synced-label {
+	opacity: .9;
+	padding-top: 7px
+}
+
+.settings-editor .settings-tabs-widget>.monaco-action-bar .action-item .action-details {
+	opacity: .9
+}
+
+.settings-editor>.settings-header>.settings-header-controls .settings-tabs-widget .action-label:hover {
+	opacity: 1
+}
+
+.settings-editor>.settings-header>.settings-header-controls .settings-tabs-widget .action-label.checked {
+	color: var(--vscode-settings-headerForeground);
+	opacity: 1
+}
+
+.settings-editor>.settings-header>.settings-header-controls .settings-tabs-widget .action-label.checked:not(:focus) {
+	border-bottom-color: var(--vscode-settings-headerForeground)
+}
+
+.settings-editor>.settings-header .settings-tabs-widget>.monaco-action-bar .action-item .action-label {
+	margin-right: 0
+}
+
+.settings-editor>.settings-header .settings-tabs-widget .monaco-action-bar .action-item .dropdown-icon {
+	padding-top: 3px
+}
+
+.settings-editor>.settings-header>.settings-header-controls .settings-tabs-widget>.monaco-action-bar .action-item {
+	padding: 0
+}
+
+.settings-editor>.settings-header>.settings-header-controls .settings-tabs-widget>.monaco-action-bar .action-item .action-label {
+	font-size: 13px;
+	padding: 7px 8px 6.5px;
+	text-transform: none
+}
+
+.settings-editor>.settings-header>.settings-header-controls .settings-tabs-widget>.monaco-action-bar .action-item .action-label .dropdown-icon {
+	padding-top: 2px
+}
+
+.settings-editor>.settings-header>.settings-header-controls .settings-tabs-widget>.monaco-action-bar .action-item .action-label:not(.checked):not(:focus) {
+	border-bottom: 1px solid transparent
+}
+
+.settings-editor>.settings-body {
+	position: relative
+}
+
+.settings-editor>.settings-body>.no-results-message {
+	box-sizing: border-box;
+	display: none;
+	margin: 20px auto auto;
+	max-width: 1200px;
+	padding-left: 24px;
+	padding-right: 24px
+}
+
+.settings-editor>.settings-body>.monaco-split-view2 {
+	margin-top: 14px
+}
+
+.settings-editor>.settings-body .settings-toc-container,
+.settings-editor>.settings-body .settings-tree-container {
+	height: 100%
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-label,
+.settings-editor>.settings-body .settings-tree-container .settings-group-title-label {
+	color: var(--vscode-settings-headerForeground)
+}
+
+.settings-editor.no-results>.settings-body .settings-toc-container,
+.settings-editor.no-results>.settings-body .settings-tree-container {
+	display: none
+}
+
+.settings-editor.no-results>.settings-body>.no-results-message {
+	display: block
+}
+
+.settings-editor>.settings-body>.no-results-message a.prominent {
+	text-decoration: underline
+}
+
+.settings-editor.narrow-width>.settings-body .settings-tree-container .monaco-list-row .monaco-tl-contents {
+	padding-left: 33px
+}
+
+.settings-editor>.settings-body .settings-tree-container .monaco-list-row {
+	outline: none !important
+}
+
+.settings-editor>.settings-body .settings-tree-container .monaco-list-row .monaco-tl-twistie {
+	display: none !important
+}
+
+.settings-editor>.settings-body .settings-tree-container .monaco-list-row.focused .settings-row-inner-container {
+	background-color: var(--vscode-settings-focusedRowBackground)
+}
+
+.settings-editor>.settings-body .settings-tree-container .monaco-tree-sticky-container .monaco-list-row.focused .settings-row-inner-container {
+	background-color: unset
+}
+
+.settings-editor>.settings-body .settings-tree-container .monaco-list-row:not(.focused) .settings-row-inner-container:hover {
+	background-color: var(--vscode-settings-rowHoverBackground)
+}
+
+.settings-editor>.settings-body .settings-tree-container .monaco-list:focus-within .monaco-list-row.focused .setting-item-contents,
+.settings-editor>.settings-body .settings-tree-container .monaco-list:focus-within .monaco-list-row.focused .settings-group-title-label {
+	outline: 1px solid var(--vscode-settings-focusedRowBorder)
+}
+
+.settings-editor>.settings-body .settings-tree-container .monaco-list:focus-within .monaco-tree-sticky-container .monaco-list-row.focused .settings-group-title-label {
+	outline: none
+}
+
+.settings-editor>.settings-body .settings-tree-container .settings-editor-tree>.monaco-scrollable-element>.shadow.top {
+	z-index: 11
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-toolbar-container {
+	bottom: 0;
+	height: 22px;
+	left: -22px;
+	position: absolute;
+	top: 8px;
+	width: 22px
+}
+
+.settings-editor>.settings-body .settings-tree-container .monaco-list-row .mouseover .setting-toolbar-container>.monaco-toolbar .codicon,
+.settings-editor>.settings-body .settings-tree-container .monaco-list-row .setting-toolbar-container:hover>.monaco-toolbar .codicon,
+.settings-editor>.settings-body .settings-tree-container .monaco-list-row .setting-toolbar-container>.monaco-toolbar .active .codicon,
+.settings-editor>.settings-body .settings-tree-container .monaco-list-row.focused .setting-item-contents .setting-toolbar-container>.monaco-toolbar .codicon {
+	opacity: 1
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-toolbar-container>.monaco-toolbar .codicon {
+	align-items: center;
+	display: flex;
+	justify-content: center;
+	opacity: 0
+}
+
+.monaco-workbench:not(.reduce-motion) .settings-editor>.settings-body .settings-tree-container .setting-toolbar-container>.monaco-toolbar .codicon {
+	transition: opacity .3s
+}
+
+.settings-editor>.settings-body .settings-toc-container {
+	pointer-events: none;
+	position: absolute;
+	width: 100%;
+	z-index: 10
+}
+
+.settings-editor>.settings-body .settings-toc-container .monaco-list {
+	pointer-events: auto
+}
+
+.settings-editor.narrow-width>.settings-body .settings-toc-container {
+	display: none
+}
+
+.settings-editor>.settings-body .settings-toc-container .monaco-list-row:not(.selected) {
+	color: var(--vscode-foreground);
+	opacity: .9
+}
+
+.settings-editor>.settings-body .settings-toc-container .monaco-list-row .monaco-tl-contents {
+	display: flex
+}
+
+.settings-editor>.settings-body .settings-toc-container .monaco-list-row .settings-toc-entry {
+	flex-shrink: 1;
+	line-height: 22px;
+	overflow: hidden;
+	text-overflow: ellipsis
+}
+
+.settings-editor>.settings-body .settings-toc-container .monaco-list-row .settings-toc-count {
+	display: none;
+	line-height: 22px;
+	margin-left: 3px;
+	opacity: .8
+}
+
+.settings-editor>.settings-body .settings-toc-container .monaco-list-row.selected .settings-toc-entry {
+	font-weight: 700
+}
+
+.settings-editor>.settings-body .settings-tree-container {
+	border-collapse: separate;
+	border-spacing: 0;
+	position: relative
+}
+
+.settings-editor>.settings-body .settings-toc-container .monaco-scrollable-element,
+.settings-editor>.settings-body .settings-tree-container .monaco-scrollable-element {
+	padding-top: 0
+}
+
+.settings-editor>.settings-body .settings-toc-wrapper {
+	height: 100%;
+	margin: auto;
+	max-width: 1200px;
+	padding-left: 24px
+}
+
+.settings-editor.narrow-width>.settings-body .settings-tree-container {
+	margin-left: 0
+}
+
+.settings-editor>.settings-body .settings-tree-container .monaco-list-row {
+	cursor: default;
+	line-height: 1.4em !important;
+	overflow: visible
+}
+
+.settings-editor>.settings-body .settings-tree-container .monaco-list-rows {
+	min-height: 100%;
+	overflow: visible !important
+}
+
+.settings-editor>.settings-body .settings-tree-container .monaco-list-row .monaco-tl-contents {
+	box-sizing: border-box;
+	margin: auto;
+	max-width: min(100%, 1200px);
+	overflow: visible;
+	padding-left: 24px;
+	padding-right: 24px
+}
+
+.settings-editor>.settings-body .settings-tree-container .monaco-list-row .monaco-tl-contents.group-title {
+	max-width: min(100%, 1200px)
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents,
+.settings-editor>.settings-body .settings-tree-container .settings-group-title-label {
+	outline-offset: -1px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents {
+	padding: 12px 14px 18px;
+	position: relative;
+	white-space: normal
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-title {
+	display: inline-block;
+	overflow: hidden;
+	padding-bottom: 2px;
+	text-overflow: ellipsis
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-modified-indicator {
+	border-color: var(--vscode-settings-modifiedItemIndicator);
+	display: none
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents.is-configured .setting-item-modified-indicator {
+	border-left-style: solid;
+	border-left-width: 2px;
+	bottom: 18px;
+	content: " ";
+	display: block;
+	left: 5px;
+	position: absolute;
+	top: 15px;
+	width: 6px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-bool .setting-item-contents.is-configured .setting-item-modified-indicator,
+.settings-editor>.settings-body .settings-tree-container .setting-item-list .setting-item-contents.is-configured .setting-item-modified-indicator {
+	bottom: 23px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-title>.setting-indicators-container {
+	font-style: italic
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-title .setting-item-ignored,
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-title .setting-item-overrides {
+	color: var(--vscode-foreground);
+	opacity: .9
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-title>.setting-indicators-container .setting-indicator {
+	padding-bottom: 2px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-title .codicon {
+	padding-left: 1px;
+	vertical-align: middle
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-title .setting-item-label .codicon {
+	vertical-align: middle
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-title .setting-item-overrides a.modified-scope {
+	cursor: pointer;
+	text-decoration: underline
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-label {
+	margin-right: 7px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-cat-label-container {
+	float: left
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-category,
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-label {
+	font-weight: 600;
+	user-select: text;
+	-webkit-user-select: text
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-category {
+	opacity: .9
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-deprecation-message {
+	color: var(--vscode-errorForeground);
+	display: none;
+	margin-top: 3px;
+	user-select: text;
+	-webkit-user-select: text
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents.is-deprecated .setting-item-deprecation-message {
+	display: flex
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents.is-deprecated .setting-item-deprecation-message .codicon {
+	color: inherit;
+	margin-right: 4px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-description {
+	color: var(--vscode-foreground);
+	margin-top: -1px;
+	opacity: .9;
+	user-select: text;
+	-webkit-user-select: text
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-validation-message {
+	background-color: var(--vscode-inputValidation-errorBackground);
+	border: 1px solid var(--vscode-inputValidation-errorBorder);
+	color: var(--vscode-inputValidation-errorForeground);
+	display: none
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item .setting-item-contents.invalid-input .setting-item-validation-message {
+	box-sizing: border-box;
+	display: block;
+	margin-top: -1px;
+	padding: 5px;
+	position: absolute;
+	z-index: 1
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-item-contents.invalid-input .setting-item-validation-message {
+	margin-top: 1rem;
+	position: static
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-text .setting-item-validation-message {
+	width: 420px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-number .setting-item-validation-message {
+	width: 200px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-number input[type=number]::-webkit-inner-spin-button {
+	-webkit-appearance: none !important
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-number input[type=number] {
+	-moz-appearance: textfield !important;
+	appearance: textfield !important
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-markdown * {
+	margin: 0
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-markdown :not(:last-child) {
+	margin-bottom: 8px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .edit-in-settings-button {
+	opacity: .9
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .edit-in-settings-button,
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a,
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a>code {
+	color: var(--vscode-textLink-foreground)
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .edit-in-settings-button:focus,
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-color: var(--vscode-focusBorder);
+	outline-offset: -1px;
+	text-decoration: underline
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .edit-in-settings-button:active,
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .edit-in-settings-button:hover,
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a:active,
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a:active>code,
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a:hover,
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a:hover>code {
+	color: var(--vscode-textLink-activeForeground)
+}
+
+.settings-editor>.settings-body .settings-tree-container .edit-in-settings-button:hover,
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-markdown a:hover {
+	cursor: pointer;
+	text-decoration: underline
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-markdown code {
+	background-color: var(--vscode-textPreformat-background);
+	border-radius: 4px;
+	color: var(--vscode-textPreformat-foreground);
+	font-family: var(--monaco-monospace-font);
+	font-size: 11px;
+	line-height: 15px;
+	padding: 1px 3px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-markdown .monaco-tokenized-source {
+	font-family: var(--monaco-monospace-font);
+	white-space: pre
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-enumDescription {
+	display: block
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-bool .setting-item-contents,
+.settings-editor>.settings-body .settings-tree-container .setting-item-list .setting-item-contents {
+	padding-bottom: 26px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-bool .setting-item-value-description {
+	cursor: pointer;
+	display: flex
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-bool .setting-value-checkbox {
+	border: 1px solid transparent;
+	border-radius: 3px;
+	height: 18px;
+	margin-left: 0;
+	margin-right: 9px;
+	padding: 0;
+	width: 18px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-bool .setting-value-checkbox.codicon:not(.checked):before {
+	opacity: 0
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .setting-item-value {
+	display: flex;
+	margin-top: 9px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-number .setting-item-value>.setting-item-control {
+	min-width: 200px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-text .setting-item-control {
+	width: 420px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-enum .setting-item-value>.setting-item-control,
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-text .setting-item-value>.setting-item-control {
+	min-width: auto
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-enum .setting-item-value>.setting-item-control>select {
+	width: 320px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-contents .monaco-select-box {
+	font: inherit;
+	height: 26px;
+	padding: 2px 6px;
+	width: auto
+}
+
+.monaco-select-box-dropdown-container>.select-box-details-pane>.select-box-description-markdown code {
+	background-color: var(--vscode-textPreformat-background);
+	border-radius: 4px;
+	color: var(--vscode-textPreformat-foreground);
+	font-family: var(--monaco-monospace-font);
+	font-size: 12px;
+	padding: 2px 5px
+}
+
+.monaco-select-box-dropdown-container>.select-box-details-pane>.select-box-description-markdown a,
+.monaco-select-box-dropdown-container>.select-box-details-pane>.select-box-description-markdown a>code {
+	color: var(--vscode-textLink-foreground)
+}
+
+.monaco-select-box-dropdown-container>.select-box-details-pane>.select-box-description-markdown a:active,
+.monaco-select-box-dropdown-container>.select-box-details-pane>.select-box-description-markdown a:active>code,
+.monaco-select-box-dropdown-container>.select-box-details-pane>.select-box-description-markdown a:hover,
+.monaco-select-box-dropdown-container>.select-box-details-pane>.select-box-description-markdown a:hover>code {
+	color: var(--vscode-textLink-activeForeground)
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-new-extensions {
+	display: flex
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-new-extensions .settings-new-extensions-button {
+	margin: auto auto 15px;
+	padding: 4px 10px;
+	width: auto
+}
+
+.settings-editor>.settings-body .settings-tree-container .group-title {
+	cursor: default
+}
+
+.settings-editor>.settings-body .settings-tree-container .settings-group-title-label {
+	box-sizing: border-box;
+	display: inline-block;
+	font-weight: 600;
+	height: 100%;
+	margin: 0;
+	overflow: hidden;
+	padding: 10px 10px 10px 15px;
+	position: relative;
+	text-overflow: ellipsis;
+	width: 100%
+}
+
+.settings-editor>.settings-body .settings-tree-container .settings-group-title-label.settings-group-level-1 {
+	font-size: 26px
+}
+
+.settings-editor>.settings-body .settings-tree-container .settings-group-title-label.settings-group-level-2 {
+	font-size: 22px
+}
+
+.settings-editor>.settings-body .settings-tree-container .settings-group-title-label.settings-group-level-3 {
+	font-size: 18px
+}
+
+.settings-editor.search-mode>.settings-body .settings-toc-container .monaco-list-row .settings-toc-count {
+	display: block
+}
+
+.settings-editor>.settings-body .settings-toc-container .monaco-list-row.focused .codicon,
+.settings-editor>.settings-body .settings-tree-container .monaco-list-row.focused .setting-item-contents .codicon,
+.settings-editor>.settings-body .settings-tree-container .setting-item-bool .codicon {
+	color: inherit !important
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-item-value>.setting-item-control {
+	width: 100%
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-object-key,
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-value {
+	margin-left: 2px;
+	margin-right: 3px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-object-key,
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-object-value,
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-sibling,
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-value {
+	overflow-wrap: normal;
+	white-space: normal
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-bool .setting-value-checkbox {
+	background-color: var(--vscode-settings-checkboxBackground) !important;
+	border-color: var(--vscode-settings-checkboxBorder) !important;
+	color: var(--vscode-settings-checkboxForeground) !important
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-bool .setting-list-object-input-key-checkbox {
+	height: 24px;
+	margin-left: 4px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item-bool .setting-list-object-input-key-checkbox .setting-value-checkbox {
+	margin-top: 3px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-item-bool .setting-list-object-value {
+	cursor: pointer;
+	width: 100%
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-object-key {
+	margin-left: 4px;
+	width: 40%
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-object-input-key {
+	margin-left: 0;
+	min-width: 40%
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-object-input-value,
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-object-value {
+	width: 100%
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-row .setting-list-object-value,
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-value {
+	box-sizing: border-box;
+	padding-right: 40px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-object-value {
+	width: 60%
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-object-key,
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-object-value,
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-sibling,
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-value {
+	display: inline-block;
+	line-height: 24px;
+	min-height: 24px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-include-exclude-widget .setting-list-sibling,
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-include-exclude-widget .setting-list-value {
+	font-family: var(--monaco-monospace-font)
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-sibling {
+	font-size: .9em;
+	margin-left: .5em;
+	opacity: .7;
+	white-space: pre
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-row .monaco-action-bar {
+	display: none;
+	position: absolute;
+	right: 0;
+	top: 0
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-row {
+	display: flex
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-row:hover {
+	background-color: var(--vscode-list-hoverBackground);
+	color: var(--vscode-list-hoverForeground)
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-row.selected:focus {
+	background-color: var(--vscode-list-activeSelectionBackground);
+	color: var(--vscode-list-activeSelectionForeground)
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-row.selected:not(:focus) {
+	background-color: var(--vscode-list-inactiveSelectionBackground);
+	color: var(--vscode-list-inactiveSelectionForeground)
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-row.draggable {
+	cursor: pointer;
+	user-select: none
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-row.drag-hover {
+	background-color: var(--vscode-list-dropBackground)
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-row.drag-hover * {
+	pointer-events: none
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-row,
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-row-header {
+	max-height: 24px;
+	position: relative
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-row-header {
+	font-weight: 700
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-row,
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-row-header {
+	display: flex;
+	padding-right: 4px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-edit-row.setting-list-object-row:nth-child(odd):hover,
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-object-row:nth-child(odd):not(:hover):not(:focus):not(.selected),
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-row-header {
+	background-color: hsla(0, 0%, 51%, .04)
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-row.selected .monaco-action-bar,
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-row:hover .monaco-action-bar {
+	display: block
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-row .monaco-action-bar .action-label {
+	align-items: center;
+	color: inherit;
+	display: flex;
+	height: 20px;
+	justify-content: center;
+	margin-right: 2px;
+	padding: 2px;
+	width: 16px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-row .monaco-action-bar .setting-listAction-edit {
+	margin-right: 4px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .monaco-text-button {
+	padding: 2px 14px;
+	white-space: nowrap;
+	width: auto
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-item-control.setting-list-hide-add-button .setting-list-new-row {
+	display: none
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .monaco-text-button.setting-list-addButton {
+	display: inline-block;
+	margin-right: 4px;
+	margin-top: 4px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-edit-row,
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-row {
+	display: flex
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-object-input,
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-siblingInput,
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-valueInput {
+	height: 24px;
+	margin-right: 4px;
+	max-width: 320px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-object-input,
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-valueInput.no-sibling {
+	max-width: unset
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-valueInput.no-sibling {
+	width: 100%
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-object-value-container .setting-list-object-input {
+	margin-right: 0
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-ok-button {
+	margin: 0 4px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-include-exclude-widget,
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget,
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-widget {
+	margin-bottom: 1px;
+	padding: 1px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-object-input select,
+.settings-editor>.settings-body .settings-tree-container .setting-item.setting-item-list .setting-list-object-widget .setting-list-object-value-container {
+	height: 24px;
+	width: 100%
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-list-widget .setting-list-object-list-row.select-container {
+	width: 320px
+}
+
+.settings-editor>.settings-body .settings-tree-container .setting-list-widget .setting-list-object-list-row.select-container>select {
+	width: inherit
+}
+
+.monaco-workbench .codicon.codicon-ports-forwarded-with-process-icon {
+	color: var(--vscode-ports-iconRunningProcessForeground)
+}
+
+
+.monaco-workbench .search-container .monaco-custom-toggle.disabled {
+	background-color: inherit !important;
+	cursor: default;
+	opacity: .3;
+	pointer-events: none;
+	user-select: none;
+	-webkit-user-select: none
+}
+
+.monaco-workbench .search-container .find-filter-button {
+	box-sizing: border-box;
+	color: inherit;
+	cursor: pointer;
+	float: left;
+	margin-left: 2px;
+	user-select: none;
+	-webkit-user-select: none
+}
+
+.file-icons-enabled .show-file-icons .webview-vs_code_release_notes-name-file-icon.file-icon:before {
+	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256' fill='none'%3E%3Cmask id='a' width='256' height='256' x='0' y='0' mask-type='alpha' maskUnits='userSpaceOnUse'%3E%3Cpath fill='%23fff' fill-rule='evenodd' d='M181.534 254.252a15.93 15.93 0 0 0 12.7-.488l52.706-25.361a16 16 0 0 0 9.06-14.42V42.018c0-6.15-3.522-11.754-9.06-14.42L194.234 2.238a15.94 15.94 0 0 0-18.185 3.097l-100.9 92.052-43.95-33.361a10.655 10.655 0 0 0-13.614.605L3.49 77.453c-4.648 4.227-4.653 11.54-.011 15.774L41.593 128 3.478 162.773c-4.642 4.235-4.637 11.547.011 15.775l14.097 12.822a10.655 10.655 0 0 0 13.613.606l43.95-33.362 100.9 92.053a15.9 15.9 0 0 0 5.485 3.585m10.505-184.367L115.479 128l76.56 58.115z' clip-rule='evenodd'/%3E%3C/mask%3E%3Cg mask='url(%23a)'%3E%3Cpath fill='%230065A9' d='M246.94 27.638 194.193 2.241a15.95 15.95 0 0 0-18.194 3.092L3.324 162.773c-4.645 4.235-4.64 11.547.011 15.775L17.44 191.37a10.67 10.67 0 0 0 13.622.606l207.941-157.75c6.976-5.291 16.996-.316 16.996 8.44v-.612a16 16 0 0 0-9.059-14.416'/%3E%3Cg filter='url(%23b)'%3E%3Cpath fill='%23007ACC' d='m246.94 228.362-52.747 25.397a15.95 15.95 0 0 1-18.194-3.092L3.324 93.227c-4.645-4.234-4.64-11.547.011-15.775L17.44 64.63a10.67 10.67 0 0 1 13.622-.605l207.941 157.748c6.976 5.292 16.996.317 16.996-8.44v.613a16 16 0 0 1-9.059 14.416'/%3E%3C/g%3E%3Cg filter='url(%23c)'%3E%3Cpath fill='%231F9CF0' d='M194.196 253.763A15.955 15.955 0 0 1 176 250.667c5.904 5.904 16 1.722 16-6.628V11.961c0-8.35-10.096-12.532-16-6.628a15.955 15.955 0 0 1 18.196-3.097L246.934 27.6A16 16 0 0 1 256 42.018v171.965a16 16 0 0 1-9.066 14.419z'/%3E%3C/g%3E%3Cpath fill='url(%23d)' fill-rule='evenodd' d='M181.378 254.252a15.94 15.94 0 0 0 12.699-.488l52.706-25.362a16 16 0 0 0 9.061-14.419V42.018c0-6.15-3.522-11.754-9.06-14.42L194.077 2.238a15.94 15.94 0 0 0-18.185 3.096l-100.9 92.053-43.95-33.361a10.655 10.655 0 0 0-13.613.605L3.333 77.452c-4.648 4.228-4.653 11.54-.011 15.775L41.436 128 3.322 162.773c-4.642 4.235-4.637 11.547.011 15.775L17.43 191.37a10.655 10.655 0 0 0 13.614.606l43.95-33.362 100.899 92.053a15.9 15.9 0 0 0 5.486 3.585m10.505-184.367L115.323 128l76.56 58.115z' clip-rule='evenodd' opacity='.25' style='mix-blend-mode:overlay'/%3E%3C/g%3E%3Cdefs%3E%3Cfilter id='b' width='298.822' height='236.149' x='-21.49' y='40.523' color-interpolation-filters='sRGB' filterUnits='userSpaceOnUse'%3E%3CfeFlood flood-opacity='0' result='BackgroundImageFix'/%3E%3CfeColorMatrix in='SourceAlpha' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0'/%3E%3CfeOffset/%3E%3CfeGaussianBlur stdDeviation='10.667'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0'/%3E%3CfeBlend in2='BackgroundImageFix' mode='overlay' result='effect1_dropShadow'/%3E%3CfeBlend in='SourceGraphic' in2='effect1_dropShadow' result='shape'/%3E%3C/filter%3E%3Cfilter id='c' width='122.667' height='297.347' x='154.667' y='-20.674' color-interpolation-filters='sRGB' filterUnits='userSpaceOnUse'%3E%3CfeFlood flood-opacity='0' result='BackgroundImageFix'/%3E%3CfeColorMatrix in='SourceAlpha' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0'/%3E%3CfeOffset/%3E%3CfeGaussianBlur stdDeviation='10.667'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0'/%3E%3CfeBlend in2='BackgroundImageFix' mode='overlay' result='effect1_dropShadow'/%3E%3CfeBlend in='SourceGraphic' in2='effect1_dropShadow' result='shape'/%3E%3C/filter%3E%3ClinearGradient id='d' x1='127.844' x2='127.844' y1='.66' y2='255.34' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23fff'/%3E%3Cstop offset='1' stop-color='%23fff' stop-opacity='0'/%3E%3C/linearGradient%3E%3C/defs%3E%3C/svg%3E");
+	content: " "
+}
+
+.file-icons-enabled .show-file-icons .vscode_getting_started_page-name-file-icon.file-icon:before {
+	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256' fill='none'%3E%3Cmask id='a' width='256' height='256' x='0' y='0' mask-type='alpha' maskUnits='userSpaceOnUse'%3E%3Cpath fill='%23fff' fill-rule='evenodd' d='M181.534 254.252a15.93 15.93 0 0 0 12.7-.488l52.706-25.361a16 16 0 0 0 9.06-14.42V42.018c0-6.15-3.522-11.754-9.06-14.42L194.234 2.238a15.94 15.94 0 0 0-18.185 3.097l-100.9 92.052-43.95-33.361a10.655 10.655 0 0 0-13.614.605L3.49 77.453c-4.648 4.227-4.653 11.54-.011 15.774L41.593 128 3.478 162.773c-4.642 4.235-4.637 11.547.011 15.775l14.097 12.822a10.655 10.655 0 0 0 13.613.606l43.95-33.362 100.9 92.053a15.9 15.9 0 0 0 5.485 3.585m10.505-184.367L115.479 128l76.56 58.115z' clip-rule='evenodd'/%3E%3C/mask%3E%3Cg mask='url(%23a)'%3E%3Cpath fill='%230065A9' d='M246.94 27.638 194.193 2.241a15.95 15.95 0 0 0-18.194 3.092L3.324 162.773c-4.645 4.235-4.64 11.547.011 15.775L17.44 191.37a10.67 10.67 0 0 0 13.622.606l207.941-157.75c6.976-5.291 16.996-.316 16.996 8.44v-.612a16 16 0 0 0-9.059-14.416'/%3E%3Cg filter='url(%23b)'%3E%3Cpath fill='%23007ACC' d='m246.94 228.362-52.747 25.397a15.95 15.95 0 0 1-18.194-3.092L3.324 93.227c-4.645-4.234-4.64-11.547.011-15.775L17.44 64.63a10.67 10.67 0 0 1 13.622-.605l207.941 157.748c6.976 5.292 16.996.317 16.996-8.44v.613a16 16 0 0 1-9.059 14.416'/%3E%3C/g%3E%3Cg filter='url(%23c)'%3E%3Cpath fill='%231F9CF0' d='M194.196 253.763A15.955 15.955 0 0 1 176 250.667c5.904 5.904 16 1.722 16-6.628V11.961c0-8.35-10.096-12.532-16-6.628a15.955 15.955 0 0 1 18.196-3.097L246.934 27.6A16 16 0 0 1 256 42.018v171.965a16 16 0 0 1-9.066 14.419z'/%3E%3C/g%3E%3Cpath fill='url(%23d)' fill-rule='evenodd' d='M181.378 254.252a15.94 15.94 0 0 0 12.699-.488l52.706-25.362a16 16 0 0 0 9.061-14.419V42.018c0-6.15-3.522-11.754-9.06-14.42L194.077 2.238a15.94 15.94 0 0 0-18.185 3.096l-100.9 92.053-43.95-33.361a10.655 10.655 0 0 0-13.613.605L3.333 77.452c-4.648 4.228-4.653 11.54-.011 15.775L41.436 128 3.322 162.773c-4.642 4.235-4.637 11.547.011 15.775L17.43 191.37a10.655 10.655 0 0 0 13.614.606l43.95-33.362 100.899 92.053a15.9 15.9 0 0 0 5.486 3.585m10.505-184.367L115.323 128l76.56 58.115z' clip-rule='evenodd' opacity='.25' style='mix-blend-mode:overlay'/%3E%3C/g%3E%3Cdefs%3E%3Cfilter id='b' width='298.822' height='236.149' x='-21.49' y='40.523' color-interpolation-filters='sRGB' filterUnits='userSpaceOnUse'%3E%3CfeFlood flood-opacity='0' result='BackgroundImageFix'/%3E%3CfeColorMatrix in='SourceAlpha' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0'/%3E%3CfeOffset/%3E%3CfeGaussianBlur stdDeviation='10.667'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0'/%3E%3CfeBlend in2='BackgroundImageFix' mode='overlay' result='effect1_dropShadow'/%3E%3CfeBlend in='SourceGraphic' in2='effect1_dropShadow' result='shape'/%3E%3C/filter%3E%3Cfilter id='c' width='122.667' height='297.347' x='154.667' y='-20.674' color-interpolation-filters='sRGB' filterUnits='userSpaceOnUse'%3E%3CfeFlood flood-opacity='0' result='BackgroundImageFix'/%3E%3CfeColorMatrix in='SourceAlpha' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0'/%3E%3CfeOffset/%3E%3CfeGaussianBlur stdDeviation='10.667'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0'/%3E%3CfeBlend in2='BackgroundImageFix' mode='overlay' result='effect1_dropShadow'/%3E%3CfeBlend in='SourceGraphic' in2='effect1_dropShadow' result='shape'/%3E%3C/filter%3E%3ClinearGradient id='d' x1='127.844' x2='127.844' y1='.66' y2='255.34' gradientUnits='userSpaceOnUse'%3E%3Cstop stop-color='%23fff'/%3E%3Cstop offset='1' stop-color='%23fff' stop-opacity='0'/%3E%3C/linearGradient%3E%3C/defs%3E%3C/svg%3E");
+	content: " "
+}
+
+.profile-view-tree-container .customview-tree .monaco-list .monaco-list-row .custom-view-tree-node-item .actions {
+	display: inherit
+}
+
+</style>
+
+
+<style type="text/css" media="screen">
+	.monaco-list.list_id_1
+	  .monaco-scrollable-element
+	  .monaco-tree-sticky-container {
+	  background-color: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_1
+	  .monaco-scrollable-element
+	  .monaco-tree-sticky-container
+	  .monaco-tree-sticky-row {
+	  background-color: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_1.sticky-scroll-focused
+	  .monaco-scrollable-element
+	  .monaco-tree-sticky-container:focus
+	  .monaco-list-row.focused {
+	  color: var(
+		--vscode-settings-settingsHeaderHoverForeground
+	  );
+	}
+	.monaco-list.list_id_1:not(.sticky-scroll-focused)
+	  .monaco-scrollable-element
+	  .monaco-tree-sticky-container
+	  .monaco-list-row.focused {
+	  color: inherit;
+	}
+	.monaco-list.list_id_1.sticky-scroll-focused
+	  .monaco-scrollable-element
+	  .monaco-tree-sticky-container:focus
+	  .monaco-list-row.focused.selected {
+	  outline: 1px solid
+		var(
+		  --vscode-list-focusAndSelectionOutline,
+		  var(
+			--vscode-contrastActiveBorder,
+			var(--vscode-focusBorder)
+		  )
+		);
+	  outline-offset: -1px;
+	}
+	.monaco-list.list_id_1:not(.sticky-scroll-focused)
+	  .monaco-scrollable-element
+	  .monaco-tree-sticky-container
+	  .monaco-list-row.focused.selected {
+	  outline: inherit;
+	}
+	.monaco-list.list_id_1.sticky-scroll-focused
+	  .monaco-scrollable-element
+	  .monaco-tree-sticky-container:focus
+	  .monaco-list-row.focused {
+	  outline: 1px solid var(--vscode-focusBorder);
+	  outline-offset: -1px;
+	}
+	.monaco-list.list_id_1:not(.sticky-scroll-focused)
+	  .monaco-scrollable-element
+	  .monaco-tree-sticky-container
+	  .monaco-list-row.focused {
+	  outline: inherit;
+	}
+	.monaco-workbench.context-menu-visible
+	  .monaco-list.list_id_1.last-focused.sticky-scroll-focused
+	  .monaco-list-rows
+	  .monaco-list-row.focused {
+	  outline: inherit;
+	}
+	.monaco-workbench.context-menu-visible
+	  .monaco-list.list_id_1.last-focused:not(.sticky-scroll-focused)
+	  .monaco-tree-sticky-container
+	  .monaco-list-rows
+	  .monaco-list-row.focused {
+	  outline: inherit;
+	}
+  </style>
+
+<style type="text/css" media="screen">
+	.monaco-list.list_id_1 .monaco-list-rows {
+	  background: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_1:focus
+	  .monaco-list-row.focused {
+	  background-color: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_1:focus
+	  .monaco-list-row.focused:hover {
+	  background-color: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_1:focus
+	  .monaco-list-row.focused {
+	  color: var(
+		--vscode-settings-settingsHeaderHoverForeground
+	  );
+	}
+	.monaco-list.list_id_1:focus
+	  .monaco-list-row.selected {
+	  background-color: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_1:focus
+	  .monaco-list-row.selected:hover {
+	  background-color: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_1:focus
+	  .monaco-list-row.selected {
+	  color: var(--vscode-settings-headerForeground);
+	}
+	.monaco-list.list_id_1:focus
+	  .monaco-list-row.selected
+	  .codicon {
+	  color: var(
+		--vscode-list-activeSelectionIconForeground
+	  );
+	}
+
+	.monaco-drag-image,
+	.monaco-list.list_id_1:focus
+	  .monaco-list-row.selected.focused {
+	  background-color: var(--vscode-editor-background);
+	}
+
+	.monaco-drag-image,
+	.monaco-list.list_id_1:focus
+	  .monaco-list-row.selected.focused {
+	  color: var(--vscode-settings-headerForeground);
+	}
+
+	.monaco-list.list_id_1
+	  .monaco-list-row.focused
+	  .codicon {
+	  color: var(
+		--vscode-list-inactiveSelectionIconForeground
+	  );
+	}
+	.monaco-list.list_id_1 .monaco-list-row.focused {
+	  background-color: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_1
+	  .monaco-list-row.focused:hover {
+	  background-color: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_1 .monaco-list-row.selected {
+	  background-color: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_1
+	  .monaco-list-row.selected:hover {
+	  background-color: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_1 .monaco-list-row.selected {
+	  color: var(--vscode-settings-headerForeground);
+	}
+	.monaco-list.list_id_1:not(.drop-target):not(.dragging)
+	  .monaco-list-row:hover:not(.selected):not(.focused) {
+	  background-color: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_1:not(.drop-target):not(.dragging)
+	  .monaco-list-row:hover:not(.selected):not(.focused) {
+	  color: var(
+		--vscode-settings-settingsHeaderHoverForeground
+	  );
+	}
+	.monaco-list.list_id_1:focus
+	  .monaco-list-row.focused.selected {
+	  outline: 1px solid
+		var(
+		  --vscode-list-focusAndSelectionOutline,
+		  var(
+			--vscode-contrastActiveBorder,
+			var(--vscode-focusBorder)
+		  )
+		);
+	  outline-offset: -1px;
+	}
+
+	.monaco-drag-image,
+	.monaco-list.list_id_1:focus
+	  .monaco-list-row.focused {
+	  outline: 1px solid var(--vscode-focusBorder);
+	  outline-offset: -1px;
+	}
+	.monaco-workbench.context-menu-visible
+	  .monaco-list.list_id_1.last-focused
+	  .monaco-list-row.focused {
+	  outline: 1px solid var(--vscode-focusBorder);
+	  outline-offset: -1px;
+	}
+
+	.monaco-list.list_id_1
+	  .monaco-list-row.focused.selected {
+	  outline: 1px dotted
+		var(
+		  --vscode-contrastActiveBorder,
+		  var(--vscode-editor-background)
+		);
+	  outline-offset: -1px;
+	}
+	.monaco-list.list_id_1 .monaco-list-row.selected {
+	  outline: 1px dotted
+		var(--vscode-contrastActiveBorder);
+	  outline-offset: -1px;
+	}
+	.monaco-list.list_id_1 .monaco-list-row.focused {
+	  outline: 1px dotted var(--vscode-editor-background);
+	  outline-offset: -1px;
+	}
+	.monaco-list.list_id_1 .monaco-list-row:hover {
+	  outline: 1px dashed
+		var(--vscode-contrastActiveBorder);
+	  outline-offset: -1px;
+	}
+
+	.monaco-list.list_id_1.drop-target,
+	.monaco-list.list_id_1 .monaco-list-rows.drop-target,
+	.monaco-list.list_id_1 .monaco-list-row.drop-target {
+	  background-color: var(
+		--vscode-list-dropBackground
+	  ) !important;
+	  color: inherit !important;
+	}
+
+	.monaco-list.list_id_1
+	  .monaco-list-rows.drop-target-before
+	  .monaco-list-row:first-child::before,
+	.monaco-list.list_id_1
+	  .monaco-list-row.drop-target-before::before {
+	  content: '';
+	  position: absolute;
+	  top: 0px;
+	  left: 0px;
+	  width: 100%;
+	  height: 1px;
+	  background-color: var(
+		--vscode-list-dropBetweenBackground
+	  );
+	}
+
+	.monaco-list.list_id_1
+	  .monaco-list-rows.drop-target-after
+	  .monaco-list-row:last-child::after,
+	.monaco-list.list_id_1
+	  .monaco-list-row.drop-target-after::after {
+	  content: '';
+	  position: absolute;
+	  bottom: 0px;
+	  left: 0px;
+	  width: 100%;
+	  height: 1px;
+	  background-color: var(
+		--vscode-list-dropBetweenBackground
+	  );
+	}
+
+	.monaco-table > .monaco-split-view2,
+	.monaco-table
+	  > .monaco-split-view2
+	  .monaco-sash.vertical::before,
+	.monaco-workbench:not(.reduce-motion)
+	  .monaco-table:hover
+	  > .monaco-split-view2,
+	.monaco-workbench:not(.reduce-motion)
+	  .monaco-table:hover
+	  > .monaco-split-view2
+	  .monaco-sash.vertical::before {
+	  border-color: var(--vscode-tree-tableColumnsBorder);
+	}
+
+	.monaco-workbench:not(.reduce-motion)
+	  .monaco-table
+	  > .monaco-split-view2,
+	.monaco-workbench:not(.reduce-motion)
+	  .monaco-table
+	  > .monaco-split-view2
+	  .monaco-sash.vertical::before {
+	  border-color: transparent;
+	}
+
+	.monaco-table
+	  .monaco-list-row[data-parity='odd']:not(.focused):not(.selected):not(:hover)
+	  .monaco-table-tr,
+	.monaco-table
+	  .monaco-list:not(:focus)
+	  .monaco-list-row[data-parity='odd'].focused:not(.selected):not(:hover)
+	  .monaco-table-tr,
+	.monaco-table
+	  .monaco-list:not(.focused)
+	  .monaco-list-row[data-parity='odd'].focused:not(.selected):not(:hover)
+	  .monaco-table-tr {
+	  background-color: var(
+		--vscode-tree-tableOddRowsBackground
+	  );
+	}
+
+	#espressif-action-0:hover,
+	#espressif-action-1:hover,
+	#espressif-action-2:hover {
+	  color: var(--vscode-textLink-activeForeground);
+	}
+
+	#espressif-action-0,
+	#espressif-action-1,
+	#espressif-action-2 {
+	  color: var(--vscode-textLink-foreground);
+	}
+  </style>
+
+
+
+<style type="text/css" media="screen">
+	.monaco-list.list_id_2
+	  .monaco-scrollable-element
+	  .monaco-tree-sticky-container {
+	  background-color: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_2
+	  .monaco-scrollable-element
+	  .monaco-tree-sticky-container
+	  .monaco-tree-sticky-row {
+	  background-color: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_2.sticky-scroll-focused
+	  .monaco-scrollable-element
+	  .monaco-tree-sticky-container:focus
+	  .monaco-list-row.focused {
+	  color: var(--vscode-foreground);
+	}
+	.monaco-list.list_id_2:not(.sticky-scroll-focused)
+	  .monaco-scrollable-element
+	  .monaco-tree-sticky-container
+	  .monaco-list-row.focused {
+	  color: inherit;
+	}
+	.monaco-list.list_id_2.sticky-scroll-focused
+	  .monaco-scrollable-element
+	  .monaco-tree-sticky-container:focus
+	  .monaco-list-row.focused.selected {
+	  outline: 1px solid
+		var(
+		  --vscode-list-focusAndSelectionOutline,
+		  var(
+			--vscode-contrastActiveBorder,
+			var(--vscode-editor-background)
+		  )
+		);
+	  outline-offset: -1px;
+	}
+	.monaco-list.list_id_2:not(.sticky-scroll-focused)
+	  .monaco-scrollable-element
+	  .monaco-tree-sticky-container
+	  .monaco-list-row.focused.selected {
+	  outline: inherit;
+	}
+	.monaco-list.list_id_2.sticky-scroll-focused
+	  .monaco-scrollable-element
+	  .monaco-tree-sticky-container:focus
+	  .monaco-list-row.focused {
+	  outline: 1px solid var(--vscode-editor-background);
+	  outline-offset: -1px;
+	}
+	.monaco-list.list_id_2:not(.sticky-scroll-focused)
+	  .monaco-scrollable-element
+	  .monaco-tree-sticky-container
+	  .monaco-list-row.focused {
+	  outline: inherit;
+	}
+	.monaco-workbench.context-menu-visible
+	  .monaco-list.list_id_2.last-focused.sticky-scroll-focused
+	  .monaco-list-rows
+	  .monaco-list-row.focused {
+	  outline: inherit;
+	}
+	.monaco-workbench.context-menu-visible
+	  .monaco-list.list_id_2.last-focused:not(.sticky-scroll-focused)
+	  .monaco-tree-sticky-container
+	  .monaco-list-rows
+	  .monaco-list-row.focused {
+	  outline: inherit;
+	}
+  </style>
+
+
+<style type="text/css" media="screen">
+	.monaco-list.list_id_2 .monaco-list-rows {
+	  background: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_2:focus .monaco-list-row.focused {
+	  background-color: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_2:focus
+	  .monaco-list-row.focused:hover {
+	  background-color: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_2:focus .monaco-list-row.focused {
+	  color: var(--vscode-foreground);
+	}
+	.monaco-list.list_id_2:focus .monaco-list-row.selected {
+	  background-color: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_2:focus
+	  .monaco-list-row.selected:hover {
+	  background-color: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_2:focus .monaco-list-row.selected {
+	  color: var(--vscode-foreground);
+	}
+	.monaco-list.list_id_2:focus
+	  .monaco-list-row.selected
+	  .codicon {
+	  color: var(
+		--vscode-list-activeSelectionIconForeground
+	  );
+	}
+
+	.monaco-drag-image,
+	.monaco-list.list_id_2:focus
+	  .monaco-list-row.selected.focused {
+	  background-color: var(--vscode-editor-background);
+	}
+
+	.monaco-drag-image,
+	.monaco-list.list_id_2:focus
+	  .monaco-list-row.selected.focused {
+	  color: var(--vscode-foreground);
+	}
+
+	.monaco-list.list_id_2
+	  .monaco-list-row.focused
+	  .codicon {
+	  color: var(
+		--vscode-list-inactiveSelectionIconForeground
+	  );
+	}
+	.monaco-list.list_id_2 .monaco-list-row.focused {
+	  background-color: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_2 .monaco-list-row.focused:hover {
+	  background-color: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_2 .monaco-list-row.selected {
+	  background-color: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_2 .monaco-list-row.selected:hover {
+	  background-color: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_2 .monaco-list-row.selected {
+	  color: var(--vscode-foreground);
+	}
+	.monaco-list.list_id_2:not(.drop-target):not(.dragging)
+	  .monaco-list-row:hover:not(.selected):not(.focused) {
+	  background-color: var(--vscode-editor-background);
+	}
+	.monaco-list.list_id_2:not(.drop-target):not(.dragging)
+	  .monaco-list-row:hover:not(.selected):not(.focused) {
+	  color: var(--vscode-foreground);
+	}
+	.monaco-list.list_id_2:focus
+	  .monaco-list-row.focused.selected {
+	  outline: 1px solid
+		var(
+		  --vscode-list-focusAndSelectionOutline,
+		  var(
+			--vscode-contrastActiveBorder,
+			var(--vscode-editor-background)
+		  )
+		);
+	  outline-offset: -1px;
+	}
+
+	.monaco-drag-image,
+	.monaco-list.list_id_2:focus .monaco-list-row.focused {
+	  outline: 1px solid var(--vscode-editor-background);
+	  outline-offset: -1px;
+	}
+	.monaco-workbench.context-menu-visible
+	  .monaco-list.list_id_2.last-focused
+	  .monaco-list-row.focused {
+	  outline: 1px solid var(--vscode-editor-background);
+	  outline-offset: -1px;
+	}
+
+	.monaco-list.list_id_2
+	  .monaco-list-row.focused.selected {
+	  outline: 1px dotted
+		var(
+		  --vscode-contrastActiveBorder,
+		  var(--vscode-editor-background)
+		);
+	  outline-offset: -1px;
+	}
+	.monaco-list.list_id_2 .monaco-list-row.selected {
+	  outline: 1px dotted var(--vscode-contrastActiveBorder);
+	  outline-offset: -1px;
+	}
+	.monaco-list.list_id_2 .monaco-list-row.focused {
+	  outline: 1px dotted var(--vscode-editor-background);
+	  outline-offset: -1px;
+	}
+	.monaco-list.list_id_2 .monaco-list-row:hover {
+	  outline: 1px dashed var(--vscode-editor-background);
+	  outline-offset: -1px;
+	}
+
+	.monaco-list.list_id_2.drop-target,
+	.monaco-list.list_id_2 .monaco-list-rows.drop-target,
+	.monaco-list.list_id_2 .monaco-list-row.drop-target {
+	  background-color: var(
+		--vscode-list-dropBackground
+	  ) !important;
+	  color: inherit !important;
+	}
+
+	.monaco-list.list_id_2
+	  .monaco-list-rows.drop-target-before
+	  .monaco-list-row:first-child::before,
+	.monaco-list.list_id_2
+	  .monaco-list-row.drop-target-before::before {
+	  content: '';
+	  position: absolute;
+	  top: 0px;
+	  left: 0px;
+	  width: 100%;
+	  height: 1px;
+	  background-color: var(
+		--vscode-list-dropBetweenBackground
+	  );
+	}
+
+	.monaco-list.list_id_2
+	  .monaco-list-rows.drop-target-after
+	  .monaco-list-row:last-child::after,
+	.monaco-list.list_id_2
+	  .monaco-list-row.drop-target-after::after {
+	  content: '';
+	  position: absolute;
+	  bottom: 0px;
+	  left: 0px;
+	  width: 100%;
+	  height: 1px;
+	  background-color: var(
+		--vscode-list-dropBetweenBackground
+	  );
+	}
+
+	.monaco-table > .monaco-split-view2,
+	.monaco-table
+	  > .monaco-split-view2
+	  .monaco-sash.vertical::before,
+	.monaco-workbench:not(.reduce-motion)
+	  .monaco-table:hover
+	  > .monaco-split-view2,
+	.monaco-workbench:not(.reduce-motion)
+	  .monaco-table:hover
+	  > .monaco-split-view2
+	  .monaco-sash.vertical::before {
+	  border-color: var(--vscode-tree-tableColumnsBorder);
+	}
+
+	.monaco-workbench:not(.reduce-motion)
+	  .monaco-table
+	  > .monaco-split-view2,
+	.monaco-workbench:not(.reduce-motion)
+	  .monaco-table
+	  > .monaco-split-view2
+	  .monaco-sash.vertical::before {
+	  border-color: transparent;
+	}
+
+  </style>

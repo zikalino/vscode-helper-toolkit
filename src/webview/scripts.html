@@ -1,0 +1,2549 @@
+<script>
+  var mediaFolder = "";
+
+  // Handle the message inside the webviewonA
+  window.addEventListener('message', event => {
+
+    const message = event.data;
+
+    switch (message.command) {
+      case 'create':
+        data = message.data;
+        mediaFolder = message.mediaFolder;
+        formPopulate(data, 'main-div');
+
+        break;
+    }
+  });
+
+var id_idx = 0;
+var ids = new Set();
+function getNextAutoId() {
+  var auto_id = "";
+  do {
+    auto_id = "auto_" + (id_idx++).toString();
+  } while (auto_id in ids);
+  return auto_id;
+}
+
+function formPopulate(data, parent_id) {
+  var entries = Array.isArray(data) ? data : [ data ];
+
+  for (let entry of entries) {
+
+    if (!('id' in entry)) {
+      entry['id'] = getNextAutoId();
+    }
+    ids.add(entry['id']);
+    // XXX - fail if id already there?
+
+    if (entry['type'] === 'layout-welcome') {
+      // this layout will have 4 elements
+      //  - header
+      //  - left-column
+      //  - right-column
+      //  - footer
+      createLayoutWelcome(parent_id, entry);
+      formPopulate(entry['header'], 'header');
+      formPopulate(entry['left-column'], 'left-column');
+      formPopulate(entry['right-column'], 'right-column');
+      formPopulate(entry['footer'], 'footer');
+
+    } else if (entry['type'] === 'layout-form') {
+      // this layout will have 3 elements
+      //  - header
+      //  - form
+      //  - footer
+      createLayoutForm(parent_id, entry);
+      formPopulate(entry['header'], entry['id'] + "-header");
+      formPopulate(entry['form'], entry['id'] + "-form");
+      formPopulate(entry['footer'], entry['id'] + "-footer");
+    } else if (entry['type'] === 'layout-canvas') {
+      createLayoutCanvas(parent_id, entry);
+    } else if (entry['type'] === 'layout-tree-with-details') {
+      // this layout will have 3 elements
+      //  - search-box
+      //  - tree
+      //  - details
+      createLayoutTreeWithDetails(parent_id, entry);
+      formPopulate(entry['subitems'], entry['id']);
+    } else if (entry['type'] === 'header') {
+      createHeader(parent_id, entry);
+    } else if (entry['type'] === 'fieldset') {
+      createFieldSet(parent_id, entry);
+      formPopulate(entry['subitems'], entry['id']);
+    } else if (entry['type'] === 'separator') {
+      createSeparator(parent_id, entry);
+    } else if (entry['type'] === 'row') {
+      createRow(parent_id, entry);
+      formPopulate(entry['subitems'], entry['id']);
+    } else if (entry['type'] === 'checkbox') {
+      createCheckBox(parent_id, entry);
+    } else if (entry['type'] === 'combo') {
+      createCombo(parent_id, entry);
+      // XXX - simple dropdown
+    } else if (entry['type'] === 'button') {
+      createButton(parent_id, entry);
+    } else if (entry['type'] === 'datagrid') {
+      createDataGrid(parent_id, entry);
+      formPopulate(entry['subitems'], entry['id']);
+    } else if (entry['type'] === 'grid-header') {
+      createDataGridRow(parent_id, entry);
+      formPopulate(entry['subitems'], entry['id']);
+    } else if (entry['type'] === 'grid-header-cell') {
+      createDataGridCell(parent_id, entry);
+
+    } else if (entry['type'] === 'grid-row') {
+      createDataGridRow(parent_id, entry);
+      formPopulate(entry['subitems'], entry['id']);
+    } else if (entry['type'] === 'grid-cell') {
+      createDataGridCell(parent_id, entry);
+    } else if (entry['type'] === 'panel') {
+      createPanel(parent_id, entry);
+      formPopulate(entry['subitems'], entry['id']);
+    } else if (entry['type'] === 'panels') {
+      createPanels(parent_id, entry);
+      formPopulate(entry['subitems'], entry['id']);
+    } else if (entry['type'] === 'radio') {
+      createRadio(parent_id, entry);
+    } else if (entry['type'] === 'radiogroup') {
+      createRadioGroup(parent_id, entry);
+      formPopulate(entry['subitems'], entry['id']);
+    } else if (entry['type'] === 'textarea') {
+      createTextArea(parent_id, entry);
+    } else if (entry['type'] === 'textfield') {
+      createTextField(parent_id, entry);
+    } else if (entry['type'] === 'folder-selector') {
+      createFolderSelector(parent_id, entry);
+    } else if (entry['type'] === 'link') {
+      createLink(parent_id, entry);
+    } else if (entry['type'] === 'progressring') {
+      createProgressRing(parent_id, entry);
+    } else if (entry['type'] === 'tag') {
+      createTag(parent_id, entry);
+    } else if (entry['type'] === 'divider') {
+      createDivider(parent_id, entry);
+    } else if (entry['type'] === 'badge') {
+      createBadge(parent_id, entry);
+    } else if (entry['type'] === 'text-block') {
+      createTextBlock(parent_id, entry);
+    } else if (entry['type'] === 'tile') {
+      createTile(parent_id, entry);
+    } else if (entry['type'] === 'two-column-layout') {
+      createTwoColumnLayout(parent_id, entry);
+      formPopulate(entry['first'], 'main-form-frame');
+      formPopulate(entry['second'], 'second-column');
+    } else if (entry['type'] === 'footer') {
+      createFooter(parent_id, entry);
+      formPopulate(entry['subitems'], entry['id']);
+    }
+  }
+}
+
+
+
+//provideVSCodeDesignSystem().register(vsCodeDropdown());
+
+function createHeader(parent_id, data) {
+  var linkExternal = `
+  `;
+  if ('link' in data) {
+    linkExternal = `
+    <div style="display: table-cell; vertical-align: middle; padding-left: 5px;">
+          <a href="${data['link']}" class="codicon codicon-link-external"></a>
+        </div>
+    `;
+  }
+  var html = `
+    <div class="form-header">
+      <h1>
+        <div style="display: table-cell; vertical-align: middle;">
+          <img src="${mediaFolder}/${data['logo']}" width="60" height="60" />
+        </div>
+        <div style="display: table-cell; vertical-align: middle; padding-left: 10px; font-size: 35px; font-weight: 400; color: var(--vscode-foreground);">
+          ${data['title']}
+        </div>
+        ${linkExternal}
+      </h1>
+    </div>
+    `;
+    document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);
+  }
+
+function createFieldSet(parent_id, data) {
+  // XXX - width is set to 650px, which is form width
+  var html = `
+     <fieldset id="${data['id']}" style='border: 0; border-bottom: 1px solid var(--vscode-welcomePage-tileBorder); width: 650px; padding-bottom: 15px; padding-top: 15px;'>
+     </fieldset>
+     `;
+  document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);
+}
+
+function createSeparator(parent_id, data) {
+  // XXX - width is set to 650px, which is form width
+  var html = `
+     <div id="${data['id']}" style='border: 0; width: 650px; height: 1px; background-color: var(--vscode-welcomePage-tileBorder); margin-bottom: 15px; margin-top: 15px;'>
+     </div>
+     `;
+  document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);
+}
+
+function createFooter(parent_id, data) {
+  // XXX - width is fixed now
+  var html = `
+     <footer class='form-footer' id="${data['id']}-wrappah" style='width: 650px;'>
+        <div class="footer-button-strip" id="${data['id']}">
+        </div>
+     </footer>
+     `;
+  document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);
+}
+
+function createRow(parent_id, data) {
+  var html = '';
+  if (data['narrow']) {
+    html = `
+    <div class="form-row form-row--narrow" id="${data['id']}"> </div>
+    `;
+  } else {
+    html = `
+    <div class="form-row" id="${data['id']}-wrapper">
+      <div class="three-column-row" id="${data['id']}"></div>
+    </div>
+    `;
+  }
+  document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);
+}
+
+function createCheckBox(parent_id, data) {
+  let align = 'left';
+  if (data['vertical-alignment']) {
+    align = 'center';
+  }
+  let text = ('name' in data) ? data['name'] : (('text' in data) ? data['text'] : 'CheckBox')
+  var html = `
+    <div class="checkbox-field" style="justify-content: ${align};">
+      <vscode-checkbox id="${data.id}"
+                       role="checkbox"
+                       aria-checked="true"
+                       aria-required="false"
+                       aria-disabled="false"
+                       tabindex="0"
+                       aria-label="Checkbox"
+                       current-value="on"
+                       current-checked="true"
+                       class="checked">
+        ${text}
+        <span
+          title="Set up your solution for Git version control, allowing you to track changes."
+          class="tooltip codicon codicon-question">
+        </span>
+      </vscode-checkbox>
+    </div>
+  `;
+  document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);
+}
+
+function createCombo(parent_id, data) {
+  var html = "";
+  if (typeof data['items'][0] !== 'string') {
+    html = `
+      <div class="dropdown-select" id=${data['id']}>
+        <div class="dropdown-select-label">
+          <span class="dropdown-select-label-text">${data['name']}</span>
+        </div>
+        <div
+          id="create-project-${data['id']}"
+          class="dropdown-select-input"
+          aria-disabled="false"
+          onclick="comboOpenClose('${data['id']}');event.stopPropagation();"
+        >
+          <span id="${data['id']}-box" class="dropdown-select-input-text">
+            ESP-IDF
+          </span>
+          <span class="codicon codicon-chevron-down"></span>
+        </div>
+
+        <div class="dropdown-anchor">
+          <div id="${data['id']}-list"
+                class="dropdown-box dropdown-select-content templates-and-examples-dropdown"
+              hidden="true">
+            <ul>
+              `;
+
+    for (var i in data['items']) {
+      html += `
+              <li onclick="comboClicked('${data['id']}', '${data['items'][i]['name']}');">
+              <section class="template-entry">
+                <header>${data['items'][i]['name']}</header>
+                <p>${data['items'][i]['description']}</p>
+              </section>
+              </li>
+      `;
+    }
+  
+    html += `
+            </ul>
+          </div>
+        </div>
+      </div>
+    `;
+  } else {
+    html = `
+    <div class="dropdown-select">
+    <div class="dropdown-select-label">
+      <span class="dropdown-select-label-text">${data['name']}</span>
+    </div>
+      <vscode-dropdown id='${data.id}'
+                       style="display: flex;"
+                       onchange="comboClicked(this.value);">
+          `;
+
+    for (var i in data['items']) {
+      var item_id = data['items'][i];
+      html += `
+        <vscode-option value='${item_id}' label='${item_id}'>
+          ${item_id}
+        </vscode-option>
+      `;
+    }
+  
+    html += `
+      </vscode-dropdown>
+      </div>
+    `;
+  }
+  document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);
+}
+
+function createButton(parent_id, entry) {
+  var text = "Button Text";
+  var codicon = "";
+  var disabled = "";
+  var id = "QQ";
+  if ('text' in entry) { text = entry['text']; };
+  if ('codicon' in entry) { codicon = entry['codicon']; };
+  if ('id' in entry) { id = entry['id']; };
+  if ('state' in entry) {
+    if (entry['state'] === 'disabled') {
+      disabled = 'disabled';
+    }
+  }
+
+  var html_codicon = ``;
+
+  if (codicon !== '') {
+    html_codicon = `<span slot="start" class="codicon codicon-${codicon}"></span>`;
+  }
+
+  var html = `
+        <vscode-button id='${id}' ${disabled} onclick="onButtonClicked('${id}');" >
+          ${text}
+          ${html_codicon}
+        </vscode-button>
+      `;
+      document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+function createDataGrid(parent_id, entry) {
+  // removed  grid-template-columns="1fr 120px 1fr 2fr" aria-label="With Custom Column Widths"
+  var html = `
+    <vscode-data-grid id="${entry['id']}" class="basic-grid">
+    </vscode-data-grid>
+      `;
+      document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+function createDataGridRow(parent_id, entry) {
+  var html = `
+  <vscode-data-grid-row id="${entry['id']}">
+  </vscode-data-grid-row>
+      `;
+      document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+function createDataGridCell(parent_id, entry) {
+  var parent = document.getElementById(parent_id);
+  var count = parent.childElementCount;
+  var html = `
+        <vscode-data-grid-cell id="${entry['id']}" grid-column="${(count + 1).toString()}">${entry['content']}
+        </vscode-data-grid-cell>
+      `;
+      document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+function createPanels(parent_id, entry) {
+  var html = `
+        <vscode-panels id="${entry['id']}" style="height: 100%; width: 100%;">
+        </vscode-panels>
+      `;
+      document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+function createPanel(parent_id, entry) {
+  var html = `
+  <vscode-panel-tab id="${entry['id']}-tab">${entry['label']}</vscode-panel-tab>
+  <vscode-panel-view id="${entry['id']}-view" style="position: absolute; top: 0px; bottom: 0px; left: 0px; right: 0px;">
+    <div id="${entry['id']}" style="overflow-y: scroll; overflow-x: hidden; backround-color: red; width: 100%; height: 100%;">
+    </div>
+  </vscode-panel-view>        
+`;
+    document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+function createRadio(parent_id, entry) {
+  var id = ('id' in entry) ? entry['id'] : 'unknown';
+  var value = ('value' in entry) ? entry['value'] : id;
+  var text = ('text' in entry) ? entry['text'] : value;
+  var html = `
+        <vscode-radio value="${value}" onclick="onRadioClicked('${value}');">${text}</vscode-radio>
+      `;
+      document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+function createRadioGroup(parent_id, entry) {
+  var html = `
+      <vscode-radio-group id="${entry['id']}"></vscode-radio-group>
+      `;
+      document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+function createTextArea(parent_id, entry) {
+  var html = `
+        <vscode-text-area>Text Area Label</vscode-text-area>
+      `;
+      document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+function createTextField(parent_id, entry) {
+  var html = `
+        <vscode-text-field style='width: 100%;'>${entry['name']}</vscode-text-field>
+      `;
+      document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+function createFolderSelector(parent_id, entry) {
+  var id = entry['id'];
+  var html = `
+      <div style='width: 100%; display: inline-grid; grid-template-columns: 80% 20%; '>
+        <vscode-text-field id='${id}' >${entry['name']}</vscode-text-field>
+        <div style="display: flex; align-items: flex-end; padding-left: 5px;">
+          <vscode-button onclick="folderSelectorClicked('${id}');">Browse</vscode-button>
+        </div>
+      </div>
+      `;
+      document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+function createLink(parent_id, entry) {
+  var codicon = "X";
+  if ('codicon' in entry) {
+    codicon = `class="codicon ${entry['codicon']}" `;
+  }
+  var html = `
+        <vscode-link href="${entry['href']}" style="margin: 2px;"><div style="font-size: 20px;" ${codicon}></div> ${entry['title']}</vscode-link><br/>
+      `;
+      document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+function createProgressRing(parent_id, entry) {
+  var html = `
+        <vscode-progress-ring></vscode-progress-ring>
+      `;
+      document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+function createTag(parent_id, entry) {
+  var html = `
+        <vscode-tag>Tag Text</vscode-tag>
+      `;
+      document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+function createDivider(parent_id, entry) {
+  var html = `
+        <vscode-divider role="separator"></vscode-divider>
+      `;
+      document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+function createBadge(parent_id, entry) {
+  var html = `
+        <vscode-badge>1</vscode-badge>
+      `;
+      document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+function createTextBlock(parent_id, entry) {
+  var style = "padding-top: 10px; ";
+  
+  switch (entry['width']) {
+    case 'narrow':
+      style += 'max-width: 440px;';
+      break;
+    case 'wide':
+      style += 'max-width: 650px;';
+      break;
+  }
+
+  switch (entry['font']) {
+    case 'header-1':
+      style += 'font-size; 24px;';
+      break;
+    case 'header-2':
+      style += 'font-size: 20px;';
+      break;
+    case 'header-3':
+      style += 'font-size: 16px;';
+      break;
+  }
+
+
+  var font = entry['font'];
+  var width = '';
+  entry['width'];
+
+  var html = `
+        <vscode-text-block style='${style}'>${entry['content']}</vscode-textblock>
+      `;
+      document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+function createTile(parent_id, entry) {
+  var style = "margin-top: 10px; padding: 16px; text-align: left; border: 1px solid var(--vscode-welcomePage-tileBorder); background: var(--vscode-welcomePage-tileBackground); border-radius: 6px;"; // var(--vscode-welcomePage-titleBorder)
+  
+  switch (entry['width']) {
+    case 'narrow':
+      style += 'max-width: 440px;';
+      break;
+    case 'wide':
+      style += 'max-width: 650px;';
+      break;
+  }
+
+  var buttons = "";
+
+  if ('buttons' in entry) {
+    for (var i = 0; i < entry['buttons'].length; i++) {
+      var b = entry['buttons'][i].split("|");
+
+      buttons += `
+          <vscode-button>
+            ${b[0]}
+            <span slot="start" class="codicon ${b[1]}"></span>
+          </vscode-button>
+      `;
+    }
+  }
+
+
+  var html = `
+        <div style='${style}'>
+          <span style="font-weight: bold; font-size: 16px;" >
+            ${entry['title']}
+          </span>
+          <p style='margin-top: 10px; margin-bottom: 10px;'>
+            ${entry['content']}
+          </p>
+          ${buttons}
+
+        </div>
+      `;
+      document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+function createLayoutForm(parent_id, entry) {
+  var html = `
+  <div id='${entry['id']}' style='padding: 24px 32px 16px 32px; width: 100%; max-width: 650px; height: 100%;'>
+        <div style='display: grid;
+                    grid-template-columns: 1fr 10fr 1fr;
+                    grid-template-rows: min-content 1fr min-content;
+                    height: 100%;
+                    max-heigh: 100%;
+                    max-width: 700px;
+                    grid-template-areas: ". header ."
+                                         ". form ."
+                                         ". footer .";'>
+  
+          <div style='grid-area: header; padding-top: 16px; padding-bottom: 16px;' id='${entry['id']}-header'></div>
+          <div id='${entry['id']}-form' style='grid-area: form; width: 100%; height: 100%;'>
+          </div>
+          <div style='grid-area: footer;' id='${entry['id']}-footer'></div>
+        </div>
+      </div>
+      `;
+  document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+function createLayoutTreeWithDetails(parent_id, entry) {
+  var html = `
+          <div
+          class="file-icons-enabled enable-motion monaco-workbench windows web chromium nopanel noauxiliarybar vs-dark vscode-theme-defaults-themes-dark_modern-json nosidebar"
+          role="application"
+          style="
+            inset: 0px;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            --vscode-sash-size: 4px;
+            --vscode-sash-hover-size: 4px;
+          "
+        >
+          <div class="editor-instance" tabindex="-1">
+            <div class="settings-editor" tabindex="-1">
+              <div class="settings-header">
+                <div class="search-container">
+                  <div
+                    class="suggest-input-container"
+                    data-keybinding-context="11"
+                    data-mode-id="plaintext"
+                    style="
+                      background-color: var(--vscode-input-background);
+                      color: var(--vscode-input-foreground);
+                      border-width: 1px;
+                      border-style: solid;
+                      border-color: var(
+                        --vscode-settings-textInputBorder,
+                        transparent
+                      );
+                    "
+                  >
+                    <div
+                      class="suggest-input-placeholder"
+                      style="
+                        color: var(--vscode-input-placeholderForeground);
+                        width: 788px;
+                      "
+                      id="search-input-placeholder"
+                    >
+                      Search
+                    </div>
+                    <div
+                      class="monaco-editor no-user-select showUnused showDeprecated vs-dark"
+                      role="code"
+                      data-uri="settingseditor:searchinput0"
+                      style="width: 790px; height: 20px"
+                    >
+                      <div
+                        data-mprt="3"
+                        class="overflow-guard"
+                        style="width: 790px; height: 20px"
+                      >
+                        <div
+                          class="margin"
+                          role="presentation"
+                          aria-hidden="true"
+                          style="
+                            position: absolute;
+                            transform: translate3d(0px, 0px, 0px);
+                            contain: strict;
+                            top: 0px;
+                            height: 20px;
+                            width: 0px;
+                          "
+                        >
+                          <div
+                            class="glyph-margin"
+                            style="left: 0px; width: 0px; height: 20px"
+                          ></div>
+                          <div
+                            class="margin-view-zones"
+                            role="presentation"
+                            aria-hidden="true"
+                            style="position: absolute"
+                          ></div>
+                          <div
+                            class="margin-view-overlays"
+                            role="presentation"
+                            aria-hidden="true"
+                            style="
+                              position: absolute;
+                              font-family: 'Segoe WPC', 'Segoe UI', sans-serif,
+                                Consolas, 'Courier New', monospace;
+                              font-weight: normal;
+                              font-size: 13px;
+                              font-feature-settings: 'liga' 0, 'calt' 0;
+                              font-variation-settings: normal;
+                              line-height: 20px;
+                              letter-spacing: 0px;
+                              width: 0px;
+                              height: 20px;
+                            "
+                          >
+                            <div
+                              style="
+                                position: absolute;
+                                top: 0px;
+                                width: 100%;
+                                height: 20px;
+                              "
+                            >
+                              <div
+                                class="current-line"
+                                style="width: 0px; height: 20px"
+                              ></div>
+                            </div>
+                          </div>
+                          <div
+                            class="glyph-margin-widgets"
+                            style="position: absolute; top: 0px"
+                          ></div>
+                        </div>
+                        <div
+                          class="monaco-scrollable-element editor-scrollable vs-dark"
+                          role="presentation"
+                          data-mprt="6"
+                          style="
+                            position: absolute;
+                            overflow: hidden;
+                            left: 0px;
+                            width: 790px;
+                            height: 20px;
+                          "
+                        >
+                          <div
+                            class="lines-content monaco-editor-background"
+                            style="
+                              position: absolute;
+                              overflow: hidden;
+                              width: 1e6px;
+                              height: 1e6px;
+                              transform: translate3d(0px, 0px, 0px);
+                              contain: strict;
+                              top: 0px;
+                              left: 0px;
+                            "
+                          >
+                            <div
+                              class="view-overlays"
+                              role="presentation"
+                              aria-hidden="true"
+                              style="
+                                position: absolute;
+                                font-family: 'Segoe WPC', 'Segoe UI', sans-serif,
+                                  Consolas, 'Courier New', monospace;
+                                font-weight: normal;
+                                font-size: 13px;
+                                font-feature-settings: 'liga' 0, 'calt' 0;
+                                font-variation-settings: normal;
+                                line-height: 20px;
+                                letter-spacing: 0px;
+                                height: 0px;
+                                width: 790px;
+                              "
+                            >
+                              <div
+                                style="
+                                  position: absolute;
+                                  top: 0px;
+                                  width: 100%;
+                                  height: 20px;
+                                "
+                              ></div>
+                            </div>
+                            <div
+                              role="presentation"
+                              aria-hidden="true"
+                              class="view-rulers"
+                            ></div>
+                            <div
+                              class="view-zones"
+                              role="presentation"
+                              aria-hidden="true"
+                              style="position: absolute"
+                            ></div>
+                            <div
+                              class="view-lines monaco-mouse-cursor-text"
+                              role="presentation"
+                              aria-hidden="true"
+                              data-mprt="8"
+                              style="
+                                position: absolute;
+                                font-family: 'Segoe WPC', 'Segoe UI', sans-serif,
+                                  Consolas, 'Courier New', monospace;
+                                font-weight: normal;
+                                font-size: 13px;
+                                font-feature-settings: 'liga' 0, 'calt' 0;
+                                font-variation-settings: normal;
+                                line-height: 20px;
+                                letter-spacing: 0px;
+                                width: 790px;
+                                height: 20px;
+                              "
+                            >
+                              <div style="top: 0px; height: 20px" class="view-line">
+                                <span><span></span></span>
+                              </div>
+                            </div>
+                            <div
+                              data-mprt="1"
+                              class="contentWidgets"
+                              style="position: absolute; top: 0px"
+                            ></div>
+                            <div
+                              role="presentation"
+                              aria-hidden="true"
+                              class="cursors-layer cursor-line-style cursor-solid"
+                            >
+                              <div
+                                class="cursor monaco-mouse-cursor-text"
+                                style="
+                                  height: 20px;
+                                  top: 0px;
+                                  left: 0px;
+                                  font-family: 'Segoe WPC', 'Segoe UI', sans-serif,
+                                    Consolas, 'Courier New', monospace;
+                                  font-weight: normal;
+                                  font-size: 13px;
+                                  font-feature-settings: 'liga' 0, 'calt' 0;
+                                  font-variation-settings: normal;
+                                  line-height: 20px;
+                                  letter-spacing: 0px;
+                                  display: block;
+                                  visibility: hidden;
+                                  background-color: var(--vscode-input-foreground);
+                                  padding-left: 0px;
+                                  width: 0.8px;
+                                "
+                              ></div>
+                            </div>
+                          </div>
+                          <div
+                            role="presentation"
+                            aria-hidden="true"
+                            class="invisible scrollbar horizontal"
+                            style="
+                              position: absolute;
+                              width: 790px;
+                              height: 0px;
+                              left: 0px;
+                              bottom: 0px;
+                            "
+                          >
+                            <div
+                              class="slider"
+                              style="
+                                position: absolute;
+                                top: 0px;
+                                left: 0px;
+                                height: 12px;
+                                transform: translate3d(0px, 0px, 0px);
+                                contain: strict;
+                                width: 790px;
+                              "
+                            ></div>
+                          </div>
+                          <canvas
+                            class="decorationsOverviewRuler"
+                            aria-hidden="true"
+                            width="0"
+                            height="0"
+                            style="
+                              position: absolute;
+                              transform: translate3d(0px, 0px, 0px);
+                              contain: strict;
+                              top: 0px;
+                              right: 0px;
+                              width: 14px;
+                              height: 20px;
+                              display: none;
+                            "
+                          ></canvas>
+                          <div
+                            role="presentation"
+                            aria-hidden="true"
+                            class="invisible scrollbar vertical"
+                            style="
+                              position: absolute;
+                              width: 0px;
+                              height: 20px;
+                              right: 0px;
+                              top: 0px;
+                            "
+                          >
+                            <div
+                              class="slider"
+                              style="
+                                position: absolute;
+                                top: 0px;
+                                left: 0px;
+                                width: 14px;
+                                transform: translate3d(0px, 0px, 0px);
+                                contain: strict;
+                                height: 20px;
+                              "
+                            ></div>
+                          </div>
+                        </div>
+                        <div
+                          role="presentation"
+                          aria-hidden="true"
+                          style="width: 790px"
+                        ></div>
+                        <textarea
+                          data-mprt="7"
+                          class="inputarea monaco-mouse-cursor-text"
+                          wrap="off"
+                          autocorrect="off"
+                          autocapitalize="off"
+                          autocomplete="off"
+                          spellcheck="false"
+                          aria-label="Ustawienia wyszukiwania"
+                          aria-required="false"
+                          tabindex="0"
+                          role="textbox"
+                          aria-roledescription="edytor"
+                          aria-multiline="true"
+                          aria-autocomplete="both"
+                          style="
+                            tab-size: 14.25px;
+                            font-family: 'Segoe WPC', 'Segoe UI', sans-serif,
+                              Consolas, 'Courier New', monospace;
+                            font-weight: normal;
+                            font-size: 13px;
+                            font-feature-settings: 'liga' 0, 'calt' 0;
+                            font-variation-settings: normal;
+                            line-height: 20px;
+                            letter-spacing: 0px;
+                            top: 0px;
+                            left: 0px;
+                            width: 1px;
+                            height: 1px;
+                          "
+                        ></textarea>
+                        <div
+                          class="monaco-editor-background textAreaCover"
+                          style="
+                            position: absolute;
+                            top: 0px;
+                            left: 0px;
+                            width: 0px;
+                            height: 0px;
+                          "
+                        ></div>
+                        <div
+                          data-mprt="4"
+                          class="overlayWidgets"
+                          style="width: 790px"
+                        ></div>
+                        <div
+                          data-mprt="9"
+                          class="minimap slider-mouseover"
+                          role="presentation"
+                          aria-hidden="true"
+                          style="
+                            position: absolute;
+                            left: 0px;
+                            width: 0px;
+                            height: 20px;
+                          "
+                        >
+                          <div
+                            class="minimap-shadow-hidden"
+                            style="height: 20px"
+                          ></div>
+                          <canvas
+                            width="0"
+                            height="25"
+                            style="
+                              position: absolute;
+                              left: 0px;
+                              width: 0px;
+                              height: 20px;
+                            "
+                          ></canvas
+                          ><canvas
+                            class="minimap-decorations-layer"
+                            width="0"
+                            height="25"
+                            style="
+                              position: absolute;
+                              left: 0px;
+                              width: 0px;
+                              height: 20px;
+                            "
+                          ></canvas>
+                          <div
+                            class="minimap-slider"
+                            style="
+                              position: absolute;
+                              transform: translate3d(0px, 0px, 0px);
+                              contain: strict;
+                              width: 0px;
+                            "
+                          >
+                            <div
+                              class="minimap-slider-horizontal"
+                              style="position: absolute; width: 0px; height: 0px"
+                            ></div>
+                          </div>
+                        </div>
+                        <div
+                          role="presentation"
+                          aria-hidden="true"
+                          class="blockDecorations-container"
+                        ></div>
+                      </div>
+                      <div data-mprt="2" class="overflowingContentWidgets"></div>
+                      <div data-mprt="5" class="overflowingOverlayWidgets"></div>
+                    </div>
+                  </div>
+                  <div
+                    class="settings-count-widget monaco-count-badge long"
+                    style="
+                      background-color: var(--vscode-badge-background);
+                      color: var(--vscode-badge-foreground);
+                      border: 1px solid var(--vscode-contrastBorder);
+                      display: none;
+                    "
+                  ></div>
+                  <div class="settings-clear-widget">
+                    <div class="monaco-action-bar">
+                      <ul class="actions-container" role="toolbar">
+                        <li class="action-item disabled" role="presentation">
+                          <a
+                            class="action-label codicon codicon-preferences-clear-input disabled"
+                            role="button"
+                            aria-disabled="true"
+                            aria-label="Wyczyść dane wejściowe wyszukiwania ustawień"
+                            tabindex="0"
+                          ></a>
+                        </li>
+                        <li class="action-item" role="presentation">
+                          <div class="monaco-dropdown">
+                            <div class="dropdown-label">
+                              <a
+                                class="action-label codicon codicon-preferences-filter"
+                                role="button"
+                                aria-haspopup="true"
+                                aria-expanded="false"
+                                aria-label="Ustawienia filtru"
+                              ></a>
+                            </div>
+                          </div>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+                <div
+                  class="settings-header-controls"
+                  style="border-color: var(--vscode-settings-headerBorder)"
+                >
+                  <div class="settings-target-container">
+                    <div class="settings-tabs-widget">
+                      <div class="monaco-action-bar">
+                        <ul
+                          class="actions-container"
+                          role="toolbar"
+                          aria-label="Przełącznik ustawień"
+                        >
+                          <li class="action-item" role="presentation">
+                            <a
+                              class="action-label checked"
+                              role="checkbox"
+                              aria-label="Local"
+                              tabindex="0"
+                              aria-checked="true"
+                              >Local</a
+                            >
+                          </li>
+                          <li class="action-item" role="presentation">
+                            <a
+                              class="action-label"
+                              role="checkbox"
+                              aria-label="Component Manager"
+                              aria-checked="false"
+                              >Component Manager</a
+                            >
+                          </li>
+                          <li class="action-item disabled" role="presentation">
+                            <a
+                              class="action-label folder-settings"
+                              role="button"
+                              aria-haspopup="true"
+                              tabindex="0"
+                              title="Folder"
+                              ><div class="action-title">Folder</div>
+                              <div class="action-details"></div>
+                              <div
+                                class="dropdown-icon codicon codicon-settings-folder-dropdown"
+                              ></div
+                            ></a>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="settings-right-controls">
+                    <div class="turn-on-sync">
+                      <!-- don't need this button right now
+                      <a
+                        class="monaco-button monaco-text-button"
+                        tabindex="0"
+                        role="button"
+                        aria-disabled="false"
+                        style="
+                          color: var(--vscode-button-foreground);
+                          background-color: var(--vscode-button-background);
+                        "
+                        >Button</a
+                      >-->
+                    </div>
+                    <div
+                      class="last-synced-label"
+                      aria-hidden="true"
+                      style="display: none"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+              <div class="settings-body">
+                <div
+                  class="no-results-message"
+                  style="color: var(--vscode-editor-foreground)"
+                >
+                  Nie znaleziono ustawień<span
+                    class="clear-search-filters"
+                    style="display: none"
+                  >
+                    -
+                    <a class="pointer prominent" tabindex="0"
+                      >Wyczyść filtry</a
+                    ></span
+                  >
+                </div>
+                <!-- XXX - THIS IS ENTIRE SPLIT VIEW -->
+                <div
+                  id="split-view"
+                  class="monaco-split-view2 horizontal separator-border"
+                  style="
+                    height: 508px;
+                    width: 864px;
+                    visibility: visible;
+                    --separator-border: var(--vscode-settings-headerBorder);
+                  "
+                >
+                  <div class="sash-container">
+                    <div class="monaco-sash vertical" style="left: 198px"
+                    onmouseenter="onSashMouseEnter()"
+                    onmouseleave="onSashMouseLeave()"
+                    onmousedown="onSashMouseDown(event)"
+                    onmouseup="onSashMouseUp()"
+                    onmousemove="onSashMouseMove()"
+                    id="vertical-sash"></div>
+                  </div>
+                  <div
+                    class="monaco-scrollable-element"
+                    role="presentation"
+                    style="position: relative; overflow: hidden"
+                  >
+                    <div class="split-view-container" style="overflow: hidden" id="split-view-container">
+                      <!-- THIS IS TOC VIEW -->
+                      <div
+                        class="split-view-view visible"
+                        style="left: 0px; width: 200px"
+                        id="tree-container"
+                      >
+                        <div class="settings-toc-container" style="width: 200px" id="container-toc">
+                          <div
+                            class="settings-toc-wrapper"
+                            role="navigation"
+                            aria-label="Ustawienia"
+                          >
+                            <!-- LIST OF SETTINGS (TOC) -->
+                            <div
+                              class="monaco-list list_id_1 mouse-support last-focused element-focused selection-single"
+                              tabindex="0"
+                              role="tree"
+                              aria-label="Spis treści ustawień"
+                              data-keybinding-context="12"
+                              aria-activedescendant="list_id_1_6"
+                            >
+                              <div
+                                class="monaco-scrollable-element"
+                                role="presentation"
+                                style="position: relative; overflow: hidden"
+                              >
+                                <div
+                                  class="monaco-list-rows"
+                                  id="scrollable-toc"
+                                  style="
+                                    transform: translate3d(0px, 0px, 0px);
+                                    overflow: hidden;
+                                    contain: strict;
+                                    left: 0px;
+                                    top: 0px;
+                                  "
+                                  onmousedown="onScrollableMouseDown(event, 'toc')"
+                                  onwheel="onScrollableWheel(event, 'toc')"
+                                >
+                                </div>
+                                <div
+                                  role="presentation"
+                                  aria-hidden="true"
+                                  class="invisible scrollbar horizontal"
+                                  style="
+                                    position: absolute;
+                                    width: 0px;
+                                    height: 10px;
+                                    left: 0px;
+                                    bottom: 0px;
+                                  "
+                                >
+                                  <div
+                                    class="slider"
+                                    style="
+                                      position: absolute;
+                                      top: 0px;
+                                      left: 0px;
+                                      height: 10px;
+                                      transform: translate3d(0px, 0px, 0px);
+                                      contain: strict;
+                                      width: 0px;
+                                    "
+                                  ></div>
+                                </div>
+                                <!-- XXX-SCROLLBAR - set invisible to visible to show it
+                                    this probably should be done when hovering -->
+                                <div
+                                  role="presentation"
+                                  aria-hidden="true"
+                                  class="visible scrollbar vertical"
+                                  style="
+                                    position: absolute;
+                                    width: 10px;
+                                    bottom: 0px;
+                                    right: 0px;
+                                    top: 0px;
+                                  "
+                                  id="scrollbar-toc"
+                                >
+                                  <div
+                                    class="slider"
+                                    style="
+                                      position: absolute;
+                                      top: 0px;
+                                      left: 0px;
+                                      width: 10px;
+                                      transform: translate3d(0px, 0px, 0px);
+                                      contain: strict;
+                                      height: 50px;
+                                    "
+                                    id="slider-toc"
+                                    onmousedown="onSliderMouseDown(event, 'toc')"
+                                  ></div>
+                                </div>
+                                <div class="shadow"></div>
+                                <div class="shadow"></div>
+                                <div class="shadow"></div>
+                                <div class="monaco-tree-sticky-container empty">
+                                  <div
+                                    class="monaco-tree-sticky-container-shadow"
+                                  ></div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <!-- THIS IS DETAILS VIEW -->
+                      <div
+                        class="split-view-view visible"
+                        style="left: 200px; width: 664px;"
+                        id="container-details"
+                      >
+                        <div class="settings-tree-container" style="width: 100%">
+                          <div
+                            class="monaco-list list_id_2 mouse-support settings-editor-tree element-focused selection-single"
+                            tabindex="0"
+                            role="tree"
+                            aria-label="Ustawienia"
+                            data-keybinding-context="13"
+                            aria-activedescendant="list_id_2_216"
+                          >
+                            <div
+                              class="monaco-scrollable-element"
+                              role="presentation"
+                              style="position: relative; overflow: hidden"
+                            >
+                              <div
+                                class="monaco-list-rows"
+                                style="
+                                  overflow: hidden;
+                                  left: 0px;
+                                  top: 0px;
+                                  height: auto;
+                                "
+                                id="scrollable-details"
+                                onmousedown="onScrollableMouseDown(event, 'details')"
+                                onwheel="onScrollableWheel(event, 'details')"
+
+                              >
+                                <!-- ALL THE SETTINGS SHOULD BE CREATED HERE -->
+                              </div>
+                              <div
+                                role="presentation"
+                                aria-hidden="true"
+                                class="invisible scrollbar horizontal"
+                                style="
+                                  position: absolute;
+                                  width: 0px;
+                                  height: 10px;
+                                  left: 0px;
+                                  bottom: 0px;
+                                "
+                              >
+                                <div
+                                  class="slider"
+                                  style="
+                                    position: absolute;
+                                    top: 0px;
+                                    left: 0px;
+                                    height: 10px;
+                                    transform: translate3d(0px, 0px, 0px);
+                                    contain: strict;
+                                    width: 0px;
+                                  "
+                                ></div>
+                              </div>
+                              <!-- XXX-SCROLLBAR --- this is a second scollbar -->
+                              <div
+                                role="presentation"
+                                aria-hidden="true"
+                                class="visible scrollbar vertical"
+                                style="
+                                  position: absolute;
+                                  width: 10px;
+                                  bottom: 0px;
+                                  right: 0px;
+                                  top: 0px;
+                                "
+                                id="scrollbar-details"
+                              >
+                                <div
+                                  class="slider"
+                                  style="
+                                    position: absolute;
+                                    top: 0px;
+                                    left: 0px;
+                                    width: 10px;
+                                    transform: translate3d(0px, 0px, 0px);
+                                    contain: strict;
+                                    height: 50px;
+                                  "
+                                  id="slider-details"
+                                  onmousedown="onSliderMouseDown(event, 'details')"
+                                ></div>
+                              </div>
+                              <div class="shadow"></div>
+                              <div class="shadow top"></div>
+                              <div class="shadow top-left-corner top"></div>
+
+                              <!-- THIS IS STICKY CONTAINER -->
+                              <div
+                                class="monaco-tree-sticky-container"
+                                id="sticky-container"
+                                tabindex="0"
+                                style="height: 126px"
+                              >
+                              </div>
+
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div
+                      role="presentation"
+                      aria-hidden="true"
+                      class="invisible scrollbar horizontal"
+                      style="
+                        position: absolute;
+                        width: 903px;
+                        height: 10px;
+                        left: 0px;
+                        bottom: 0px;
+                      "
+                    >
+                      <div
+                        class="slider"
+                        style="
+                          position: absolute;
+                          top: 0px;
+                          left: 0px;
+                          height: 10px;
+                          transform: translate3d(0px, 0px, 0px);
+                          contain: strict;
+                          width: 903px;
+                        "
+                      ></div>
+                    </div>
+                    <div
+                      role="presentation"
+                      aria-hidden="true"
+                      class="invisible scrollbar vertical"
+                      style="
+                        position: absolute;
+                        width: 0px;
+                        height: 0px;
+                        right: 0px;
+                        top: 0px;
+                      "
+                    >
+                      <div
+                        class="slider"
+                        style="
+                          position: absolute;
+                          top: 0px;
+                          left: 0px;
+                          width: 10px;
+                          transform: translate3d(0px, 0px, 0px);
+                          contain: strict;
+                          height: 0px;
+                        "
+                      ></div>
+                    </div>
+                    <div class="shadow"></div>
+                    <div class="shadow"></div>
+                    <div class="shadow"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    `;
+  document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+function createLayoutWelcome(parent_id, entry) {
+
+  var html = `
+      <div style='padding: 12px 24px; width: 100%; height: 100%;'>
+        <div style='display: grid;
+                    grid-template-columns: 1fr 8fr 1fr 2fr 1fr;
+                    grid-template-rows: min-content 1fr min-content;
+                    height: 100%;
+                    max-width: 1200px;
+                    grid-template-areas: ". header header header ."
+                                         ". left-column . right-column ."
+                                         ". footer footer footer .";'>
+  
+          <div style='grid-area: header; padding-top: 16px; padding-bottom: 16px;' id='header'></div>
+          <div id="left-column"
+               style='grid-area: left-column;
+               display: inline-block; overflow: scroll;'>
+            <form id="main-form" autocomplete="off">
+            </form>
+          </div>
+          <div id="right-column"
+              style='grid-area: right-column;
+                     display: inline-block;
+                     vertical-align: top;
+                     border-left: solid 2px var(--vscode-welcomePage-tileBorder);
+                     padding-left: 16px; overflow: scroll;'>
+          </div>
+          <div style='grid-area: footer; padding: 16px;' id='footer'></div>
+        </div>
+      </div>
+    `;
+  document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+
+function createTwoColumnLayout(parent_id, entry) {
+
+  var html = `
+      <div id="main-form-frame" class="form-frame" style='display: inline-block;'>
+        <form id="main-form" autocomplete="off">
+        </form>
+      </div>
+      <div id="second-column" class="form-frame" style='display: inline-block;
+          vertical-align: top;
+          margin-left: 64px;
+          border-left: solid 2px var(--vscode-welcomePage-tileBorder);
+          padding-left: 10px;
+          '>
+      </div>
+    `;
+  document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+function createLayoutCanvas(parent_id, entry) {
+  var canvasWidth = 1024;
+  var canvasHeight = 1024;
+  var canvasGridMinor = 10;
+  var canvasGridMajor = 10;
+
+  if ("grid" in entry) {
+    if ("width" in entry["grid"]) {
+      canvasWidth = entry["grid"]["width"];
+    }
+    if ("height" in entry["grid"]) {
+      canvasHeight = entry["grid"]["height"];
+    }
+    if ("major" in entry["grid"]) {
+      canvasGridMajor = entry["grid"]["major"];
+    }
+    if ("minor" in entry["grid"]) {
+      canvasGridMajor = entry["grid"]["minor"];
+    }
+  }
+
+  var symbolsToolbar = entry['symbols'];
+  var symbolsProperties = getCanvasSvgSymbolsProperties();
+  var html = getCanvasHtml(canvasWidth, canvasHeight, canvasGridMinor, canvasGridMajor);
+  var toolbar = getCanvasToolbarHtml();
+  var properties = getCanvasPropertiesHtml();
+  var rulers = getCanvasRulersHtml();
+  document.getElementById(parent_id).insertAdjacentHTML('beforeend', symbolsToolbar + symbolsProperties + html);   
+  document.getElementById('toolbar-container').innerHTML = toolbar;
+  document.getElementById('properties-container').innerHTML = properties;
+  document.getElementById('main-stage').insertAdjacentHTML('beforeend', rulers);
+  document.getElementById("horizontal-ruler-numbers").innerHTML = "XXX";
+  document.getElementById("vertical-ruler-numbers").innerHTML = "YYY";
+
+  createSelector();
+  positionRulers(-50, -50);
+
+  html = "";
+  for (var i = 0; i < entry['toolbox'].length; i++) {
+    var e = entry['toolbox'][i];
+    var name = e['name'];
+    var symbol = e['symbol'];
+    html += `
+        <li class="toolbar-panel-list-item" title="${name}"
+                  onmousedown="onToolbar${name}Clicked()"
+                >
+                  <svg class="svg-icon">
+                    <use xlink:href="#${symbol}"></use>
+                  </svg>
+                  <span class="toolbar-panel-list-item-label">${name}</span>
+                </li>
+    `;
+  }
+  document.getElementById("toolbar-section-common").innerHTML = html;
+}
+
+function folderSelectorClicked(id) {
+  vscode.postMessage({ command: 'select-folder', id: id });
+}
+
+function comboClicked(id, value) {
+  vscode.postMessage({ command: 'dropdown-clicked', id: id });
+
+  document.getElementById(id + '-list').hidden = true;
+  document.getElementById(id + '-box').innerText = value;
+
+  // XXX - this needs to be fixed ---- hide/show example selection
+  //document.getElementById('esp-idf-version-selection-area').hidden =
+  //  platformType != 'ESP-IDF' && platformType != 'Arduino on ESP-IDF'
+}
+
+var activeCombo = "";
+
+function comboOpenClose(id) {
+  if (activeCombo !== '') {
+    document.getElementById(activeCombo + "-list").hidden = true;
+  }
+
+  document.getElementById(id + "-list").hidden = false;
+  activeCombo = id;
+}
+
+document.addEventListener('click', function onBodyClick(e) {
+  if (activeCombo !== '') {
+    document.getElementById(activeCombo + "-list").hidden = true;
+    activeCombo = "";
+  }
+});
+
+//--------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
+//---------------- BELOW IS THE CODE RELATED TO TREEVIEW
+//--------------------------------------------------------------------------------------------------------------
+
+var data = [];
+
+var config = {
+  maxStickyHeadersVisible: 1
+};
+var headerLevel = -1;
+
+function onListItemClicked(id) {
+
+  //document.getElementById('search-input-placeholder').innerText = "XXX - 1";
+
+  document.getElementById('scrollable-toc').innerHTML = "";
+  toggleTreeItem(data, id, []);
+  treePopulate(data, 0);
+  treeLayout();
+  adjustScrollbar('toc');
+
+  //document.getElementById('search-input-placeholder').innerText = "XXX - 2";
+
+  let focusedEntry = treeFindFocusedEntry(data);
+  //document.getElementById('search-input-placeholder').innerText = "XXX - 2-A";
+
+  let entryType = "leaf";
+  let focusedId = "none";
+  if (focusedEntry !== null) {
+    focusedId = focusedEntry['id'];
+    var hasSubitems = ('subitems' in focusedEntry && focusedEntry['subitems'].length > 0);
+    if (hasSubitems) {
+      entryType = "node";
+    }
+  } else {
+    entryType = "none";
+  }
+  //document.getElementById('search-input-placeholder').innerText = "XXX - 3";
+
+  try {
+    vscode.postMessage({ command: 'selected', id: focusedId, type: entryType });
+  } catch (e) {
+    //document.getElementById('search-input-placeholder').innerText = "EXCEPTION: " + e.toString();
+  }
+  //document.getElementById('search-input-placeholder').innerText = "PASSED";
+}
+
+function setHeaderCount(count) {
+  headerLevel = count;
+  let max = config['maxStickyHeadersVisible'];
+  let hidden = 0;
+  let container = document.getElementById('sticky-container');
+  let shadow = document.getElementById('sticky-container-shadow');
+  if (max < count) {
+    hidden = count - max;
+  }
+  let totalHeight = 42 * (count - hidden);
+  for (var i = 0; i < 3; i++) {
+    let header = document.getElementById('sticky-header-row-' + (i + 1).toString());
+    if (i < count) {
+      if (header !== null) { continue; }
+
+      let html = `
+        <div
+          class="monaco-tree-sticky-row monaco-list-row focused"
+          data-index="14"
+          data-parity="even"
+          id="sticky-header-row-${i + 1}"
+          aria-label="Sticky Container #${i + 1}"
+          aria-selected="false"
+          aria-expanded="true"
+          style="top: ${42 * (i - hidden)}px; height: 42px; line-height: 42px"
+        >
+          <div class="monaco-tl-row" id="sticky-header-row-x-${i + 1}">
+            <div
+              class="monaco-tl-indent"
+              style="width: 0px"
+            ></div>
+            <div
+              class="monaco-tl-twistie codicon codicon-tree-item-expanded collapsible"
+              style="padding-left: 8px"
+            ></div>
+            <div class="monaco-tl-contents group-title">
+              <div
+                class="settings-group-title-label settings-row-inner-container settings-group-level-${i + 1}"
+                id="sticky-header-${i + 1}"
+              >
+                Sticky Container XX#${i + 1}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      container.insertAdjacentHTML("beforeend", html);
+      // create header
+    } else {
+      if (header !== null) {
+        header.remove();
+      }
+    }
+  }
+
+  // XXX - cover shadow that comes from some other element, perhaps empty scrollable?
+  if (totalHeight === 0) { totalHeight = 5; }
+  container.style.height = totalHeight.toString() + "px";
+
+  if (count === 0 && shadow !== null) {
+    shadow.remove();
+  } else if (count > 0 && shadow === null){
+    html = `
+      <div class="monaco-tree-sticky-container-shadow" id="sticky-container-shadow"></div>
+    `;
+    container.insertAdjacentHTML("afterbegin", html);
+  }
+}
+
+function setHeader(level, text) {
+  let header = document.getElementById('sticky-header-' + (level + 1).toString());
+  if (header !== null) {
+    header.innerText = text;
+  }
+}
+
+function setDetailsActions(actions) {
+  //document.getElementById('search-input-placeholder').innerText = "SET DETAILS ACTIONS";
+
+  let header = document.getElementById('sticky-header-row-x-' + (headerLevel).toString());
+
+  var elements = header.getElementsByClassName("action-link");
+  while (elements.length > 0) {
+      elements[0].parentNode.removeChild(elements[0]);
+  }
+
+  document.getElementById('search-input-placeholder').innerText = "SET DETAILS ACTIONS - A";
+  for (let i = 0; i < actions.length; i++) {
+    //document.getElementById('search-input-placeholder').innerText = "SET DETAILS ACTIONS- X";
+
+    let action = actions[i];
+    let html = `
+      <a style="font-size: 25px; padding-right: 10px;" href="https://devportal.espressif.com"
+        id="espressif-action-${i}" class="codicon ${action['codicon']} action-link" title="${action['description']}">
+      </a>   
+    `;
+    header.insertAdjacentHTML("beforeend", html);
+    //document.getElementById('search-input-placeholder').innerText = "SET DETAILS ACTIONS- Y";
+
+  }
+}
+
+function setFolder(folderSelectorId, folder) {
+    document.getElementById(folderSelectorId).value = folder;
+  }
+
+function toggleTreeItem(entries, id, headers) {
+  for (let entry of entries) {
+    var hasSubitems = ('subitems' in entry && entry['subitems'].length > 0);
+
+    if (entry['id'] === id) {
+      entry['focused'] = true;
+      entry['selected'] = true;
+      if (hasSubitems) {
+        entry['expanded'] = !('expanded' in entry && entry['expanded']);
+      }
+      if (headers.length > 0) {
+        setHeaderCount(2);
+        setHeader(0, headers[0]);
+        setHeader(1, entry['name']);
+      } else {
+        setHeaderCount(1);
+        setHeader(0, entry['name']);
+      }
+    } else {
+      entry['focused'] = false;
+      entry['selected'] = false;
+    }
+
+    if (hasSubitems) {
+      toggleTreeItem(entry['subitems'], id, headers.concat([entry['name']]));
+    }
+  }
+}
+
+function treePopulate(entries, level) {
+ 
+  for (let entry of entries) {
+    var hasSubitems = ('subitems' in entry && entry['subitems'].length > 0);
+    var isCollapsed = hasSubitems ? !('expanded' in entry && entry['expanded']) : true;
+    var isFocused = ('focused' in entry && entry['focused']);
+    var isSelected = ('selected' in entry && entry['selected']);
+    createMenuItem("beforeend", entry['id'], entry['name'], level, hasSubitems, isCollapsed, isFocused, isSelected);
+
+    if (hasSubitems && !isCollapsed) {
+      treePopulate(entry['subitems'], level + 1);
+    }
+  }
+}
+
+function createMenuItem(location, id, text, level, hasSubitems, isCollapsed, isFocused, isSelected) {
+  var html_to_insert = `
+    <div
+      class="monaco-list-row${isFocused ? ' focused' : ''}${isSelected ? ' selected' : ''}"
+      role="treeitem"
+      data-index="12"
+      data-last-element="false"
+      data-parity="even"
+      aria-setsize="8"
+      aria-posinset="4"
+      aria-selected="false"
+      aria-label="Okno, grupa"
+      aria-level="2"
+      draggable="false"
+      style="top: 100px; height: 22px; line-height: 22px"
+      aria-expanded="false"
+      id="${id}"
+      onclick="onListItemClicked('${id}')"
+    >
+      <div class="monaco-tl-row">
+        <div class="monaco-tl-indent" style="width: 0px"></div>
+        <div
+          class="monaco-tl-twistie ${hasSubitems ? ('codicon ' + (isCollapsed ? 'codicon-tree-item-expanded collapsible collapsed' : 'codicon-tree-item-expanded collapsible')) : ''}"
+          style="padding-left: ${((level * 16)).toString()}px"
+        ></div>
+        <div class="monaco-tl-contents">
+          <div class="settings-toc-entry" title="Okno">${text}</div>
+          <div class="settings-toc-count">(12)</div>
+        </div>
+      </div>
+    </div>
+  `;
+  var e = document.getElementById('scrollable-toc').insertAdjacentHTML(location, html_to_insert);
+}
+
+function createSettingCheckBox() {
+var html_to_insert = `
+  <div
+  class="monaco-list-row"
+  role="treeitem"
+  data-index="210"
+  data-last-element="false"
+  data-parity="even"
+  aria-setsize="17"
+  aria-posinset="14"
+  id="list_id_2_210"
+  aria-selected="false"
+  aria-label=" Render Side By Side. Określa, czy edytor różnic pokazuje porównanie obok siebie, czy w trybie śródwierszowym.
+"
+  aria-level="3"
+  draggable="false"
+  style="
+    top: 19282px;
+    line-height: 80px;
+    height: 80px;
+  "
+>
+  <div class="monaco-tl-row">
+    <div
+      class="monaco-tl-indent"
+      style="width: 16px"
+    ></div>
+    <div
+      class="monaco-tl-twistie"
+      style="padding-left: 24px"
+    ></div>
+    <div
+      class="monaco-tl-contents setting-item setting-item-bool"
+    >
+      <div
+        class="setting-item-contents settings-row-inner-container"
+        data-key="diffEditor.renderSideBySide"
+        data-id="editor_diffEditor_diffEditor.renderSideBySide"
+      >
+        <div class="setting-item-title">
+          <span
+            class="setting-item-category"
+            title="diffEditor.renderSideBySide"
+          ></span
+          ><span
+            class="setting-item-label"
+            title="diffEditor.renderSideBySide"
+            >Render Side By Side</span
+          >
+          <div
+            class="setting-indicators-container"
+            role="toolbar"
+            style="display: none"
+          ></div>
+        </div>
+        <div class="setting-item-value-description">
+          <div class="setting-item-bool-control">
+            <div
+              class="monaco-custom-toggle codicon codicon-check setting-value-checkbox setting-control-focus-target checked"
+              tabindex="-1"
+              role="checkbox"
+              aria-checked="true"
+              aria-label="diffEditor.renderSideBySide"
+              data-focusable="true"
+              style="
+                color: rgb(255, 255, 255);
+                border-color: rgba(0, 122, 204, 0);
+                background-color: rgba(
+                  14,
+                  99,
+                  156,
+                  0.314
+                );
+              "
+            ></div>
+          </div>
+          <div class="setting-item-description">
+            Określa, czy edytor różnic pokazuje
+            porównanie obok siebie, czy w trybie
+            śródwierszowym.
+          </div>
+        </div>
+        <div
+          class="setting-item-modified-indicator"
+          title="Ustawienie zostało skonfigurowane w bieżącym zakresie."
+        ></div>
+        <div
+          class="setting-item-deprecation-message"
+        >
+          <div class="codicon codicon-error"></div>
+        </div>
+        <div class="setting-toolbar-container">
+          <div class="monaco-toolbar">
+            <div class="monaco-action-bar">
+              <ul
+                class="actions-container"
+                role="toolbar"
+              >
+                <li
+                  class="action-item"
+                  role="presentation"
+                >
+                  <div class="monaco-dropdown">
+                    <div class="dropdown-label">
+                      <a
+                        class="action-label codicon codicon-settings-more-action"
+                        role="button"
+                        aria-haspopup="true"
+                        aria-expanded="false"
+                        aria-label="Więcej akcji...  (Shift+F9)"
+                        tabindex="-1"
+                        data-focusable="true"
+                      ></a>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  `;
+  var e = document.getElementById('scrollable-details').insertAdjacentHTML("afterbegin", html_to_insert);
+}
+
+
+function createSettingSelectionBox() {
+  var html_to_insert = `
+  <div
+    class="monaco-list-row"
+    role="treeitem"
+    data-index="213"
+    data-last-element="false"
+    data-parity="odd"
+    aria-setsize="17"
+    aria-posinset="17"
+    id="list_id_2_213"
+    aria-selected="false"
+    aria-label=" Word Wrap."
+    aria-level="3"
+    draggable="false"
+    style="
+      top: 19549px;
+      line-height: 88px;
+      height: 88px;
+    "
+  >
+    <div class="monaco-tl-row">
+      <div
+        class="monaco-tl-indent"
+        style="width: 16px"
+      ></div>
+      <div
+        class="monaco-tl-twistie"
+        style="padding-left: 24px"
+      ></div>
+      <div
+        class="monaco-tl-contents setting-item setting-item-enum"
+      >
+        <div
+          class="setting-item-contents settings-row-inner-container"
+          data-key="diffEditor.wordWrap"
+          data-id="editor_diffEditor_diffEditor.wordWrap"
+        >
+          <div class="setting-item-title">
+            <div
+              class="setting-item-cat-label-container"
+            >
+              <span
+                class="setting-item-category"
+                title="diffEditor.wordWrap"
+              ></span
+              ><span
+                class="setting-item-label"
+                title="diffEditor.wordWrap"
+                >Word Wrap</span
+              >
+            </div>
+            <div
+              class="setting-indicators-container"
+              role="toolbar"
+              style="display: none"
+            ></div>
+          </div>
+          <div class="setting-item-description"></div>
+          <div
+            class="setting-item-enumDescription"
+          ></div>
+          <div
+            class="setting-item-modified-indicator"
+            title="Ustawienie zostało skonfigurowane w bieżącym zakresie."
+          ></div>
+          <div class="setting-item-value">
+            <div
+              class="setting-item-control select-container"
+            >
+              <select
+                class="monaco-select-box monaco-select-box-dropdown-padding setting-control-focus-target"
+                tabindex="-1"
+                aria-label="diffEditor.wordWrap"
+                data-focusable="true"
+                style="
+                  background-color: var(
+                    --vscode-settings-dropdownBackground
+                  );
+                  color: var(
+                    --vscode-settings-dropdownForeground
+                  );
+                  border-color: var(
+                    --vscode-settings-dropdownBorder
+                  );
+                "
+              >
+                <option value="off">off</option>
+                <option value="on">on</option>
+                <option value="inherit">
+                  inherit
+                </option>
+              </select>
+            </div>
+          </div>
+          <div
+            class="setting-item-deprecation-message"
+          >
+            <div class="codicon codicon-error"></div>
+          </div>
+          <div class="setting-toolbar-container">
+            <div class="monaco-toolbar">
+              <div class="monaco-action-bar">
+                <ul
+                  class="actions-container"
+                  role="toolbar"
+                >
+                  <li
+                    class="action-item"
+                    role="presentation"
+                  >
+                    <div class="monaco-dropdown">
+                      <div class="dropdown-label">
+                        <a
+                          class="action-label codicon codicon-settings-more-action"
+                          role="button"
+                          aria-haspopup="true"
+                          aria-expanded="false"
+                          aria-label="Więcej akcji...  (Shift+F9)"
+                          tabindex="-1"
+                          data-focusable="true"
+                        ></a>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  `;
+  var e = document.getElementById('scrollable-details').insertAdjacentHTML("afterbegin", html_to_insert);
+}
+
+function treeLayout() {
+  var e = document.getElementById('scrollable-toc');
+  var children = e.children;
+  var pos = 0;
+  for (var i = 0; i < children.length; i++) {
+    var item = children[i];
+    item.style.top = pos.toString() + "px";
+    //item.innerHTML = "AAAA " + pos.toString();
+    pos += 24;
+  }
+  e.style.height = pos.toString() + "px";
+}
+
+var isSashMoving = false;
+var activeScrollbar = "";
+var activeScrollable = "";
+var offset = [0,0];
+
+function onSashMouseEnter() {
+  var el = document.getElementById('vertical-sash');
+  el.setAttribute('class', 'monaco-sash vertical maximum hover');
+}
+  
+function onSashMouseLeave() {
+  var el = document.getElementById('vertical-sash');
+  el.setAttribute('class', 'monaco-sash vertical maximum');
+}
+
+function onSashMouseDown(e) {
+  var el = document.getElementById('vertical-sash');
+
+  isSashMoving = true;
+  offset = [
+    el.offsetLeft - e.clientX,
+    el.offsetTop - e.clientY
+  ];
+  //document.getElementById('sticky-header-1').innerText = offset[0].toString();
+}
+
+function onSliderMouseDown(e, scrollbarId) {
+  var el = document.getElementById("slider-" + scrollbarId);
+
+  activeScrollbar = scrollbarId;
+  offset = [
+    el.offsetLeft - e.clientX,
+    el.offsetTop - e.clientY
+  ];
+  //document.getElementById('sticky-header-1').innerText = offset[0].toString();
+}
+
+function onScrollableMouseDown(e, scrollbarId) {
+  //document.getElementById('search-input-placeholder').innerText = "CLICKED";
+
+  var el = document.getElementById("scrollable-" + scrollbarId);
+
+  activeScrollable = scrollbarId;
+  offset = [
+    el.offsetLeft - e.clientX,
+    el.offsetTop - e.clientY
+  ];
+}
+
+function onButtonClicked(id) {
+  vscode.postMessage({ command: 'button-clicked', id: id })
+}
+
+function onRadioClicked(id) {
+  vscode.postMessage({ command: 'radio-clicked', id: id })
+}
+
+function onScrollableWheel(e, scrollbarId) {
+  //document.getElementById('search-input-placeholder').innerText = "WHEEL " + e.deltaY.toString();
+
+  let scrollable = document.getElementById('scrollable-' + scrollbarId);
+  let container = document.getElementById('container-' + scrollbarId);
+  let newPosition = scrollable.offsetTop - e.deltaY;
+  if (newPosition <= 0 && -newPosition < scrollable.offsetHeight - container.offsetHeight) {
+    //document.getElementById('search-input-placeholder').innerText = "SETTING POSITION: " + (newPosition).toString() + "px";
+    scrollable.style.top = (newPosition).toString() + "px";
+  }
+}
+
+// returns pair [focusedIndex, nextIndex, focusedLevel]
+function treeCalculateIndexes(entries, indexes, level) {
+  let count = entries.length;
+  for (var i = 0; i < count; i++) {
+    var entry = entries[i];
+    if (entry['focused']) {
+      indexes[1] = indexes[0];
+      indexes[2] = level;
+    }
+    indexes[0] += 1;
+    if (entries[i]['expanded']) {
+      treeCalculateIndexes(entries[i]['subitems'], indexes, level + 1);
+    }
+  }
+}
+
+function treeGetNodeByIndex(entries, index) {
+  let count = entries.length;
+  for (var i = 0; i < count; i++) {
+    if (index === 0) {
+      return entries[i];
+    }
+    index--;
+
+    if (entries[i]['expanded']) {
+      var r = treeGetNodeByIndex(entries[i]['subitems'], index);
+      if (typeof r === 'number') {
+        index = r;
+      } else {
+        return r;
+      }
+    }
+  }
+  return index;
+}
+
+function treeSelectPrevNode() {
+  var indexes = [0, -1, -1];
+  treeCalculateIndexes(data, indexes, 0);
+  if (indexes[1] >= 1) {
+    var current = treeGetNodeByIndex(data, indexes[1]);
+    var next = treeGetNodeByIndex(data, indexes[1] - 1);
+    current['focused'] = false;
+    next['focused'] = true;
+    current['selected'] = false;
+    next['selected'] = true;
+
+    // recalculate and return new level
+    treeCalculateIndexes(data, indexes, 0);
+
+    setHeaderCount(indexes[2] + 1);
+    setHeader(indexes[2], next['name']);
+  }
+}
+
+function treeSelectNextNode() {
+  var indexes = [0, -1, -1];
+  treeCalculateIndexes(data, indexes);
+
+  if (indexes[1] < indexes[0] - 1) {
+    var current = treeGetNodeByIndex(data, indexes[1]);
+    var next = treeGetNodeByIndex(data, indexes[1] + 1, 0);
+    current['focused'] = false;
+    next['focused'] = true;
+    current['selected'] = false;
+    next['selected'] = true;
+
+    // recalculate and return new level
+    treeCalculateIndexes(data, indexes, 0);
+
+    setHeaderCount(indexes[2] + 1);
+    setHeader(indexes[2], next['name']);
+  }
+}
+
+function treeArrowUp() {
+  document.getElementById('scrollable-toc').innerHTML = "";
+  treeSelectPrevNode();
+  treePopulate(data, 0);
+  treeLayout();
+  treeAdjustPosition();
+  adjustScrollbar('toc');
+}
+
+function treeArrowDown() {
+  document.getElementById('scrollable-toc').innerHTML = "";
+  treeSelectNextNode();
+  treePopulate(data, 0);
+  treeLayout(); 
+  treeAdjustPosition();
+  adjustScrollbar('toc');
+}
+
+function treeArrowLeft() {
+  document.getElementById('scrollable-toc').innerHTML = "";
+  treeArrowLeftInternal(data, 0);
+  treePopulate(data, 0);
+  treeLayout();
+  adjustScrollbar('toc');
+}
+
+function treeArrowLeftInternal(entries, level) {
+  let count = entries.length;
+  for (let i = 0; i < count; i++) {
+    var entry = entries[i];
+    var expanded = entry['expanded'];
+    var focused = entry['focused'];
+    var hasSubitems = ('subitems' in entry && entry['subitems'].length > 0);
+
+    if (focused) {
+      if (expanded) {
+        // it's focused and expanded, so we jist collapse it
+        entry['expanded'] = false;
+        return 'handled';
+      } else {
+        // not expanded so we move focus to parent
+        if (level > 0) {
+          entry['focused'] = false;
+          entry['selected'] = false;
+        }
+        return 'leave';
+      }
+    } else if (expanded) {
+      let result = treeArrowLeftInternal(entry['subitems'], level + 1);
+      if (result === "handled") {
+        return result;
+      } else if (result === 'leave') {
+        entry['focused'] = true;
+        entry['selected'] = true;
+        setHeader(level, entry['name']);
+        return 'handled';
+      }
+    }
+  }
+  return "none";
+}
+
+function treeArrowRight() {
+  document.getElementById('scrollable-toc').innerHTML = "";
+  treeArrowRightInternal(data, 0);
+  treePopulate(data, 0);
+  treeLayout();
+  adjustScrollbar('toc');
+}
+
+function treeArrowRightInternal(entries, level) {
+  let count = entries.length;
+  for (let i = 0; i < count; i++) {
+    var entry = entries[i];
+    var expanded = entry['expanded'];
+    var focused = entry['focused'];
+    var hasSubitems = ('subitems' in entry && entry['subitems'].length > 0);
+
+    if (focused) {
+      if (expanded) {
+        // already expanded, so we should move focus to submenu
+        treeArrowDownInternal(entries, level, true);
+      } else {
+        // not expanded yet, so we should expand
+        if (hasSubitems) {
+          entry['expanded'] = true;
+        }
+        // in any case we should treat this event as handled here
+        return 'handled';
+      }
+    } else if (expanded) {
+      let result = treeArrowRightInternal(entry['subitems'], level + 1);
+      if (result === "handled") {
+        return result;
+      }
+    }
+  }
+  return "none";
+}
+
+function treeFindFocusedEntry(entries) {
+  let count = entries.length;
+  for (let i = 0; i < count; i++) {
+    var entry = entries[i];
+    var expanded = entry['expanded'];
+    var focused = entry['focused'];
+    var hasSubitems = ('subitems' in entry && entry['subitems'].length > 0);
+
+    if (focused) {
+      return entry;
+    }
+    else if (expanded)
+    {
+      let focusedChild = treeFindFocusedEntry(entry['subitems']);
+      if (focusedChild !== null) {
+        return focusedChild;
+      }
+    }
+  }
+  return null;
+}
+
+function treeFindFocusedEntryId() {
+  let entry = treeFindFocusedEntry(data);
+  if (entry !== null) {
+    return entry['id'];
+  } else {
+    return "";
+  }
+}
+
+function treeAdjustPosition() {
+  // adjust position, so selected / focused element is actually visible
+  let focusedId = treeFindFocusedEntryId();
+  if (focusedId !== "") {
+    let focusedEl = document.getElementById(focusedId);
+    let toc = document.getElementById('scrollable-toc');
+    let tocContainer = document.getElementById('container-toc');
+    let tocContainerHeight = tocContainer.offsetHeight;
+    let tocTop = toc.offsetTop;
+    let focusedTop = focusedEl.offsetTop;
+    let focusedBottom = focusedTop + focusedEl.offsetHeight;
+
+    if (focusedTop < -tocTop) {
+      toc.style.top = (-focusedTop).toString() + "px";
+    } else if (focusedBottom > -tocTop + tocContainerHeight) {
+      toc.style.top = (tocContainerHeight - focusedBottom).toString() + "px";
+    } 
+  }
+}
+
+function adjustScrollbar(id) {
+  let scrollable = document.getElementById('scrollable-' + id);
+  let container = document.getElementById('container-' + id);
+  let scrollbar = document.getElementById('scrollbar-' + id);
+  let slider = document.getElementById('slider-' + id);
+  let scrollableHeight = scrollable.offsetHeight;
+  let containerHeight = container.offsetHeight;
+  let scrollbarHeight = scrollbar.offsetHeight;
+
+  if (scrollableHeight <= containerHeight) {
+    if (scrollbar.classList.contains("visible")) {
+      scrollbar.classList.replace("visible", "invisible");
+    }
+    return;
+  }
+  if (scrollbar.classList.contains("invisible")) {
+    scrollbar.classList.replace("invisible", "visible");
+  }
+
+  // calculate slider height
+  let sliderHeight = (containerHeight / scrollableHeight) * scrollbarHeight;
+
+  // calculate slider position
+  let scrollablePosition = -scrollable.offsetTop;
+  let scrollableMaxPosition = scrollableHeight - containerHeight;
+  let maxSliderPosition = scrollbarHeight - sliderHeight;
+  let sliderPosition = (scrollablePosition / scrollableMaxPosition) * maxSliderPosition;
+
+  // finally update slider parameters
+  slider.style.top = sliderPosition + 'px';
+  slider.style.height = sliderHeight + 'px';
+}
+
+
+document.addEventListener('mouseup', function() {
+  if (isSashMoving) {
+    isSashMoving = false;
+    let sashPosition = document.getElementById('vertical-sash').offsetLeft;
+    let splitContainerWidth = document.getElementById('split-view').offsetWidth;
+
+    //document.getElementById('search-input-placeholder').innerText = "XXX - " + sashPosition.toString() + " " + splitContainerWidth.toString();
+
+    document.getElementById('tree-container').style.width = sashPosition.toString() + "px";
+    document.getElementById('container-toc').style.width = sashPosition.toString() + "px";
+    document.getElementById('container-details').style.left = sashPosition.toString() + "px";
+    document.getElementById('container-details').style.width = (splitContainerWidth - sashPosition).toString() + "px";
+  } else if (activeScrollbar !== "") {
+    activeScrollbar = "";
+  } else if (activeScrollable !== "") {
+    activeScrollable = "";
+  }
+}, true);
+
+document.addEventListener('mousemove', function(event) {
+  event.preventDefault();
+  mousePosition = {
+
+    x : event.clientX,
+    y : event.clientY
+
+  };
+
+  if (isSashMoving) {
+    var el = document.getElementById('vertical-sash');
+    el.style.left = (mousePosition.x + offset[0]) + 'px';
+  } else if (activeScrollbar !== "") {
+    // XXX - handle active scrollbar
+    let scrollbar = document.getElementById('scrollbar-' + activeScrollbar);
+    let slider = document.getElementById('slider-' + activeScrollbar);
+    let maxSliderPosition = scrollbar.offsetHeight - slider.offsetHeight;
+    let newPosition = mousePosition.y + offset[1];
+    if (newPosition < 0) { newPosition = 0; }
+    if (newPosition > maxSliderPosition) { newPosition = maxSliderPosition; }
+    slider.style.top = newPosition + 'px';
+
+    let toc = document.getElementById('scrollable-' + activeScrollbar);
+    let tocContainer = document.getElementById('container-' + activeScrollbar);
+    let tocHeight = toc.offsetHeight;
+    let tocContainerHeight = tocContainer.offsetHeight;
+    //document.getElementById('sticky-header-1').innerText = ">> " + tocHeight.toString() + " " + tocContainerHeight.toString();
+    if (tocHeight > tocContainerHeight)
+    {
+      let newTocPosition = (tocHeight - tocContainerHeight) * (newPosition / maxSliderPosition);
+      toc.style.top = (-newTocPosition).toString() + 'px';
+    }
+  } else if (activeScrollable !== "") {
+    let scrollable = document.getElementById('scrollable-' + activeScrollable);
+    let container = document.getElementById('container-' + activeScrollable);
+    let newPosition = mousePosition.y + offset[1];
+    if (newPosition <= 0 && -newPosition < scrollable.offsetHeight - container.offsetHeight) {
+      //document.getElementById('search-input-placeholder').innerText = "SETTING POSITION: " + (newPosition).toString() + "px";
+      scrollable.style.top = (newPosition).toString() + "px";
+    }
+  }
+}, true);
+
+document.addEventListener(
+  "keydown",
+  (event) => {
+    const keyName = event.key;
+
+    if (keyName === "ArrowLeft") {
+      treeArrowLeft();
+    } else if (keyName === "ArrowRight") {
+      treeArrowRight();
+    } else if (keyName === "ArrowUp") {
+      treeArrowUp();
+    } else if (keyName === "ArrowDown") {
+      treeArrowDown();
+    };
+
+    //if (event.ctrlKey) {
+    //  // Even though event.key is not 'Control' (e.g., 'a' is pressed),
+    //  // event.ctrlKey may be true if Ctrl key is pressed at the same time.
+    //  alert(`Combination of ctrlKey + ${keyName}`);
+    //} else {
+    //  alert(`Key pressed ${keyName}`);
+    //}
+  },
+  false,
+);
+
+window.addEventListener('message', event => {
+
+  const message = event.data;
+
+  switch (message.command) {
+      case 'populate':
+          data = message.data;
+          document.getElementById('scrollable-toc').innerHTML = "";
+          setHeaderCount(0);
+          treePopulate(data, 0);
+          treeLayout();
+          layout();
+          adjustScrollbar('toc');
+          break;
+      case 'details':
+        document.getElementById('scrollable-details').innerHTML = message.data;
+        document.getElementById('scrollable-details').style.top = "0px";
+        adjustScrollbar('details');
+        //document.getElementById('sticky-header-1').innerText = "XX " + document.getElementById('container-details').offsetWidth.toString() + " " + document.getElementById('scrollable-details').offsetWidth.toString() + " " + document.getElementById('scrollbar-details').offsetLeft.toString();;
+        //document.getElementById('sticky-header-1').innerText = "split view width: " + document.getElementById('split-view-container').offsetWidth.toString() + " left=" + document.getElementById('container-details').style.left.toString() + " width=" + document.getElementById('container-details').offsetWidth.toString() + "vpv=" + visualViewport.width.toString();
+        break;
+      case 'config':
+        for (var key in message.data) {
+          config[key] = message.data[key];
+        } 
+        break;
+      case 'hide':
+        document.getElementById(message.id).style.display = "none";
+        break;
+      case 'show':
+        document.getElementById(message.id).style.display = "block";
+        break;
+      case 'disable':
+        document.getElementById(message.id).disabled = true;
+        break;
+      case 'enable':
+        document.getElementById(message.id).disabled = false;
+        break;
+      case 'actions':
+        setDetailsActions(message.data);
+        break;
+      case 'folder-selected':
+        setFolder(message.id, message.folder);
+        break;
+  }
+});
+
+visualViewport.addEventListener("resize", () => {
+  layout();
+});
+
+function layout() {
+  document.getElementById('split-view').style.height = (visualViewport.height - document.getElementById('split-view').getBoundingClientRect().top - 14).toString() + "px";
+  document.getElementById('split-view').style.width = (visualViewport.width - 2 * 14 ).toString() + "px";
+  document.getElementById('container-details').style.width = (visualViewport.width - document.getElementById('container-details').getBoundingClientRect().left - 14 - 14).toString() + "px";
+
+  // document.getElementById('sticky-header-1').innerText = visualViewport.width.toString() + " " + visualViewport.height.toString();
+}
+</script>

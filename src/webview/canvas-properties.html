@@ -1,0 +1,1143 @@
+<style>
+#properties-sidebar-main {
+	background: var(--vscode-menu-background);
+	border-left: 1px solid var(--vscode-menu-border);
+	bottom: 0;
+	box-sizing: border-box;
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 250px;
+	z-index: 50
+}
+
+.properties-sidebar {
+	font-size: 13px
+}
+
+#properties-sidebar-main .properties-sidebar {
+	bottom: 0;
+	left: 0;
+	overflow: auto;
+	position: absolute;
+	right: 0;
+	top: 0;
+	transform: translateZ(0)
+}
+
+.properties-panel {
+	border-bottom: 1px solid var(--vscode-menu-border);
+	display: block
+}
+
+.properties-panel:last-of-type {
+	border-bottom: 1px solid #0000
+}
+
+.properties-panel-header {
+	align-items: center;
+	display: flex;
+	justify-content: space-between
+}
+
+.properties-panel-header-title {
+	background: var(--vscode-menu-background);
+	box-sizing: border-box;
+	color: var(--vscode-editor-foreground);
+	cursor: pointer;
+	flex-grow: 1;
+	font-size: 12px;
+	font-weight: 600;
+	margin: 0;
+	overflow: hidden;
+	padding: 8px 3em 0 1em;
+	text-overflow: ellipsis;
+	white-space: nowrap
+}
+
+.properties-panel-content {
+	display: block;
+	padding: 2px 0 calc(.5em - 2px)
+}
+
+.properties-panel-content-section {
+	margin: .5em 0
+}
+
+.properties-panel-content-section--outline {
+	margin: .4em 0
+}
+
+.properties-panel-content-section--outline div:last-child {
+	margin-right: .25em
+}
+
+#properties-sidebar-panel-alignment {
+	border-bottom: 1px solid var(--vscode-menu-border);
+	font-size: 13px;
+	height: 2em;
+	opacity: 1;
+	padding: 1px 5px;
+	position: relative;
+	z-index: 1
+}
+
+#properties-sidebar-panel-alignment .svg-icon {
+	height: 16px;
+	width: 16px
+}
+
+
+.properties-sidebar-section {
+	border-bottom: 1px solid var(--vscode-menu-border);
+	padding: .5em 1em
+}
+
+.properties-sidebar-section:last-child {
+	border-bottom: none
+}
+
+.properties-sidebar-section-heading {
+	color: var(--vscode-tab-inactiveForeground);
+	font-size: 12px;
+	font-weight: 400;
+	margin: 0 0 .5em
+}
+
+
+
+.properties-color-input {
+	background: var(--vscode-input-background);
+	border: 1px solid var(--vscode-input-border);
+	border-radius: 4px;
+	box-sizing: border-box;
+	display: block;
+	height: 2em;
+	padding: 3px 3px 3px 1.8em;
+	position: relative;
+	width: 100%
+}
+
+.properties-color-input .properties-color-swatch {
+	background-size: 9px 9px
+}
+
+.properties-color-input .svg-icon {
+	height: 16px;
+	width: 16px
+}
+
+.properties-color-swatches {
+	align-items: stretch;
+	display: flex;
+	gap: 2px;
+	justify-content: space-between;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	width: 100%
+}
+
+.properties-color-swatches.project-palette {
+	gap: 5px;
+	justify-content: flex-start;
+	width: auto
+}
+
+.properties-color-swatch {
+	background-size: 9px 9px;
+	border-radius: 2px;
+	flex-basis: 0;
+	flex-grow: 1;
+	margin-left: 1px;
+	overflow: hidden;
+	position: relative;
+	width: 1em
+}
+
+.properties-color-swatch:after {
+	border: 1px solid #333;
+	border-radius: 2px;
+	bottom: 0;
+	content: "";
+	display: block;
+	left: 0;
+	mix-blend-mode: multiply;
+	opacity: .2;
+	pointer-events: none;
+	position: absolute;
+	right: 0;
+	top: 0
+}
+
+.properties-color-swatch.project-palette {
+	flex-basis: auto;
+	margin: 0 0 5px;
+	max-width: calc(2em - 8px)
+}
+
+.properties-color-swatch.project-palette a {
+	height: calc(2em - 8px)
+}
+
+.properties-color-swatch:first-child {
+	margin-left: 0
+}
+
+.properties-color-swatch a {
+	border-radius: 0;
+	display: block;
+	height: calc(2em - 8px)
+}
+
+.mq-input-icon {
+	display: flex;
+	left: .25em;
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	z-index: 2
+}
+
+.mq-input-icon:last-child {
+	left: auto;
+	right: .5em
+}
+
+.slider {
+	background: var(--vscode-menu-border);
+	border-radius: .25em;
+	flex-basis: 32.5%;
+	height: 4px;
+	margin: .8em .8em .8em 0;
+	position: relative
+}
+
+.slider-fill {
+	background: var(--vscode-button-background);
+	border-radius: .25em 0 0 .25em;
+	bottom: 0;
+	left: 0;
+	position: absolute;
+	top: 0
+}
+
+.slider-knob {
+	border: 1px solid var(--vscode-tab-inactiveForeground);
+	border-radius: 14px;
+	box-shadow: 0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a;
+	height: 14px;
+	position: absolute;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	width: 14px
+}
+
+.slider-knob,
+.slider-knob:active {
+	background: var(--vscode-menu-background)
+}
+
+.padding__pane .properties-sidebar-section {
+	margin: .2em 2.5em;
+	padding: 0;
+	position: relative
+}
+
+.padding__pane__overlay {
+	border: 1px solid var(--vscode-input-border);
+	border-radius: calc(4px*1.5);
+	bottom: 0;
+	left: 0;
+	margin: .75em 1.75em;
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: -1
+}
+
+.padding__pane .uix-input--numeric {
+	max-width: 4em
+}
+
+input[type=text].properties-sidebar-object-name {
+	background: #0000;
+	background-image: linear-gradient(to right, var(--vscode-tab-inactiveForeground) 40%, #fff0 20%);
+	background-position: bottom;
+	background-repeat: repeat-x;
+	background-size: 3px 1px;
+	border: none !important;
+	border-radius: 0 !important;
+	color: var(--vscode-button-background);
+	font-weight: 500;
+	padding-left: 0 !important;
+	width: 100%
+}
+
+.properties-sidebar-object-name[disabled] {
+	background: #0000 !important;
+	color: var(--vscode-tab-inactiveForeground) !important
+}
+
+input[type=text].properties-sidebar-object-name:focus {
+	background-image: linear-gradient(to right, var(--vscode-editor-foreground) 40%, #fff0 20%)
+}
+
+.properties-sidebar-copy-button {
+	box-sizing: border-box;
+	display: flex;
+	flex-grow: 0;
+	flex-shrink: 0;
+	gap: 4px;
+	padding-right: 9px;
+	padding-top: 5px
+}
+
+.properties-sidebar-copy-button .properties-sidebar-btn {
+	align-items: center;
+	color: var(--vscode-editor-foreground);
+	display: flex;
+	height: 20px;
+	justify-content: center;
+	margin-bottom: -1px;
+	margin-top: 1px;
+	padding: 0;
+	width: 20px
+}
+
+.properties-sidebar-copy-button .properties-sidebar-btn .svg-icon {
+	fill: currentColor;
+	color: inherit;
+	height: 14px;
+	opacity: .6;
+	width: 14px
+}
+
+.properties-sidebar-copy-button .properties-sidebar-btn:hover .svg-icon {
+	opacity: 1
+}
+
+.btn-spacer {
+	flex-basis: 24px
+}
+
+.btn-spacer--lg {
+	flex-basis: 48px
+}
+
+
+.properties-sidebar-btn {
+	align-items: center;
+	background: var(--vscode-menu-background);
+	border: 1px solid var(--vscode-menu-border);
+	border-radius: 4px;
+	color: var(--vscode-editor-foreground);
+	display: flex;
+	height: 2em;
+	justify-content: center;
+	padding: .285em .45em;
+	transition: background-color .1s cubic-bezier(0.23, 1, 0.32, 1)
+}
+
+.properties-sidebar-btn {
+	text-align: center;
+	text-decoration: none;
+	vertical-align: middle;
+	white-space: nowrap
+}
+
+.properties-sidebar-btn-group {
+	align-items: center;
+	display: flex;
+	justify-content: stretch
+}
+
+.properties-sidebar-btn-group:after {
+	clear: both;
+	content: "";
+	display: block;
+	height: 0;
+	visibility: hidden
+}
+
+.properties-sidebar-btn-group .properties-sidebar-btn {
+	align-items: center;
+	border-radius: 0;
+	box-sizing: border-box;
+	display: flex;
+	flex-grow: 1;
+	justify-content: center;
+	margin-left: -1px;
+	position: relative
+}
+
+.properties-sidebar-btn-group.btn-2 .properties-sidebar-btn {
+	width: 50%
+}
+
+.properties-sidebar-btn-group.btn-3 .properties-sidebar-btn {
+	width: 33%
+}
+
+.properties-sidebar-btn-group.btn-4 .properties-sidebar-btn {
+	width: 25%
+}
+
+.properties-sidebar-btn-group.btn-5 .properties-sidebar-btn {
+	width: 20%
+}
+
+.properties-sidebar-btn-group.btn-6 .properties-sidebar-btn {
+	width: 16.66%
+}
+
+.properties-sidebar-btn-group.btn-7 .properties-sidebar-btn {
+	width: 14.5%
+}
+
+.properties-sidebar-btn-group .properties-sidebar-btn.active {
+	z-index: 2
+}
+
+.properties-sidebar-btn-group .properties-sidebar-btn:first-child {
+	border-radius: 4px 0 0 4px;
+	margin-left: 0
+}
+
+.properties-sidebar-btn-group .properties-sidebar-btn:last-child {
+	border-radius: 0 4px 4px 0
+}
+
+.properties-sidebar-btn-lock-ratio {
+	flex-basis: 24px !important;
+	left: 6px;
+	padding: .2em 0
+}
+
+.properties-sidebar-btn.active,
+.properties-sidebar-btn.active:hover {
+	background: var(--vscode-input-background);
+	border-color: var(--vscode-input-border) !important;
+	color: var(--vscode-button-background)
+}
+
+.properties-sidebar-btn.active .svg-icon {
+	fill: var(--vscode-button-background);
+	color: var(--vscode-button-background)
+}
+
+.properties-sidebar-btn:hover {
+	background: var(--vscode-button-background);
+	text-decoration: none
+}
+
+.properties-sidebar-btn .svg-icon {
+	fill: var(--vscode-editor-foreground);
+	color: var(--vscode-editor-foreground)
+}
+
+.properties-sidebar-btn-transparent {
+	background: none;
+	border: 0;
+	box-shadow: none;
+	padding-bottom: 0;
+	padding-top: 0;
+	text-align: center
+}
+
+.properties-sidebar-btn-transparent.active {
+	background: var(--vscode-editor-hoverHighlightBackground)
+}
+
+.properties-sidebar-btn-transparent .svg-icon {
+	fill: var(--vscode-editor-foreground);
+	color: var(--vscode-editor-foreground)
+}
+
+.properties-sidebar-btn-transparent.active .svg-icon {
+	fill: var(--vscode-list-activeSelectionBackground);
+	color: var(--vscode-list-activeSelectionBackground)
+}
+
+.properties-sidebar-btn-outline {
+	margin-left: .25em;
+	padding: 0 .45em;
+	width: 1em
+}
+
+.properties-sidebar-btn-lock-radius {
+	margin: -1.25em auto;
+	padding: 0 .5em;
+	position: relative;
+	width: 1em;
+
+	z-index: 2
+}
+
+.properties-sidebar-btn-group.btn-2.properties-sidebar-rich-text-btns {
+	margin-right: 0
+}
+
+.properties-sidebar-rich-text-btns .svg-icon {
+	height: 1.05em;
+	padding: .1em 0;
+	width: 1.05em
+}
+
+.properties-sidebar-rich-text-btns .properties-sidebar-btn {
+	height: 1.7em
+}
+
+.flex {
+	display: flex
+}
+
+.flex-space-between {
+	align-items: stretch;
+	justify-content: space-between
+}
+
+.flex-col-1 {
+	align-items: stretch;
+	display: flex;
+	justify-content: space-between
+}
+
+.flex-col-1>* {
+	flex-basis: 0;
+	flex-grow: 1;
+	margin-left: .5em
+}
+
+.flex-col-1>:first-child {
+	margin-left: 1em
+}
+
+.flex-col-1>:last-child {
+	margin-right: 1em
+}
+
+.flex-col-1-inner {
+	display: flex
+}
+
+.flex-col-1-inner>* {
+	flex-basis: 0;
+	flex-grow: 1
+}
+
+.flex-col-1-inner>:first-child {
+	margin-right: .5em
+}
+
+.flex-col-1-inner>:last-child {
+	margin-right: 0
+}
+
+.flex-no-grow {
+	flex-basis: 1.5em;
+	flex-grow: 0;
+	margin-left: 0;
+	padding-left: 0;
+	padding-right: 0
+}
+
+.flex-col-2-1 {
+	display: flex
+}
+
+.flex-col-2-1>* {
+	flex-basis: 0;
+	flex-grow: 1
+}
+
+.flex-col-2,
+.flex-col-2-1 :first-child {
+	flex-grow: 2
+}
+
+.flex-col-3 {
+	flex-grow: 2;
+	gap: 1em
+}
+
+.flex-col-3>* {
+	flex-basis: 0;
+	flex-grow: 1
+}
+
+.flex-exp {
+	display: flex
+}
+
+.flex-exp>* {
+	flex-basis: 0;
+	flex-grow: 1
+}
+
+.properties-sidebar-styles {
+	overflow-x: hidden;
+	top: 29px !important
+}
+
+</style>
+<script>
+    function getCanvasPropertiesHtml() {
+      return `
+      <div id="properties-sidebar-main" class="" style="--input-min-width: 40px;">
+
+        <!-- ALIGNMENT PANEL -->
+        <div
+          class="properties-panel flex flex-space-between"
+          id="properties-sidebar-panel-alignment"
+        >
+          <a
+            class="properties-sidebar-btn properties-sidebar-btn-transparent"
+            href="#"
+            title="Left edges"
+            ><svg class="svg-icon">
+              <use xlink:href="#icon-properties-align-left"></use></svg
+          ></a>
+          <a
+            class="properties-sidebar-btn properties-sidebar-btn-transparent"
+            href="#"
+            title="Horizontal centers"
+            ><svg class="svg-icon">
+              <use xlink:href="#icon-properties-align-center"></use></svg
+          ></a>
+          <a
+            class="properties-sidebar-btn properties-sidebar-btn-transparent"
+            href="#"
+            title="Right edges"
+            ><svg class="svg-icon">
+              <use xlink:href="#icon-properties-align-right"></use></svg
+          ></a>
+          <a
+            class="properties-sidebar-btn properties-sidebar-btn-transparent"
+            href="#"
+            title="Top edges"
+            ><svg class="svg-icon">
+              <use xlink:href="#icon-properties-align-top"></use></svg
+          ></a>
+          <a
+            class="properties-sidebar-btn properties-sidebar-btn-transparent"
+            href="#"
+            title="Vertical centers"
+            ><svg class="svg-icon">
+              <use xlink:href="#icon-properties-align-middle"></use></svg
+          ></a>
+          <a
+            class="properties-sidebar-btn properties-sidebar-btn-transparent"
+            href="#"
+            title="Bottom edges"
+            ><svg class="svg-icon">
+              <use xlink:href="#icon-properties-align-bottom"></use></svg
+          ></a>
+          <a
+            class="properties-sidebar-btn properties-sidebar-btn-transparent"
+            href="#"
+            title="Distribute horizontally"
+            ><svg class="svg-icon">
+              <use xlink:href="#icon-properties-distribute-horizontally"></use></svg
+          ></a>
+          <a
+            class="properties-sidebar-btn properties-sidebar-btn-transparent"
+            href="#"
+            title="Distribute vertically"
+            ><svg class="svg-icon">
+              <use xlink:href="#icon-properties-distribute-vertically"></use></svg
+          ></a>
+        </div>
+        <div
+          id="properties-sidebar-panel-content"
+          class="properties-sidebar-styles properties-sidebar scrollable"
+        >
+          <div
+            class="properties-panel-content-section properties-panel-content-section--outline flex-col-1"
+          >
+            <div class="">
+              <input
+                id="object-name-input"
+                class="properties-sidebar-object-name"
+                type="text"
+                placeholder="Object Name"
+                onchange="onObjectNameChanged()"
+              />
+            </div>
+            <div class="flex-no-grow">
+              <div>
+                <a
+                  class="properties-sidebar-btn properties-sidebar-btn-transparent properties-sidebar-btn-outline"
+                  href="#"
+                  title="Lock"
+                  ><svg class="svg-icon">
+                    <use xlink:href="#icon-properties-unlock"></use></svg
+                ></a>
+              </div>
+            </div>
+            <div class="flex-no-grow">
+              <div>
+                <a
+                  class="properties-sidebar-btn properties-sidebar-btn-transparent properties-sidebar-btn-outline"
+                  href="#"
+                  title="Hide"
+                  ><svg class="svg-icon">
+                    <use xlink:href="#icon-properties-visibility-on"></use></svg
+                ></a>
+              </div>
+            </div>
+          </div>
+          <div class="properties-panel">
+            <div class="properties-panel-content">
+              <!-- NO HEADER HERE -->
+              <div class="properties-panel-content-section flex-col-1">
+                <vscode-text-field id="object-left-input" onchange="onObjectLocationChanged()" >
+                  <span slot="start" style="color: var(--vscode-editor-foreground); font-size: 12px; font-variant: small-caps;">X</span>
+                  <span slot="end" style="color: var(--vscode-editor-foreground); font-size: 11px; font-variant: small-caps; opacity: .5;">PX</span>
+                </vscode-text-field>
+                <span class="btn-spacer flex-no-grow"></span>
+                <vscode-text-field id="object-width-input" onchange="onObjectLocationChanged()" >
+                  <span slot="start" style="color: var(--vscode-editor-foreground); font-size: 12px; font-variant: small-caps;">W</span>
+                  <span slot="end" style="color: var(--vscode-editor-foreground); font-size: 11px; font-variant: small-caps; opacity: .5;">PX</span>
+                </vscode-text-field>
+
+                <a
+                  style="position: relative; top: 16px"
+                  class="properties-sidebar-btn properties-sidebar-btn-lock-ratio properties-sidebar-btn-transparent flex-no-grow"
+                  href="#"
+                  tabindex="-1"
+                  title="Lock aspect ratio"
+                  ><svg class="svg-icon">
+                    <use xlink:href="#icon-properties-unlinked-v"></use>
+                    &nbsp;
+                  </svg></a
+                >
+              </div>
+              <div class="properties-panel-content-section flex-col-1">
+                <vscode-text-field id="object-top-input" onchange="onObjectLocationChanged()" >
+                  <span slot="start" style="color: var(--vscode-editor-foreground); font-size: 12px; font-variant: small-caps;">Y</span>
+                  <span slot="end" style="color: var(--vscode-editor-foreground); font-size: 11px; font-variant: small-caps; opacity: .5;">PX</span>
+                </vscode-text-field>
+                <span class="btn-spacer flex-no-grow"></span>
+                <vscode-text-field id="object-height-input" onchange="onObjectLocationChanged()" >
+                  <span slot="start" style="color: var(--vscode-editor-foreground); font-size: 12px; font-variant: small-caps;">H</span>
+                  <span slot="end" style="color: var(--vscode-editor-foreground); font-size: 11px; font-variant: small-caps; opacity: .5;">PX</span>
+                </vscode-text-field>
+
+                <span class="btn-spacer flex-no-grow"></span>
+              </div>
+              <div class="properties-panel-content-section flex-col-1">
+
+                <vscode-text-field id="object-rotation-input" onchange="onObjectLocationChanged()" >
+                  <span slot="start" style="color: var(--vscode-editor-foreground); font-size: 12px; font-variant: small-caps;">
+                    <svg style="height: 16px; width: 16px;">
+                      <use xlink:href="#icon-properties-rotate" />
+                    </svg>
+                  </span>
+                  <span slot="end" style="color: var(--vscode-editor-foreground); font-size: 11px; font-variant: small-caps; opacity: .5;">°</span>
+                </vscode-text-field>
+
+                <span class="btn-spacer flex-no-grow"></span>
+                <span class="properties-sidebar-btn-group btn-2"
+                  ><a class="properties-sidebar-btn" href="#" title="Flip Horizontal"
+                    ><svg class="svg-icon">
+                      <use xlink:href="#icon-properties-flip-horizontal"></use></svg
+                  ></a>
+                  <a class="properties-sidebar-btn" href="#" title="Flip Vertical"
+                    ><svg class="svg-icon">
+                      <use xlink:href="#icon-properties-flip-vertical"></use></svg></a
+                ></span>
+                <span class="btn-spacer flex-no-grow"></span>
+              </div>
+              <div></div>
+            </div>
+          </div>
+
+          <div class="properties-panel">
+            <div class="properties-panel-header">
+              <h3 class="properties-panel-header-title">
+                Text
+              </h3>
+              <span class="properties-sidebar-copy-button"
+                ><a
+                  class="properties-sidebar-btn properties-sidebar-btn-transparent"
+                  href="#"
+                  data-hint=" Copy properties"
+                  ><svg class="svg-icon">
+                    <use xlink:href="#icon-properties-copy-"></use></svg
+                ></a>
+                <a
+                  class="properties-sidebar-btn properties-sidebar-btn-transparent"
+                  href="#"
+                  data-hint="Paste properties"
+                  hidden=""
+                  ><svg class="svg-icon">
+                    <use xlink:href="#icon-properties-clipboard-"></use></svg></a
+              ></span>
+            </div>
+            <div class="properties-panel-content">
+              <div class="properties-panel-content-section flex-col-1">
+                <div style="flex-grow: 2; margin-left: 0.5em">
+                  <vscode-dropdown id="object-stroke-style-input" value="Helvetica" onchange="onObjectLocationChanged()" >
+                      <vscode-option>Helvetica</vscode-option>
+                      <vscode-option>Other</vscode-option>
+                  </vscode-dropdown>
+                </div>
+                <div style="flex-grow: 1; margin-left: 0em">
+                  <vscode-dropdown id="object-stroke-style-input" value="Normal" onchange="onObjectLocationChanged()" >
+                      <vscode-option>Normal</vscode-option>
+                      <vscode-option>Bold</vscode-option>
+                  </vscode-dropdown>
+                </div>
+              </div>
+              <div class="properties-panel-content-section flex-col-1">
+                <div>
+                  <span class="properties-color-input">
+                    <span class="mq-input-icon" title="Text Color">
+                      <svg class="svg-icon"><use xlink:href="#icon-properties-text-format-color"></use></svg>
+                    </span>
+                    <ul class="properties-color-swatches">
+                      <li class="properties-color-swatch">
+                        <a
+                          href="#"
+                          class=""
+                          title="Text Color"
+                          style="background: rgb(35, 35, 35)"
+                        ></a>
+                      </li>
+                    </ul>
+                  </span>
+                </div>
+                <span>
+                  <vscode-text-field id="object-left-input" onchange="onObjectLocationChanged()" >
+                    <span slot="start" style="color: var(--vscode-editor-foreground); font-size: 12px; font-variant: small-caps;"><svg class="svg-icon"><use xlink:href="#icon-properties-font-size"></use></svg></span>
+                    <span slot="end" style="color: var(--vscode-editor-foreground); font-size: 11px; font-variant: small-caps; opacity: .5;">PX</span>
+                  </vscode-text-field>
+                  <a class="droplist-btn" href="#" tabindex="0"></a
+                ></span>
+              </div>
+              <div class="properties-panel-content-section flex-col-1">
+                <div>
+                  <div
+                    class="properties-sidebar-btn-group btn-4 properties-sidebar-rich-text-btns"
+                  >
+                    <a title="Bold (Ctrl+B)" class="properties-sidebar-btn" href="#"
+                      ><svg class="svg-icon">
+                        <use xlink:href="#icon-properties-text-format-bold"></use></svg></a
+                    ><a title="Italic (Ctrl+I)" class="properties-sidebar-btn" href="#"
+                      ><svg class="svg-icon">
+                        <use
+                          xlink:href="#icon-properties-text-format-italic"
+                        ></use></svg></a
+                    ><a title="Underline (Ctrl+U)" class="properties-sidebar-btn" href="#"
+                      ><svg class="svg-icon">
+                        <use
+                          xlink:href="#icon-properties-text-format-underline"
+                        ></use></svg></a
+                    ><a
+                      title="Strike-through (Alt+Shift+S)"
+                      class="properties-sidebar-btn"
+                      href="#"
+                      ><svg class="svg-icon">
+                        <use
+                          xlink:href="#icon-properties-text-format-strikethrough"
+                        ></use></svg
+                    ></a>
+                  </div>
+                </div>
+              </div>
+              <div class="properties-panel-content-section flex-col-1">
+                <div>
+                  <div
+                    class="properties-sidebar-btn-group btn-4 properties-sidebar-rich-text-btns"
+                  >
+                    <a class="properties-sidebar-btn active" href="#" title="Align Left"
+                      ><svg class="svg-icon">
+                        <use xlink:href="#icon-properties-text-align-left"></use></svg
+                    ></a>
+                    <a class="properties-sidebar-btn" href="#" title="Align Center"
+                      ><svg class="svg-icon">
+                        <use xlink:href="#icon-properties-text-align-center"></use></svg
+                    ></a>
+                    <a class="properties-sidebar-btn" href="#" title="Align Right"
+                      ><svg class="svg-icon">
+                        <use xlink:href="#icon-properties-text-align-right"></use></svg
+                    ></a>
+                    <a class="properties-sidebar-btn" href="#" title="Justify"
+                      ><svg class="svg-icon">
+                        <use xlink:href="#icon-properties-text-align-justify"></use></svg
+                    ></a>
+                  </div>
+                </div>
+              </div>
+              <div class="properties-panel-content-section flex-col-1">
+                <div>
+                  <div
+                    class="properties-sidebar-btn-group btn-4 properties-sidebar-rich-text-btns"
+                  >
+                    <a class="properties-sidebar-btn" href="#" title="Align Top"
+                      ><svg class="svg-icon">
+                        <use xlink:href="#icon-properties-vertical-align-top"></use></svg
+                    ></a>
+                    <a class="properties-sidebar-btn active" href="#" title="Align Middle"
+                      ><svg class="svg-icon">
+                        <use xlink:href="#icon-properties-vertical-align-middle"></use></svg
+                    ></a>
+                    <a class="properties-sidebar-btn" href="#" title="Align Bottom"
+                      ><svg class="svg-icon">
+                        <use xlink:href="#icon-properties-vertical-align-bottom"></use></svg
+                    ></a>
+                    <a class="properties-sidebar-btn" href="#" title="Advanced"
+                      ><svg class="svg-icon">
+                        <use xlink:href="#icon-properties-dots-horizontal"></use></svg
+                    ></a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="properties-panel">
+            <div class="properties-panel-header">
+              <h3 class="properties-panel-header-title">
+                Fills &amp; Strokes
+              </h3>
+              <span class="properties-sidebar-copy-button"
+                ><a
+                  class="properties-sidebar-btn properties-sidebar-btn-transparent"
+                  href="#"
+                  data-hint=" Copy properties"
+                  ><svg class="svg-icon">
+                    <use xlink:href="#icon-properties-copy-"></use></svg
+                ></a>
+                <a
+                  class="properties-sidebar-btn properties-sidebar-btn-transparent"
+                  href="#"
+                  data-hint="Paste properties"
+                  hidden=""
+                  ><svg class="svg-icon">
+                    <use xlink:href="#icon-properties-clipboard-"></use></svg></a
+              ></span>
+            </div>
+            <div class="properties-panel-content">
+              <div class="properties-panel-content-section flex-col-1">
+                <span class="properties-color-input"
+                  ><span class="mq-input-icon"
+                    ><svg class="svg-icon">
+                      <use xlink:href="#icon-properties-fill"></use></svg
+                  ></span>
+                  <ul class="properties-color-swatches">
+                    <li class="properties-color-swatch" title="Fill Color">
+                      <a href="#" style="background: rgb(235, 235, 235)"></a>
+                    </li>
+                    <li class="properties-color-swatch" title="Foreground Color">
+                      <a href="#" style="background: rgb(68, 68, 68)"></a>
+                    </li>
+                    <li class="properties-color-swatch" title="Secondary Color">
+                      <a href="#" style="background: rgb(255, 255, 255)"></a>
+                    </li>
+                  </ul>
+                </span>
+              </div>
+              <div class="properties-panel-content-section flex-col-1">
+                <span class="properties-color-input"
+                  ><span class="mq-input-icon"
+                    ><svg class="svg-icon">
+                      <use xlink:href="#icon-properties-stroke-color"></use></svg
+                  ></span>
+                  <ul class="properties-color-swatches">
+                    <li class="properties-color-swatch" title="Stroke Color">
+                      <a href="#" style="background: rgb(35, 35, 35)"></a>
+                    </li>
+                  </ul>
+                </span>
+              </div>
+              <div class="properties-panel-content-section flex-col-1">
+                <span>
+                  <label title="Stroke Width">
+                    <vscode-text-field id="object-left-input" onchange="onObjectLocationChanged()" >
+                      <span slot="start" style="color: var(--vscode-editor-foreground); font-size: 12px; font-variant: small-caps;"><svg class="svg-icon"><use xlink:href="#icon-properties-stroke"></use></svg></span>
+                      <span slot="end" style="color: var(--vscode-editor-foreground); font-size: 11px; font-variant: small-caps; opacity: .5;">PT</span>
+                    </vscode-text-field>
+                  </label>
+                  <a class="droplist-btn" href="#" tabindex="0"></a>
+                </span>
+                <span>
+                  <label title="Stroke Style">
+                    <vscode-dropdown id="object-stroke-style-input" value="Solid" onchange="onObjectLocationChanged()" >
+                      <vscode-option>Solid</vscode-option>
+                      <vscode-option>Other</vscode-option>
+                    </vscode-dropdown>
+                  </label>
+                  <a class="droplist-btn" href="#" tabindex="0"></a
+                ></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="properties-panel">
+            <div class="properties-panel-header">
+              <h3 class="properties-panel-header-title">
+                Opacity
+              </h3>
+              <span class="properties-sidebar-copy-button"
+                ><a
+                  class="properties-sidebar-btn properties-sidebar-btn-transparent"
+                  href="#"
+                  data-hint=" Copy properties"
+                  ><svg class="svg-icon">
+                    <use xlink:href="#icon-properties-copy-"></use></svg
+                ></a>
+                <a
+                  class="properties-sidebar-btn properties-sidebar-btn-transparent"
+                  href="#"
+                  data-hint="Paste properties"
+                  hidden=""
+                  ><svg class="svg-icon">
+                    <use xlink:href="#icon-properties-clipboard-"></use></svg></a
+              ></span>
+            </div>
+            <div class="properties-panel-content">
+              <div class="properties-panel-content-section flex-col-1">
+                <div class="slider" title="100 %">
+                  <div class="slider-fill" style="width: 100%"></div>
+                  <div class="slider-knob" style="left: 100%"></div>
+                </div>
+                <span>
+                  <label title="Opacity">
+                    <vscode-text-field id="object-left-input" onchange="onObjectLocationChanged()" >
+                      <span slot="end" style="color: var(--vscode-editor-foreground); font-size: 11px; font-variant: small-caps; opacity: .5;">%</span>
+                    </vscode-text-field>
+                  </label>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="properties-panel"
+          >
+            <div class="properties-panel-header">
+              <h3 class="properties-panel-header-title">
+                Rounded Corners
+              </h3>
+              <span class="properties-sidebar-copy-button"
+                ><a
+                  class="properties-sidebar-btn properties-sidebar-btn-transparent"
+                  href="#"
+                  data-hint=" Copy properties"
+                  ><svg class="svg-icon">
+                    <use xlink:href="#icon-properties-copy-"></use></svg
+                ></a>
+                <a
+                  class="properties-sidebar-btn properties-sidebar-btn-transparent"
+                  href="#"
+                  data-hint="Paste properties"
+                  hidden=""
+                  ><svg class="svg-icon">
+                    <use xlink:href="#icon-properties-clipboard-"></use></svg></a
+              ></span>
+            </div>
+            <div class="properties-panel-content">
+              <div class="properties-panel-content-section flex-col-1">
+
+                <vscode-text-field id="object-rc-top-left-input" onchange="onObjectLocationChanged()" >
+                  <span slot="start" style="color: var(--vscode-editor-foreground); font-size: 12px; font-variant: small-caps;"><svg class="svg-icon"><use xlink:href="#icon-properties-border-tl"/></svg></span>
+                  <span slot="end" style="color: var(--vscode-editor-foreground); font-size: 11px; font-variant: small-caps; opacity: .5;">PX</span>
+                </vscode-text-field>
+                <span class="btn-spacer btn-spacer--lg flex-no-grow"></span>
+                <vscode-text-field id="object-rc-top-right-input" onchange="onObjectLocationChanged()" >
+                  <span slot="start" style="color: var(--vscode-editor-foreground); font-size: 12px; font-variant: small-caps;"><svg class="svg-icon"><use xlink:href="#icon-properties-border-tr"/></svg></span>
+                  <span slot="end" style="color: var(--vscode-editor-foreground); font-size: 11px; font-variant: small-caps; opacity: .5;">PX</span>
+                </vscode-text-field>
+              </div>
+              <a
+                class="properties-sidebar-btn properties-sidebar-btn-lock-radius properties-sidebar-btn-transparent active"
+                href="#"
+                tabindex="-1"
+                title="Unsync corners"
+                ><svg class="svg-icon">
+                  <use xlink:href="#icon-properties-linked-v"></use>
+                  &nbsp;
+                </svg></a
+              >
+              <div class="properties-panel-content-section flex-col-1">
+                <vscode-text-field id="object-rc-bottom-left-input" onchange="onObjectLocationChanged()" >
+                  <span slot="start" style="color: var(--vscode-editor-foreground); font-size: 12px; font-variant: small-caps;"><svg class="svg-icon"><use xlink:href="#icon-properties-border-bl"/></svg></span>
+                  <span slot="end" style="color: var(--vscode-editor-foreground); font-size: 11px; font-variant: small-caps; opacity: .5;">PX</span>
+                </vscode-text-field>
+                <span class="btn-spacer btn-spacer--lg flex-no-grow"></span>
+                <vscode-text-field id="object-rc-bottom-right-input" onchange="onObjectLocationChanged()" >
+                  <span slot="start" style="color: var(--vscode-editor-foreground); font-size: 12px; font-variant: small-caps;"><svg class="svg-icon"><use xlink:href="#icon-properties-border-br"/></svg></span>
+                  <span slot="end" style="color: var(--vscode-editor-foreground); font-size: 11px; font-variant: small-caps; opacity: .5;">PX</span>
+                </vscode-text-field>
+              </div>
+              <div class="properties-panel-content-section flex-col-1" style="padding-top: .4em;">
+                <vscode-checkbox>Scale radius</vscode-checkbox>
+              </div>
+            </div>
+          </div>
+          <div class="properties-panel">
+            <div class="properties-panel-header">
+              <h3 class="properties-panel-header-title">
+                Padding
+              </h3>
+              <span class="properties-sidebar-copy-button">
+                <a
+                  class="properties-sidebar-btn properties-sidebar-btn-transparent"
+                  href="#"
+                  data-hint=" Copy properties">
+                  <svg class="svg-icon"><use xlink:href="#icon-properties-copy-"></use></svg>
+                </a>
+                <a
+                  class="properties-sidebar-btn properties-sidebar-btn-transparent"
+                  href="#"
+                  data-hint="Paste properties"
+                  hidden="">
+                  <svg class="svg-icon"><use xlink:href="#icon-properties-clipboard-"></use></svg>
+                </a>
+              </span>
+            </div>
+            <div class="properties-panel-content">
+              <div>
+                <div class="properties-sidebar-panel-content padding__pane">
+                  <div class="properties-sidebar-section">
+                    <div class="padding__pane__overlay"></div>
+                    <div class="layout" style="justify-content: center; margin: .5em 0; display: flex">
+                      <div class="uix-input--numeric">
+                        <vscode-text-field id="object-padding-top-input" onchange="onObjectLocationChanged()" >
+                          <span slot="end" style="color: var(--vscode-editor-foreground); font-size: 11px; font-variant: small-caps; opacity: .5;">PX</span>
+                        </vscode-text-field>
+                      </div>
+                    </div>
+                    <div class="layout" style="justify-content: space-between; margin: .5em 0; display: flex">
+                      <div class="uix-input--numeric">
+                        <vscode-text-field id="object-padding-left-input" onchange="onObjectLocationChanged()" >
+                          <span slot="end" style="color: var(--vscode-editor-foreground); font-size: 11px; font-variant: small-caps; opacity: .5;">PX</span>
+                        </vscode-text-field>
+                      </div>
+                      <button class="properties-sidebar-btn" type="button" title="Sync All Paddings">
+                        <svg class="svg-icon"><use xlink:href="#icon-properties-unlinked"></use></svg>
+                      </button>
+                      <div class="uix-input--numeric">
+                        <vscode-text-field id="object-padding-right-input" onchange="onObjectLocationChanged()" >
+                          <span slot="end" style="color: var(--vscode-editor-foreground); font-size: 11px; font-variant: small-caps; opacity: .5;">PX</span>
+                        </vscode-text-field>
+                      </div>
+                    </div>
+                    <div style="justify-content: center; margin: .5em 0; display: flex;">
+                      <div class="uix-input--numeric">
+                        <vscode-text-field id="object-padding-bottom-input" onchange="onObjectLocationChanged()" >
+                          <span slot="end" style="color: var(--vscode-editor-foreground); font-size: 11px; font-variant: small-caps; opacity: .5;">PX</span>
+                        </vscode-text-field>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  `;
+};
+</script>

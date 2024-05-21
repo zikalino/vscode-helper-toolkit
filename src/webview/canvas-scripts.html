@@ -1,0 +1,1250 @@
+<style>
+
+#stage-wrapper {
+	right: 0px;
+	top: 0px;
+	bottom: 0px;
+	left: 0px;
+	position: absolute
+}
+
+#main-stage {
+	background-color: #eef1f5;
+	left: 250px;
+	right: 250px;
+	z-index: 20
+}
+
+.master-page {
+	pointer-events: none
+}
+
+#main-stage,
+.canvas-stage {
+	bottom: 0;
+	position: absolute;
+	top: 0
+}
+
+.canvas-stage {
+	left: 0;
+	outline: none;
+	overflow: auto;
+	overscroll-behavior: none;
+	right: 0;
+	touch-action: none
+}
+
+.canvas-stage.view-mode {
+	touch-action: pan-x pan-y
+}
+
+#canvas-stage.view-mode .master-page a {
+	pointer-events: auto
+}
+
+.fo__content {
+	color: #000;
+}
+
+.fo__content p {
+	margin: 0
+}
+
+.overflowHidden,
+ foreignObject {
+	overflow: hidden
+}
+
+.stencil-selection,
+.stencil-selection .stencil {
+	cursor: crosshair !important
+}
+
+.stencil--easier-to-select {
+	pointer-events: painted
+}
+
+.master-page .stencil--easier-to-select {
+	pointer-events: inherit
+}
+
+.stencil div {
+	box-sizing: border-box
+}
+
+.stencil table {
+	border-collapse: collapse;
+	border-spacing: 0
+}
+
+.stencil table p {
+	display: inline
+}
+
+.grid__table td p {
+	display: block
+}
+
+.stencil {
+	cursor: default;
+	-webkit-user-select: none;
+	user-select: none
+}
+
+.stencil {
+	font-variant-ligatures: none;
+	word-break: keep-all
+}
+
+.stencil p {
+	margin: 0
+}
+
+.stencil [contenteditable=true] {
+	cursor: text
+}
+
+.stencil ul:not([data-checked]) {
+	list-style-type: disc;
+	margin: 1em 0;
+	padding-inline-start: 2.5em
+}
+
+.stencil ol {
+	list-style: decimal;
+	margin: 1em 0;
+	padding-inline-start: 2.5em
+}
+
+.stencil ol:first-child,
+.stencil ul:first-child:not([data-checked]) {
+	margin-top: 0
+}
+
+.stencil ol:last-child,
+.stencil ul:last-child:not([data-checked]) {
+	margin-bottom: 0
+}
+
+.stencil ul[data-checked] {
+	--check-size: 15px;
+	--check-margin: 6px;
+	list-style: none;
+	padding-inline-start: calc(var(--check-size) + var(--check-margin));
+	text-align: start !important
+}
+
+.stencil ul[data-checked]>li:before {
+	background-position: 50%;
+	background-repeat: no-repeat;
+	background-size: 100%;
+	content: "";
+	display: inline-block;
+	height: var(--check-size);
+	margin-inline-end: var(--check-margin);
+	margin-inline-start: calc((var(--check-margin) + var(--check-size))*-1);
+	padding: calc(var(--check-margin)*.5) 0;
+	vertical-align: middle;
+	width: var(--check-size)
+}
+
+.stencil ul[data-checked=true]>li:before {
+	background-image: url("data:image/svg+xml;utf8,<svg version=%271.1%27 width=%27100%25%27 height=%27100%25%27 xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 15 15%27><path fill=%27%23006ce5%27 d=%27M7.5,0C3.4,0,0,3.4,0,7.5S3.4,15,7.5,15S15,11.6,15,7.5S11.6,0,7.5,0z M11.2,6.2L7,10.4 c-0.3,0.3-0.8,0.3-1.1,0L3.8,8.3C3.5,8,3.5,7.5,3.8,7.2c0.3-0.3,0.8-0.3,1.1,0l1.6,1.6l3.7-3.7c0.3-0.3,0.8-0.3,1.1,0 C11.5,5.4,11.5,5.9,11.2,6.2z%27/></svg>")
+}
+
+.stencil ul[data-checked=false]>li:before {
+	background-image: url("data:image/svg+xml;utf8,<svg version=%271.1%27 width=%27100%25%27 height=%27100%25%27 xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 15 15%27 ><path fill=%27%23565656%27 d=%27M7.5,1C11.1,1,14,3.9,14,7.5S11.1,14,7.5,14S1,11.1,1,7.5S3.9,1,7.5,1 M7.5,0C3.4,0,0,3.4,0,7.5S3.4,15,7.5,15 S15,11.6,15,7.5S11.6,0,7.5,0L7.5,0z%27/></svg>")
+}
+
+.stencil b,
+.stencil h1,
+.stencil h2,
+.stencil h3,
+.stencil h4,
+.stencil h5,
+.stencil h6,
+.stencil strong {
+	font-weight: 700
+}
+
+.stencil h1 {
+	font-size: 2em;
+	margin: 0
+}
+
+.stencil h2 {
+	font-size: 1.5em;
+	margin: .75em 0
+}
+
+.stencil h3 {
+	font-size: 1.17em;
+	margin: .83em 0
+}
+
+.stencil li {
+	margin-inline-start: calc(var(--indent-level, 0)*2em)
+}
+
+.canvas-svg {
+	transform-origin: 0 0
+}
+
+.canvas-svg.hidden {
+	opacity: 0
+}
+
+
+
+</style>
+<script>
+
+var beforeList = "";
+
+function updateSvgAttribute(e, a, delta) {
+  var e = document.getElementById(e);
+  var vv = (parseFloat(e.getAttributeNS(null, a)) - delta).toString();
+  e.setAttributeNS(null, a, vv.toString());
+}
+
+function getSvgAttribute(e, a) {
+  var e = document.getElementById(e);
+  return parseFloat(e.getAttributeNS(null, a));
+}
+
+function getSvgAttributeRaw(e, a) {
+  var e = document.getElementById(e);
+  return e.getAttributeNS(null, a);
+}
+
+function setSvgAttribute(e, a, v) {
+  var e = document.getElementById(e);
+  e.setAttributeNS(null, a, v.toString());
+}
+
+function moveSelector(left, right, top, bottom) {
+  // document.getElementById("moo").innerHTML = "MOVE: " + left + " " + right + " " + top + " " + bottom;
+
+  if (left != 0) {
+    updateSvgAttribute("resize-handle-w", "x", left);
+    updateSvgAttribute("resize-handle-nw", "x", left);
+    updateSvgAttribute("resize-handle-sw", "x", left);
+  }
+  if (right != 0) {
+    updateSvgAttribute("resize-handle-e", "x", right);
+    updateSvgAttribute("resize-handle-ne", "x", right);
+    updateSvgAttribute("resize-handle-se", "x", right);
+  }
+  if (top != 0) {
+    updateSvgAttribute("resize-handle-n", "y", top);
+    updateSvgAttribute("resize-handle-ne", "y", top);
+    updateSvgAttribute("resize-handle-nw", "y", top);
+  }
+  if (bottom != 0) {
+    updateSvgAttribute("resize-handle-s", "y", bottom);
+    updateSvgAttribute("resize-handle-se", "y", bottom);
+    updateSvgAttribute("resize-handle-sw", "y", bottom);
+  }
+}
+
+function handleStencilMouseDown(e, id) {
+  //let id =  e.target ? e.target.id : e.srcElement.id;
+
+  var canvasEl = document.getElementById("canvas-svg");
+  var canvasBb = canvasEl.getBoundingClientRect(); 
+  var el = document.getElementById(id);
+  var bb = el.getBoundingClientRect();// getBBox();
+  // document.getElementById("moo").innerText = "STENCIL: " + bb;
+  selectionX1 = bb.x - canvasBb.x;
+  selectionX2 = bb.width + selectionX1;
+  selectionY1 = bb.y - canvasBb.y;
+  selectionY2 = bb.height + selectionY1;
+  selectionId = id;
+
+  // document.getElementById("moo").innerText = "STENCIL: " + id + " " + selectionX1 + " " + selectionX2 + " " + selectionY1 + " " + selectionY2;
+  updateSelector();
+  updatePropertiesFromCanvas();
+
+}
+
+function repositionStencil(align) {
+
+  if (align) {
+    var moveX = -(selectionX1 % 10);
+    var moveY = -(selectionY1 % 10);
+    selectionX1 += moveX;
+    selectionY1 += moveY;
+    selectionX2 += moveX;
+    selectionY2 += moveX;
+
+    moveX = -(selectionX2 % 10);
+    moveY = -(selectionY2 % 10);
+    selectionX2 += moveX;
+    selectionY2 += moveY;
+  }
+
+  // set location
+  setSvgAttribute(selectionId, "transform", "matrix(1 0 0 1 " + (selectionX1 - 50) + " " + (selectionY1 - 50) + ")");
+
+  let e = document.getElementById(selectionId);
+  let stencil_type = e.getAttribute("data-stencil-type");//("data-stencil-type");
+    if (stencil_type === "button") {
+      document.getElementById(selectionId).innerHTML = createStencilButton(selectionX2 - selectionX1, selectionY2 -selectionY1, "Button");
+    } else if (stencil_type === "checkbox") {
+      document.getElementById(selectionId).innerHTML = createStencilCheckbox(selectionX2 - selectionX1, selectionY2 -selectionY1, "Checkbox");
+    } else if (stencil_type === "combobox") {
+      document.getElementById(selectionId).innerHTML = createStencilCombo(selectionX2 - selectionX1, selectionY2 -selectionY1, "Combo");
+    } else if (stencil_type === "progressbar") {
+      document.getElementById(selectionId).innerHTML = createStencilProgressBar(selectionX2 - selectionX1, selectionY2 -selectionY1);
+    } else if (stencil_type === "slider") {
+      document.getElementById(selectionId).innerHTML = createStencilSlider(selectionX2 - selectionX1, selectionY2 -selectionY1);
+    } else if (stencil_type === "radio") {
+      document.getElementById(selectionId).innerHTML = createStencilRadio(selectionX2 - selectionX1, selectionY2 -selectionY1), "radio";
+    } else if (stencil_type === "label") {
+      document.getElementById(selectionId).innerHTML = createStencilLabel(selectionX2 - selectionX1, selectionY2 -selectionY1, "label");
+    } else if (stencil_type === "rectangle") {
+      document.getElementById(selectionId).innerHTML = createStencilRectangle(selectionX2 - selectionX1, selectionY2 -selectionY1);
+    } else if (stencil_type === "circle") {
+      document.getElementById(selectionId).innerHTML = createStencilCircle(selectionX2 - selectionX1, selectionY2 -selectionY1);
+    } else if (stencil_type === "toggle") {
+      document.getElementById(selectionId).innerHTML = createStencilToggle(selectionX2 - selectionX1, selectionY2 -selectionY1);
+    } else if (stencil_type === "scrollbar") {
+      document.getElementById(selectionId).innerHTML = createStencilScrollbar(selectionX2 - selectionX1, selectionY2 -selectionY1);
+    } else if (stencil_type === "calendar") {
+      document.getElementById(selectionId).innerHTML = createStencilCalendar(selectionX2 - selectionX1, selectionY2 -selectionY1);
+    } else if (stencil_type === "table") {
+      document.getElementById(selectionId).innerHTML = createStencilTable(selectionX2 - selectionX1, selectionY2 -selectionY1);
+    } else if (stencil_type === "tabs") {
+      document.getElementById(selectionId).innerHTML = createStencilTabs(selectionX2 - selectionX1, selectionY2 -selectionY1);
+    } else if (stencil_type === "placeholder") {
+      document.getElementById(selectionId).innerHTML = createStencilPlaceholder(selectionX2 - selectionX1, selectionY2 -selectionY1);
+    } else if (stencil_type === "imageplaceholder") {
+      document.getElementById(selectionId).innerHTML = createStencilImagePlaceholder(selectionX2 - selectionX1, selectionY2 -selectionY1);
+    } else if (stencil_type === "container") {
+      document.getElementById(selectionId).innerHTML = createStencilContainer(selectionX2 - selectionX1, selectionY2 -selectionY1);
+    } else if (stencil_type === "keyboard") {
+      document.getElementById(selectionId).innerHTML = createStencilKeyboard(selectionX2 - selectionX1, selectionY2 -selectionY1);
+    } else if (stencil_type === "window") {
+      document.getElementById(selectionId).innerHTML = createStencilWindow(selectionX2 - selectionX1, selectionY2 -selectionY1);
+    } else if (stencil_type === "text") {
+      document.getElementById(selectionId).innerHTML = createStencilText(selectionX2 - selectionX1, selectionY2 -selectionY1);
+    } else if (stencil_type === "textarea") {
+      document.getElementById(selectionId).innerHTML = createStencilTextArea(selectionX2 - selectionX1, selectionY2 -selectionY1);
+    } else if (stencil_type === "datepicker") {
+      document.getElementById(selectionId).innerHTML = createStencilDatePicker(selectionX2 - selectionX1, selectionY2 -selectionY1);
+    } else if (stencil_type === "stepperinput") {
+      document.getElementById(selectionId).innerHTML = createStencilStepperInput(selectionX2 - selectionX1, selectionY2 -selectionY1);
+    } else if (stencil_type === "videoplayer") {
+      document.getElementById(selectionId).innerHTML = createStencilVideoPlayer(selectionX2 - selectionX1, selectionY2 -selectionY1);
+    }
+
+    updatePropertiesFromCanvas();
+  }
+
+function updatePropertiesFromCanvas() {
+  document.getElementById("object-name-input").value = selectionId;
+  document.getElementById("object-left-input").value = Math.round(selectionX1).toString();
+  document.getElementById("object-top-input").value = Math.round(selectionY1).toString();
+  document.getElementById("object-width-input").value = Math.round(selectionX2 - selectionX1).toString();
+  document.getElementById("object-height-input").value = Math.round(selectionY2 - selectionY1).toString();
+}
+
+function onToolbarButtonClicked() {
+  var id = createObjectId('Button');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="button" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+    ${createStencilButton(200, 100, "BBB")}
+    </g>
+  `;
+  // XXX - add button to the canvas
+  var e = document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+}
+
+function onToolbarCheckboxClicked() {
+  var id = createObjectId('CheckBox');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="checkbox" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+    ${createStencilCheckbox(86, 19, "Checkbox")}
+    </g>
+  `;
+  // XXX - add button to the canvas
+  var e = document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+}
+
+function onToolbarComboBoxClicked() {
+  var id = createObjectId('ComboBox');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="combobox" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+    ${createStencilCombo(180, 32, "ComboBox")}
+    </g>
+  `;
+  var e = document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+}
+
+function onToolbarProgressBarClicked() {
+  var id = createObjectId('ProgressBar');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="progressbar" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+    ${createStencilProgressBar(200, 20)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+}
+
+function onToolbarSliderClicked() {
+  var id = createObjectId('Slider');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="slider" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+    ${createStencilSlider(180, 18)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+}
+
+function onToolbarRadioClicked() {
+  var id = createObjectId('Radio');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="radio" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+    ${createStencilRadio(61, 19, "Radio")}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+}
+
+function onToolbarLabelClicked() {
+  var id = createObjectId('Label');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="label" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+    ${createStencilLabel(180, 24, "Label")}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+}
+
+function onToolbarRectangleClicked() {
+  var id = createObjectId('Rectangle');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="rectangle" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+    ${createStencilRectangle(180, 24)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+}
+
+function onToolbarTextAreaClicked() {
+  var id = createObjectId('TextArea');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="textarea" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+    ${createStencilTextArea(180, 100)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+}
+
+function onToolbarTextClicked() {
+  var id = createObjectId('Text');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="text" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+      ${createStencilText(180, 32)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+}
+
+function onToolbarDatePickerClicked() {
+  var id = createObjectId('DatePicker');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="datepicker" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+      ${createStencilDatePicker(180, 32)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+}
+
+function onToolbarStepperInputClicked() {
+  var id = createObjectId('Input');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="stepperinput" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+      ${createStencilStepperInput(90, 32)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+}
+
+function onToolbarImagePlaceholderClicked() {
+  var id = createObjectId('Image');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="imageplaceholder" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+      ${createStencilImagePlaceholder(250, 160)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+}
+
+function onToolbarPlaceholderClicked() {
+  var id = createObjectId('Placeholder');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="placeholder" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+      ${createStencilPlaceholder(100, 100)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+}
+
+function onToolbarTextPlaceholderClicked() {
+  var id = createObjectId('TextPlaceholder');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="textplaceholder" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+      ${createStencilTextPlaceholder(180, 24)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+}
+
+function onToolbarVideoPlayerClicked() {
+  var id = createObjectId('Video');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="videoplayer" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+      ${createStencilVideoPlayer(320, 240)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+} // ImagePlaceholder
+
+function onToolbarMapClicked() {
+  var id = createObjectId('Map');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="map" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+      ${createStencilMap(180, 24)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+} // ImagePlaceholder
+
+function onToolbarTabsClicked() {
+  var id = createObjectId('Tabs');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="tabs" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+      ${createStencilTabs(260, 29)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+} // ImagePlaceholder
+
+function onToolbarTableClicked() {
+  var id = createObjectId('Table');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="table" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+      ${createStencilTable(460, 180)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+} // ImagePlaceholder
+
+function onToolbarCalendarClicked() {
+  var id = createObjectId('Calendar');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="calendar" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+      ${createStencilCalendar(180, 155)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+} // ImagePlaceholder
+
+function onToolbarToggleClicked() {
+  var id = createObjectId('Toggle');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="toggle" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+      ${createStencilToggle(36, 20)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+} // ImagePlaceholder
+
+function onToolbarScrollbarClicked() {
+  var id = createObjectId('ScrollBar');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="scrollbar" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+      ${createStencilScrollbar(18, 200)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+} // ImagePlaceholder
+
+function onToolbarCircleClicked() {
+  var id = createObjectId('Circle');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="circle" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+      ${createStencilCircle(100, 100)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+} // ImagePlaceholder
+
+function onToolbarHorizontalLineClicked() {
+  var id = createObjectId('HorizontalLine');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="HorizontalLine" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+      ${createStencilHorizontalLine(180, 24)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+} // ImagePlaceholder
+
+function onToolbarVerticalLineClicked() {
+  var id = createObjectId('VerticalLine');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="VerticalLine" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+      ${createStencilVerticalLine(180, 24)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+} // ImagePlaceholder
+
+function onToolbarContainerClicked() {
+  var id = createObjectId('Container');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="container" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+      ${createStencilContainer(400, 300)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+}
+
+function onToolbarKeyboardClicked() {
+  var id = createObjectId('Keyboard');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="keyboard" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+      ${createStencilKeyboard(100, 100)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+}
+
+function onToolbarWindowClicked() {
+  var id = createObjectId('Window');
+  var html_to_insert = `
+    <g class="stencil" data-stencil-type="window" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+      ${createStencilWindow(300, 200)}
+    </g>
+  `;
+  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+}
+
+
+function createStencilButton(width, height, label) {
+
+  var html = 
+    ` <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
+        <defs></defs>
+        <path
+            d="M3 0 L${width-3} 0 ${width-1.365} 0 ${width} 1.365 ${width} 3 L${width} ${height-3} C${width} ${height-1.365} ${width-1.365} ${height} ${width-3} ${height} L3 ${height} C1.365 ${height} 0 ${height-1.365} 0 ${height-3} L0 3 C0 1.365 1.365 0 3 0 Z"
+            stroke-width="1" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(235,235,235)"></path>
+        <foreignObject class="editable-fo" width="${width}" height="${height}" x="0" y="0"
+            style="font-size: 14px; text-align: center; font-style: normal; color: rgb(35, 35, 35);">
+          <div class="fo__content "
+                data-gramm="false"
+                spellcheck="false"
+                style="color: rgb(35, 35, 35); font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: center; text-decoration: none; vertical-align: middle; width: ${width}px; height: ${height}px; padding: 0px 10px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word; display: table-cell; word-break: break-word;">${label}</div>
+        </foreignObject>
+      </svg>`;
+
+  return html;
+}
+
+function createStencilCheckbox(width, height, label) {
+  // original 86x19
+  html = `
+  <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
+    <defs></defs>
+      <path d="M14 ${height/2+7} C14 ${height/2+6.1} 13.1 ${height/2+7} 12 ${height/2+7} 12 ${height/2+7} 2 ${height/2+7} 2 ${height/2+7} 0.9 ${height/2+7} 0 ${height/2+6.1} 0 ${height/2+5} 0 ${height/2+5} 0 ${height/2-5} 0 ${height/2-5} 0 ${height/2-6.1} 0.9 ${height/2-7} 2 ${height/2-7} 2 ${height/2-7} 12 ${height/2-7} 12 ${height/2-7} 13.1 ${height/2-7} 14 ${height/2-6.1} 14 ${height/2-7} 14 ${height/2-5} 14 ${height/2+5} 14 ${height/2+5} 14 ${height/2+5} 14 ${height/2+5} 14 ${height/2+5}" stroke-width="1.5" stroke="rgb(35,35,35)" stroke-dasharray="none" stroke-dashoffset="none" fill="rgb(255,255,255)" fill-rule="evenOdd"></path>      d="M3.5 9.945919044459208C3.5 9.945919044459208 5.770330368487933 13 5.770330368487933 13 5.770330368487933 13 10.5 6 10.5 6"
+        stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="rgb(35,35,35)"
+        stroke-dasharray="none" stroke-dashoffset="none" fill="none" fill-rule="evenOdd"></path>
+        <path d="M3.5 ${height/2+0.445919044459208} C3.5 ${height/2+0.445919044459208} 5.770330368487933 ${height/2+3.5} 5.770330368487933 ${height/2+3.5} 5.770330368487933 ${height/2+3.5} 10.5 ${height/2-3.5} 10.5 ${height/2-3.5}" stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="rgb(35,35,35)" stroke-dasharray="none" stroke-dashoffset="none" fill="none" fill-rule="evenOdd"></path>
+      <foreignObject class="editable-fo" width="${width-24}" height="${height}" x="24" y="0"
+      style="font-size: 14px; text-align: left; font-style: normal; color: rgb(35, 35, 35);">
+      <div class="fo__content " data-gramm="false" spellcheck="false"
+        style="color: rgb(35, 35, 35); font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; width: auto; height: ${height}px; padding: 0px; min-width: 1px; min-height: 1px; white-space: pre; display: table-cell;">${label}</div>
+    </foreignObject>
+  </svg>`;
+
+  return html;
+}
+
+function createStencilCombo(width, height, label) {
+  // original size 180x32
+  html = `
+  <svg class=" " width="${width}" height="${height}" x="0.5"
+  y="0.5" style="opacity: 1;">
+  <defs></defs>
+  <path
+    d="M4 0 L${width-4} 0 C${width-1.82} 0 ${width} 1.82 ${width} 4 L${width} ${height-4} C${width} ${height-1.82} ${width-1.82} ${height} ${width-4} ${height} L4 ${height} C1.82 ${height} 0 ${height-1.82} 0 ${height-4} L0 4 C0 1.82 1.82 0 4 0 Z"
+    stroke-width="1" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(255,255,255)"></path>
+  <svg x="${width-25}" y="0" width="25" height="${height}">
+    <path
+      d="M0 0 L21 0 C23.18 0 25 1.82 25 4 L25 ${height-4} C25 ${height-1.82} 23.18 ${height} 21 ${height} L0 ${height} C0 ${height} 0 ${height} 0 ${height} L0 0 C0 0 0 0 0 0 Z"
+      stroke-width="1" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(235,235,235)"></path>
+      
+      <svg width="8" height="5" x="8.5" y="${(height-5)/2}">
+        <path d="M0.2,1.3l3.2,3.2c0.3,0.3,0.8,0.3,1.1,0l3.2-3.2C8.1,0.8,7.8,0,7.1,0H0.8C0.1,0-0.3,0.8,0.2,1.3z" style="fill: rgb(68, 68, 68);"></path>
+      </svg>
+  </svg>b
+  <foreignObject class="editable-fo" width="155" height="${height}" x="0" y="0"
+    style="font-size: 14px; text-align: left; font-style: normal; color: rgb(35, 35, 35);">
+    <div class="fo__content " data-gramm="false" spellcheck="false"
+      style="color: rgb(35, 35, 35); font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; width: 155px; height: ${height}px; padding: 4px 8px; min-width: 1px; min-height: 1px; white-space: pre; overflow-wrap: break-word; display: table-cell; word-break: break-word;">Select</div>
+  </foreignObject>
+</svg>`;
+
+  return html;
+}
+
+function createStencilProgressBar(width, height) {
+  html = `
+    <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
+      <defs>
+        <clipPath id="pr_clippath-1690fc45"><path d="M 0 0 L 100 0 L 100 ${height} L 0 ${height} L 0 0 Z"></path></clipPath>
+        </defs>
+      <path d="M6 0 L${width-6} 0 C${width-2.73} 0 ${width} 2.73 ${width} 6 L${width} ${height-6} C${width} ${height-2.73} ${width-2.73} ${height} ${width-6} ${height} L6 ${height} C2.73 ${height} 0 ${height-2.73} 0 ${height-6} L0 6 C0 2.73 2.73 0 6 0 Z" stroke-width="1" stroke="rgb(0,0,0)" stroke-dasharray="none" fill="rgb(255,255,255)"></path>
+      <path d="M6 0 L${width-6} 0 C${width-2.73} 0 ${width} 2.73 ${width} 6 L${width} ${height-6} C${width} ${height-2.73} ${width-2.73} ${height} ${width-6} ${height} L6 ${height} C2.73 ${height} 0 ${height-2.73} 0 ${height-6} L0 6 C0 2.73 2.73 0 6 0 Z" stroke-width="1" stroke="rgb(0,0,0)" stroke-dasharray="none" fill="rgb(170,170,170)" clip-path="url(#pr_clippath-1690fc45)"></path>
+    </svg>
+    `;
+  return html;
+}
+
+function createStencilSlider(width, height) {
+  // original size 180x18
+  html = `
+    <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
+      <defs></defs>
+      <svg x="0" y="${(height-6)/2}" width="${width}" height="${height}">
+        <path d="M3 0 L${width-3} 0 C${width-1.365} 0 ${width} 1.365 ${width} 3 L${width} 3 C${width} 4.635 ${width-1.365} 6 ${width-3} 6 L3 6 C1.365 6 0 4.635 0 3 L0 3 C0 1.365 1.365 0 3 0 Z" stroke-width="1" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(255,255,255)"></path>
+        <path d="M3 0 L${117*(width/180)} 0 C${117*(width/180)} 0 ${117*(width/180)} 0 ${117*(width/180)} 0 L${117*(width/180)} 6 C${117*(width/180)} 6 ${117*(width/180)} 6 ${117*(width/180)} 6 L3 6 C1.365 6 0 4.635 0 3 L0 3 C0 1.365 1.365 0 3 0 Z" stroke-width="1" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(192,192,192)"></path>
+      </svg>
+      <svg x="${108*(width/180)}" y="${(height-18)/2}" width="18" height="18">
+        <circle r="9" cx="9" cy="9" stroke-width="1" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(255,255,255)"></circle>
+      </svg>
+    </svg>
+  `;
+
+  return html;
+}
+
+
+function createStencilRectangle(width, height) {
+  html = `
+    <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
+      <defs></defs>
+        <path d="M0 0 L${width} 0 C${width} 0 ${width} 0 ${width} 0 L${width} ${height} C${width} ${height} ${width} ${height} ${width} ${height} L0 ${height} C0 ${height} 0 ${height} 0 ${height} L0 0 C0 0 0 0 0 0 Z" stroke-width="1" stroke="rgb(0,0,0)" stroke-dasharray="none" fill="rgb(255,255,255)"></path>
+    </svg>
+  `;
+  return html;
+}
+
+function createStencilLabel(width, height, label) {
+  html = `
+    <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
+      <defs></defs>
+        <foreignObject class="editable-fo" width="${width}" height="${height}" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; color: rgb(35, 35, 35); overflow: visible;">
+          <div class="fo__content " data-gramm="false" spellcheck="false" style="color: rgb(35, 35, 35); font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; width: auto; height: auto; padding: 0px; min-width: 1px; min-height: 1px; white-space: pre; display: table-cell;">Label</div>
+        </foreignObject>
+      </svg>
+    `;
+  return html;
+}
+
+function createStencilTextArea(width, height) {
+  // original 180x100
+  html = `
+    <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
+      <defs></defs>
+      <path d="M3 0 L${width-3} 0 C${width-1.365} 0 ${width} 1.365 ${width} 3 L${width} ${height-3} C${width} ${height-1.365} ${width-1.365} ${height} ${width-3} ${height} L3 ${height} C1.365 ${height} 0 ${height-1.365} 0 ${height-3} L0 3 C0 1.365 1.365 0 3 0 Z" stroke-width="1" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(255,255,255)"></path>
+      <foreignObject class="editable-fo" width="${width}" height="${height}" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; line-height: 1.3; color: rgb(192, 192, 192);">
+        <div class="fo__content " data-gramm="false" spellcheck="false" style="color: rgb(192, 192, 192); font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: top; line-height: 1.3; width: ${width}px; height: ${height}px; padding: 4px 8px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word;">Type here</div>
+      </foreignObject>
+    </svg>
+  `;
+  return html;
+}
+
+function createStencilText(width, height) {
+  // original 180x32
+  html = `
+    <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
+      <defs></defs>
+      <path d="M3 0 L${width-3} 0 C${width-1.365} 0 ${width} 1.365 ${width} 3 L${width} ${height-3} C${width} ${height-1.365} ${width-1.365} ${height} ${width-3} ${height} L3 ${height} C1.365 ${height} 0 ${height-1.365} 0 ${height-3} L0 3 C0 1.365 1.365 0 3 0 Z" stroke-width="1" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(255,255,255)"></path>
+      <foreignObject class="editable-fo" width="${width}" height="${height}" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; color: rgb(192, 192, 192);">
+        <div class="fo__content " data-gramm="false" spellcheck="false" style="color: rgb(192, 192, 192); font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; width: ${width}px; height: ${height}px; padding: 4px 8px; min-width: 1px; min-height: 1px; white-space: pre; overflow-wrap: break-word; display: table-cell; word-break: break-word;">Placeholder</div>
+      </foreignObject>
+    </svg>
+  `;
+  return html;
+}
+
+function createStencilDatePicker(width, height) {
+  // original size 180x32
+  html = `
+    <svg class=" " width="$width" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
+      <defs></defs>
+      <path d="M3 0 L${width-3} 0 C${width-1.365} 0 ${width} 1.365 ${width} 3 L${width} ${height-3} C${width} ${height-1.365} ${width-1.365} ${height} ${width-3} ${height} L3 ${height} C1.365 ${height} 0 ${height-1.365} 0 ${height-3} L0 3 C0 1.365 1.365 0 3 0 Z" stroke-width="1" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(255,255,255)"></path>
+      <svg x="${width-34}" y="0" width="${34}" height="${height}" style="overflow: hidden;">
+      <path d="M1 0.5 L${height-1.5} 0.5 C${height+0.135} 0.5 ${height+1.5} 1.865 ${height+1.5} 3.5 L${height+1.5} ${height-3.5} C${height+1.5} ${height-1.865} ${height+0.135} ${height-0.5} ${height-1.5} ${height-0.5} L1 ${height-0.5} C1 ${height-0.5} 1 ${height-0.5} 1 ${height-0.5} L1 0.5 C1 0.5 1 0.5 1 0.5 Z" stroke-width="0" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(235,235,235)"></path>
+        <svg x="9" y="${height/2-9}" width="15" height="17">
+          <path d="M5 7.6499999999999995C5 7.6499999999999995 3.333333333333334 7.6499999999999995 3.333333333333334 7.6499999999999995 3.333333333333334 7.6499999999999995 3.333333333333334 9.35 3.333333333333334 9.35 3.333333333333334 9.35 5 9.35 5 9.35 5 9.35 5 7.6499999999999995 5 7.6499999999999995 5 7.6499999999999995 5 7.6499999999999995 5 7.6499999999999995M8.333333333333334 7.6499999999999995C8.333333333333334 7.6499999999999995 6.666666666666668 7.6499999999999995 6.666666666666668 7.6499999999999995 6.666666666666668 7.6499999999999995 6.666666666666668 9.35 6.666666666666668 9.35 6.666666666666668 9.35 8.333333333333334 9.35 8.333333333333334 9.35 8.333333333333334 9.35 8.333333333333334 7.6499999999999995 8.333333333333334 7.6499999999999995 8.333333333333334 7.6499999999999995 8.333333333333334 7.6499999999999995 8.333333333333334 7.6499999999999995M11.666666666666668 7.6499999999999995C11.666666666666668 7.6499999999999995 10 7.6499999999999995 10 7.6499999999999995 10 7.6499999999999995 10 9.35 10 9.35 10 9.35 11.666666666666668 9.35 11.666666666666668 9.35 11.666666666666668 9.35 11.666666666666668 7.6499999999999995 11.666666666666668 7.6499999999999995 11.666666666666668 7.6499999999999995 11.666666666666668 7.6499999999999995 11.666666666666668 7.6499999999999995M13.333333333333334 1.7C13.333333333333334 1.7 12.5 1.7 12.5 1.7 12.5 1.7 12.5 0 12.5 0 12.5 0 10.833333333333334 0 10.833333333333334 0 10.833333333333334 0 10.833333333333334 1.7 10.833333333333334 1.7 10.833333333333334 1.7 4.166666666666667 1.7 4.166666666666667 1.7 4.166666666666667 1.7 4.166666666666667 0 4.166666666666667 0 4.166666666666667 0 2.5 0 2.5 0 2.5 0 2.5 1.7 2.5 1.7 2.5 1.7 1.666666666666667 1.7 1.666666666666667 1.7 0.7416666666666667 1.7 0.008333333333333304 2.465 0.008333333333333304 3.3999999999999995 0.008333333333333304 3.3999999999999995 0 15.3 0 15.3 0 16.23888407471235 0.7461920836153446 17 1.666666666666667 17 1.666666666666667 17 13.333333333333334 17 13.333333333333334 17 14.250000000000004 17 15 16.235000000000003 15 15.3 15 15.3 15 3.3999999999999995 15 3.3999999999999995 15 2.465 14.250000000000004 1.7 13.333333333333334 1.7 13.333333333333334 1.7 13.333333333333334 1.7 13.333333333333334 1.7M13.333333333333334 15.3C13.333333333333334 15.3 1.666666666666667 15.3 1.666666666666667 15.3 1.666666666666667 15.3 1.666666666666667 5.949999999999999 1.666666666666667 5.949999999999999 1.666666666666667 5.949999999999999 13.333333333333334 5.949999999999999 13.333333333333334 5.949999999999999 13.333333333333334 5.949999999999999 13.333333333333334 15.3 13.333333333333334 15.3 13.333333333333334 15.3 13.333333333333334 15.3 13.333333333333334 15.3" fill="rgb(35,35,35)" fill-rule="evenOdd"></path>
+        </svg>
+      </svg>
+      <foreignObject class="editable-fo" width="${width-34}" height="${height}" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; color: rgb(35, 35, 35);">
+        <div class="fo__content " data-gramm="false" spellcheck="false" style="color: rgb(35, 35, 35); font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; width: ${width-34}px; height: ${height}px; padding: 4px 8px; min-width: 1px; min-height: 1px; white-space: pre; overflow-wrap: break-word; display: table-cell; word-break: break-word;">03/07/2024</div>
+      </foreignObject>
+    </svg>
+  `;
+  return html;
+}
+
+function createStencilStepperInput(width, height) {
+  // original 90x32
+  html = `
+  <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
+    <defs></defs>
+    <path d="M3 0 L${width-3} 0 C${width-1.365} 0 ${width} 1.365 ${width} 3 L${width} ${height-3} C${width} ${height-1.365} ${width-1.365} ${height} ${width-3} ${height} L3 ${height} C1.365 ${height} 0 ${height-1.365} 0 ${height-3} L0 3 C0 1.365 1.365 0 3 0 Z" stroke-width="1" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(255,255,255)"></path>
+    <svg x="${width-22}" y="0" width="22" height="${height}">
+      <path d="M0 0 L19 0 C20.635 0 22 1.365 22 3 L22 ${height-3} C22 ${height-1.365} 20.635 ${height} 19 ${height} L0 ${height} C0 ${height} 0 ${height} 0 ${height} L0 0 C0 0 0 0 0 0 Z" stroke-width="1" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(235,235,235)"></path>
+      <svg x="8" y="${height/4-2}" width="6" height="4">
+        <path d="M3,0L6,4L0,4Z" fill="rgb(32,32,32)" fill-rule="evenOdd"></path>
+      </svg>
+      <rect x="0" y="${(height-1)/2}" rx="0" ry="0" width="22" height="1" fill="rgb(35,35,35)"></rect>
+      <svg x="8" y="${height/4*3-2}" width="6" height="4">
+        <path d="M0,0L6,0L3,4Z" fill="rgb(32,32,32)" fill-rule="evenOdd"></path>
+      </svg>
+    </svg>
+    <foreignObject class="editable-fo" width="${width-22}" height="${height}" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; color: rgb(32, 32, 32);">
+      <div class="fo__content " data-gramm="false" spellcheck="false" style="color: rgb(32, 32, 32); font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; width: ${width-22}px; height: ${height}px; padding: 0px 5px; min-width: 1px; min-height: 1px; white-space: pre; overflow-wrap: break-word; display: table-cell; word-break: break-word;">12px</div>
+    </foreignObject>
+  </svg>
+  `;
+  return html;
+}
+
+function createStencilImagePlaceholder(width, height) {
+  html = `
+  <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
+    <defs></defs>
+    <path d="M0 0 L${width} 0 C${width} 0 ${width} 0 ${width} 0 L${width} ${height} C${width} ${height} ${width} ${height} ${width} ${height} L0 ${height} C0 ${height} 0 ${height} 0 ${height} L0 0 C0 0 0 0 0 0 Z" stroke-width="0" stroke="none" stroke-dasharray="none" fill="rgb(230,230,230)"></path>
+    <path d="M174.49361948725203 62.296352732526344C174.49361948725203 71.14817636626317 167.0547189449333 78.52469606104387 158.12803829415083 78.52469606104387 149.20135764336834 78.52469606104387 142.50634715528147 70.4105243967851 142.50634715528147 62.296352732526344 142.50634715528147 53.444529098789516 149.20135764336834 46.068009404008826 158.12803829415083 46.068009404008826 167.05471894493328 46.068009404008826 174.49361948725203 53.444529098789516 174.49361948725203 62.296352732526344 174.49361948725203 62.296352732526344 174.49361948725203 62.296352732526344 174.49361948725203 62.296352732526344M137.29911677565838 80C133.579666504499 74.09878424417545 127.628546070644 74.09878424417545 123.90909579948463 80 123.90909579948463 80 123.16520574525276 80.73765196947807 123.16520574525276 80.73765196947807 120.18964552832526 76.31174015260966 117.21408531139777 71.14817636626317 114.98241514870215 66.72226454939477 109.77518476907903 57.87044091565793 101.59239417252843 57.87044091565793 96.3851637929053 66.72226454939477 91.1779334132822 75.5740881831316 82.99514281673159 89.58947560321491 77.78791243710847 98.44129923695172 72.58068205748536 107.29312287068856 77.0440223828766 113.93199059599118 87.45848314212283 113.93199059599118 87.45848314212283 113.93199059599118 144.7380173179771 113.93199059599118 144.7380173179771 113.93199059599118 152.17691786029582 113.93199059599118 155.1524780772233 109.50607877912276 151.43302780606393 102.86721105382014 147.71357753490457 96.22834332851752 141.7624571010496 86.63886772530262 137.29911677565838 80 137.29911677565838 80 137.29911677565838 80 137.29911677565838 80" fill="rgb(179,179,179)" fill-rule="evenOdd"></path>
+  </svg>
+  `;
+  return html;
+}
+
+function createStencilPlaceholder(width, height) {
+  // original 100x100
+  html = `
+    <svg class=" " width="100" height="100" x="0.5" y="0.5" style="opacity: 1;">
+      <defs></defs>
+      <path d="M 0 0 H ${width}V ${height}H 0 V 0 Z M 0 0 L ${width} ${height}Z M 0 ${height} L ${width} 0 Z" stroke-width="1" stroke="rgb(0,0,0)" stroke-dasharray="none" stroke-dashoffset="none" fill="rgb(255,255,255)" fill-rule="evenOdd"></path>
+    </svg>
+  `;
+  return html;
+}
+
+function createStencilContainer(width, height) {
+  // original 400x300
+  html = `
+  <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
+    <defs></defs>
+    <g>
+      <path d="M12 0 L${width-12} 0 C${width-5.46} 0 ${width} 5.46 ${width} 12 L${width} ${height-12} C${width} ${height-5.46} ${width-5.46} ${height} ${width-12} ${height} L12 ${height} C5.46 ${height} 0 ${height-5.46} 0 ${height-12} L0 12 C0 5.46 5.46 0 12 0 Z" stroke-width="1" stroke="rgb(0,0,0)" stroke-dasharray="none" fill="rgba(255,255,255, 0)"></path>
+      <foreignObject class="editable-fo" width="${width}" height="34" x="0" y="0" style="font-size: 14px; text-align: center; font-style: normal; line-height: 1.3; color: rgb(0, 0, 0);">
+        <div class="fo__content " data-gramm="false" spellcheck="false" style="color: rgb(0, 0, 0); font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: ${width}; letter-spacing: 0px; text-align: center; text-decoration: none; line-height: 1.3; width: ${width}px; height: 34px; padding: 8px 10px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word; display: table-cell; word-break: break-word;">Container</div>
+      </foreignObject>
+    </g>
+  </svg>
+  `;
+  return html;
+}
+
+function createStencilKeyboard(width, height) {
+  // original 375x216
+  // XXX - keyboard is incomplete
+  html = `
+  <svg class=" " width="375" height="216" x="0.5" y="0.5" style="opacity: 1;">
+    <defs></defs>
+    <path d="M0 0 L375 0 C375 0 375 0 375 0 L375 216 C375 216 375 216 375 216 L0 216 C0 216 0 216 0 216 L0 0 C0 0 0 0 0 0 Z" stroke-width="0" stroke="none" stroke-dasharray="none" fill="rgb(209,214,219)"></path>
+  </svg>
+  <g class="stencil" transform="matrix(1 0 0 1 308 651)">
+    <svg class=" " width="31" height="42" x="0.5" y="0.5" style="opacity: 1;">
+      <defs></defs>
+      <path d="M4 0 L27 0 C29.18 0 31 1.82 31 4 L31 38 C31 40.18 29.18 42 27 42 L4 42 C1.82 42 0 40.18 0 38 L0 4 C0 1.82 1.82 0 4 0 Z" stroke-width="0" stroke="none" stroke-dasharray="none" fill="rgb(255,255,255)"></path>
+    </svg>
+  </g>
+  `;
+  return html;
+}
+
+function createStencilWindow(width, height) {
+  // original 300x200
+  html = `
+  <svg class=" " width="${width}" height="${height}" x="0" y="0" style="opacity: 1;">
+    <defs></defs>
+    <path d="M4 0 L${width-4} 0 C${width-1.82} 0 ${width} 1.82 ${width} 4 L${width} ${height} C${width} ${height} ${width} ${height} ${width} ${height} L0 ${height} C0 ${height} 0 ${height} 0 ${height} L0 4 C0 1.82 1.82 0 4 0 Z" stroke-width="2" stroke="rgb(35,31,32)" stroke-dasharray="none" fill="rgb(255,255,255)"></path>
+    <path d="M4 0 L${width-4} 0 C${width-1.82} 0 ${width} 1.82 ${width} 4 L${width} 28 C${width} 28 ${width} 28 ${width} 28 L0 28 C0 28 0 28 0 28 L0 4 C0 1.82 1.82 0 4 0 Z" stroke-width="2" stroke="rgb(35,31,32)" stroke-dasharray="none" fill="rgb(230,230,230)"></path>
+    <svg x="8" y="8" width="47" height="11">
+      <path d="M5.5,0C2.5,0,0,2.5,0,5.5S2.5,11,5.5,11c3,0,5.5-2.5,5.5-5.5S8.5,0,5.5,0z M9,6.5H6.5V9h-2V6.5H2v-2h2.5V2h2  v2.5H9V6.5z M23.5,0c-3,0-5.5,2.5-5.5,5.5s2.5,5.5,5.5,5.5c3,0,5.5-2.5,5.5-5.5S26.5,0,23.5,0z M27,6.5h-7v-2h7V6.5z M41.5,0  c-3,0-5.5,2.5-5.5,5.5s2.5,5.5,5.5,5.5S47,8.5,47,5.5S44.5,0,41.5,0z M44.7,7.3l-1.4,1.4l-1.8-1.8l-1.8,1.8l-1.4-1.4l1.8-1.8  l-1.8-1.8l1.4-1.4l1.8,1.8l1.8-1.8l1.4,1.4l-1.8,1.8L44.7,7.3z" fill="rgb(35,31,32)" fill-rule="evenOdd"></path>
+    </svg>
+    <foreignObject class="editable-fo" width="${width}" height="28" x="0" y="0" style="font-size: 14px; text-align: center; font-style: normal; color: rgb(0, 0, 0);">
+      <div class="fo__content " data-gramm="false" spellcheck="false" style="color: rgb(0, 0, 0); font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: center; text-decoration: none; width: ${width}px; height: 28px; padding: 4px 0px 0px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word; display: table-cell; word-break: break-word;">Untitled Window</div>
+    </foreignObject>
+  </svg>
+  `;
+  return html;
+}
+
+function createStencilTextPlaceholder(width, height) {
+  html = `
+  <svg class=" " width="400" height="408" x="0.5" y="0.5" style="opacity: 1;"><defs></defs><foreignObject class="editable-fo" width="400" height="408" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; line-height: 1.3; color: rgb(170, 170, 170);"><div class="fo__content " data-gramm="false" spellcheck="false" style="color: rgb(170, 170, 170); font-family: BLOKKNeue-Regular, serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: top; line-height: 1.3; width: 400px; height: 408px; padding: 0px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word;">Lorem ipsum dolor sit amet. Qui rerum eveniet vel rerum inventore sed consequatur corrupti non labore voluptatum. Aut maiores asperiores aut numquam perspiciatis est magni Quis hic quidem obcaecati non atque aliquam. Qui ipsum sapiente sed corrupti voluptatem sit repellat voluptatem qui velit explicabo. Ea laboriosam reprehenderit ut iure repudiandae et nihil eius et quod minima? 
+
+  Sed temporibus pariatur nam quis quam s laborios molestias et incidunt quibusdam! At ipsa facere qui dolores fugit et illo perferendis. 
+  
+  Et consequatur excepturi ut voluptate consequatur et tempore commodi eum saepe galisum ut voluptatibus mollitia non ipsum reprehenderit eum ullam nihil. Qui porro maiores id Quis quam aut iure inventore? Sit illo pariatur et quisquam commodi et sint facilis. 
+  
+  Ad voluptates incidunt non incidunt maiores id blanditiis ipsa sit excepturi nisi ea facere rerum et fugit pariatur. Ab dolor ipsum et veritatis nesciunt rem inventore quis et quae impedit. 
+  
+  Sed odio minus et impedit perferendis est accusantium reiciendis ut doloribus consequatur et placeat quia. Non expedita aperiam qui veritatis consequuntur est placeat inventore aut adipisci voluptas? </div></foreignObject></svg>  `;
+  return html;
+}
+
+function createStencilVideoPlayer(width, height) {
+  // original 320x240
+  html = `
+  <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
+    <defs></defs>
+    <rect x="0" y="0" rx="0" ry="0" width="${width}" height="${height}" stroke-width="1" stroke="rgb(122,122,122)" stroke-dasharray="none" fill="#ffffff"></rect>
+    <rect x="0" y="${height-34}" rx="0" ry="0" width="${width}" height="34" stroke-width="1" stroke="rgb(122,122,122)" stroke-dasharray="none" fill="rgb(230,230,230)"></rect>
+    <svg width="${width}" height="${height}" style="overflow: hidden;">
+      <svg x="14" y="${height-24}" width="11" height="14">
+        <path d="M 0 0 V 14 L 11 7 Z" fill="rgb(68,68,68)" fill-rule="evenOdd"></path>
+      </svg>
+      <rect x="40" y="${height-18.5}" rx="1.5" ry="1.5" width="${width-102}" height="3" fill="rgb(255,255,255)"></rect>
+      <circle r="5" cx="${width-180}" cy="${height-17}" fill="rgb(68,68,68)"></circle>
+      <svg x="${width-53}" y="${height-26}" width="18" height="18">
+        <path d="M 0 5.92132 V 12.0787 H 4 L 9 17.2098 V 0.790194 L 4 5.92132 H 0 Z M 13.5 9 C 13.5 7.18358 12.48 5.62372 11 4.86431 V 13.1254 C 12.48 12.3763 13.5 10.8164 13.5 9 Z M 11 0 V 2.11402 C 13.89 2.99658 16 5.74686 16 9 S 13.89 15.0034 11 15.886 V 18 C 15.01 17.0661 18 13.3922 18 9 S 15.01 0.933865 11 0 Z" fill="rgb(68,68,68)" fill-rule="evenOdd"></path>
+      </svg>
+      <svg x="${width-23}" y="${height-24}" width="14" height="14">
+        <path d="M 2 9 H 0 V 14 H 5 V 12 H 2 V 9 Z M 0 5 H 2 V 2 H 5 V 0 H 0 V 5 Z M 12 12 H 9 V 14 H 14 V 9 H 12 V 12 Z M 9 0 V 2 H 12 V 5 H 14 V 0 H 9 Z" fill="rgb(68,68,68)" fill-rule="evenOdd"></path>
+      </svg>
+    </svg>
+  </svg>
+  `;
+  return html;
+}
+
+function createStencilMap(width, height) {
+  html = `
+    <svg class="overflowHidden " width="254" height="224" x="0.5" y="0.5" style="opacity: 1;"><defs></defs><rect x="0" y="0" rx="0" ry="0" width="254" height="224" fill="rgb(230,230,230)"></rect><path d="M34.45918520369907 243.6495C34.45918520369907 243.6495 60.25913521619595 186.9186 60.25913521619595 186.9186 60.25913521619595 186.9186 79.30437390652337 201.0918 79.30437390652337 201.0918 79.30437390652337 201.0918 65.46483379155211 229.1969 65.46483379155211 229.1969 65.22814596172233 229.66648295712295 65.4227330054167 230.2389408688664 65.89652586853288 230.4669 66.02731360051477 230.5303657642874 66.1701967715993 230.56501276638195 66.31552111972007 230.56850000000003 66.67824723818269 230.5698554083034 67.0093553465505 230.36224319357692 67.16620844788804 230.03510000000003 67.16620844788804 230.03510000000003 80.82799300174956 202.26020000000003 80.82799300174956 202.26020000000003 80.82799300174956 202.26020000000003 89.41104723819045 208.61020000000002 89.41104723819045 208.61020000000002 85.86863284178955 214.27440000000004 76.56185953511623 231.94010000000003 65.28707823044239 253.96190000000004 65.28707823044239 253.96190000000004 67.43284178955261 253.96190000000004 67.43284178955261 253.96190000000004 79.08852786803298 231.29240000000004 88.5095726068483 213.42350000000002 91.55681079730067 208.90230000000005 98.94636340914772 197.7263 109.19270182454386 187.96 113.68737815546113 183.8706 113.68737815546113 183.8706 155.81544613846538 221.2975 155.81544613846538 221.2975 132.4278930267433 228.8159 106.65333666583354 236.91850000000002 86.33841539615096 243.21769999999998 85.20521011509531 243.5595230950732 84.24630768702961 244.32320026066262 83.65938515371157 245.3513 83.58320419895026 245.45290000000003 81.75486128467882 248.6025 78.68222944263934 254 78.68222944263934 254 89.56340914771306 254 89.56340914771306 254 89.56340914771306 254 90.89657585603598 251.7013 90.89657585603598 251.7013 106.24703824043989 246.92610000000002 136.37660584853785 237.49 164.0429892526868 228.6 164.0429892526868 228.6 168.60114971257184 232.664 168.60114971257184 232.664 168.60114971257184 232.664 151.32076980754812 254 151.32076980754812 254 151.32076980754812 254 153.74586353411647 254 153.74586353411647 254 153.74586353411647 254 170.02319420144963 233.9213 170.02319420144963 233.9213 170.02319420144963 233.9213 182.4406898275431 244.95759999999999 182.4406898275431 244.95759999999999 182.4406898275431 244.95759999999999 174.61944513871532 254 174.61944513871532 254 174.61944513871532 254 179.62199450137464 254 179.62199450137464 254 179.62199450137464 254 185.25938515371155 247.47220000000002 185.25938515371155 247.47220000000002 185.25938515371155 247.47220000000002 192.61084728817792 254 192.61084728817792 254 192.61084728817792 254 206.8312921769557 254 206.8312921769557 254 206.8312921769557 254 191.44273931517117 240.3094 191.44273931517117 240.3094 191.44273931517117 240.3094 205.87903024243934 223.6089 205.87903024243934 223.6089 205.87903024243934 223.6089 233.05023744063982 244.2337 233.05023744063982 244.2337 233.05023744063982 244.2337 224.73381654586353 254 224.73381654586353 254 224.73381654586353 254 227.27318170457386 254 227.27318170457386 254 227.27318170457386 254 248.5657585603599 229.01909999999998 248.5657585603599 229.01909999999998 248.5657585603599 229.01909999999998 254 233.6038 254 233.6038 254 233.6038 254 231.14000000000001 254 231.14000000000001 254 231.14000000000001 249.78465383654088 227.59670000000003 249.78465383654088 227.59670000000003 249.78465383654088 227.59670000000003 254 222.65640000000002 254 222.65640000000002 254 222.65640000000002 254 219.71 254 219.71 254 219.71 248.34991252186956 226.35209999999998 248.34991252186956 226.35209999999998 248.34991252186956 226.35209999999998 231.374256435891 212.09 231.374256435891 212.09 231.374256435891 212.09 253.93651587103224 174.35829999999999 253.93651587103224 174.35829999999999 253.93651587103224 174.35829999999999 253.93651587103224 170.6753 253.93651587103224 170.6753 253.93651587103224 170.6753 229.9141214696326 210.82 229.9141214696326 210.82 229.9141214696326 210.82 224.5052736815796 206.26069999999999 224.5052736815796 206.26069999999999 228.16195951012247 201.46009999999998 238.7257185703574 184.50560000000002 252.85728567858038 161.163 252.85728567858038 161.163 253.93651587103227 162.0393 253.93651587103227 162.0393 253.93651587103227 162.0393 253.93651587103227 141.1224 253.93651587103227 141.1224 234.57385653586607 173.40580000000003 220.42959260184955 196.4944 217.43314171457138 200.21550000000002 213.53521619595105 202.29829999999998 192.3442139465134 209.4738 166.2649337665584 217.91930000000002 166.2649337665584 217.91930000000002 135.79255186203454 190.8937 135.79255186203454 190.8937 135.79255186203454 190.8937 146.21664583854042 153.0985 146.21664583854042 153.0985 164.74131467133222 135.3947 188.61134716320927 112.3569 208.60884778805305 92.3163 208.60884778805305 92.3163 253.93651587103224 104.14 253.93651587103224 104.14 253.93651587103224 104.14 253.93651587103224 102.17150000000001 253.93651587103224 102.17150000000001 253.93651587103224 102.17150000000001 210.2086478380405 90.7415 210.2086478380405 90.7415 228.7587103224194 72.09790000000001 243.70287428142964 56.28640000000001 247.42304423894026 50.190400000000004 249.21329667583103 47.24400000000001 251.4479380154961 41.70680000000001 253.93651587103224 34.467800000000004 253.93651587103224 34.467800000000004 253.93651587103224 28.625799999999998 253.93651587103224 28.625799999999998 250.80039990002498 38.2778 247.98170457385652 45.6565 245.8105473631592 49.2252 242.1411647088228 55.232299999999995 226.9176705823544 71.2978 208.06288427893026 90.2081 208.06288427893026 90.2081 166.60774806298426 79.38770000000001 166.60774806298426 79.38770000000001 166.60774806298426 79.38770000000001 179.77435641089727 31.66110000000001 179.77435641089727 31.66110000000001 179.77435641089727 31.66110000000001 179.77435641089727 31.66110000000001 179.77435641089727 31.66110000000001 179.77435641089727 31.66110000000001 188.50977255686078 0 188.50977255686078 0 188.50977255686078 0 186.55446138465385 0 186.55446138465385 0 186.55446138465385 0 178.21264683829042 30.238699999999998 178.21264683829042 30.238699999999998 178.21264683829042 30.238699999999998 135.70367408147965 18.3642 135.70367408147965 18.3642 135.70367408147965 18.3642 140.64273931517118 0 140.64273931517118 0 140.64273931517118 0 138.68742814296425 0 138.68742814296425 0 138.68742814296425 0 133.88802799300174 17.8562 133.88802799300174 17.8562 133.88802799300174 17.8562 93.25818545363657 6.515100000000001 93.25818545363657 6.515100000000001 93.25818545363657 6.515100000000001 95.0357410647338 0 95.0357410647338 0 95.0357410647338 0 85.23379155211197 0 85.23379155211197 0 85.23379155211197 0 52.60294926268433 119.11330000000001 52.60294926268433 119.11330000000001 52.60294926268433 119.11330000000001 0 91.567 0 91.567 0 91.567 0 102.2477 0 102.2477 0 102.2477 47.42264433891527 127.07619999999999 47.42264433891527 127.07619999999999 39.48712821794551 134.28979999999999 23.29867533116721 149.0345 7.199100224943766 163.9062 7.199100224943766 163.9062 0 170.4848 0 170.4848 0 170.4848 0 183.388 0 183.388 7.71967008247938 176.22520000000003 16.23924018995251 168.3639 24.822294426393402 160.52800000000002 24.822294426393402 160.52800000000002 58.710122469382654 185.78830000000002 58.710122469382654 185.78830000000002 58.710122469382654 185.78830000000002 32.77050737315671 242.79860000000002 32.77050737315671 242.79860000000002 32.77050737315671 242.79860000000002 0 226.06 0 226.06 0 226.06 0 228.18089999999998 0 228.18089999999998 0 228.18089999999998 50.54606348412897 254 50.54606348412897 254 50.54606348412897 254 54.69792551862035 254 54.69792551862035 254 54.69792551862035 254 34.45918520369907 243.6495 34.45918520369907 243.6495M223.23559110222442 207.7212C223.23559110222442 207.7212 247.05483629092723 227.7999 247.05483629092723 227.7999 247.05483629092723 227.7999 234.2818295426143 242.78590000000003 234.2818295426143 242.78590000000003 234.2818295426143 242.78590000000003 207.11062234441385 222.17380000000003 207.11062234441385 222.17380000000003 207.11062234441385 222.17380000000003 217.26808297925515 210.46440000000004 217.26808297925515 210.46440000000004 219.33092984769903 209.71971213227823 221.32719688336522 208.80204941184937 223.23559110222442 207.7212 223.23559110222442 207.7212 223.23559110222442 207.7212 223.23559110222442 207.7212M209.85313671582105 213.233C209.85313671582105 213.233 188.62404398900276 237.7948 188.62404398900276 237.7948 188.62404398900276 237.7948 174.4670832291927 225.2218 174.4670832291927 225.2218 188.29392651837043 220.7006 200.86378405398648 216.4715 209.85313671582105 213.233 209.85313671582105 213.233 209.85313671582105 213.233 209.85313671582105 213.233M90.50297425643589 207.07350000000002C90.50297425643589 207.07350000000002 61.4272431892027 185.42000000000002 61.4272431892027 185.42000000000002 61.4272431892027 185.42000000000002 71.94021494626344 176.79670000000002 71.94021494626344 176.79670000000002 71.94021494626344 176.79670000000002 97.76555861034741 197.5993 97.76555861034741 197.5993 95.16938380543283 200.62858752256793 92.73253198641267 203.7909282692973 90.46488377905523 207.07350000000002 90.46488377905523 207.07350000000002 90.50297425643589 207.07350000000002 90.50297425643589 207.07350000000002M98.99715071232191 196.16420000000002C98.99715071232191 196.16420000000002 73.47653086728317 175.57750000000001 73.47653086728317 175.57750000000001 73.47653086728317 175.57750000000001 84.10377405648588 166.87800000000001 84.10377405648588 166.87800000000001 84.10377405648588 166.87800000000001 106.8691827043239 187.7695 106.8691827043239 187.7695 104.44408897775557 190.1444 101.72696825793551 193.04 98.95906023494126 196.16420000000002 98.95906023494126 196.16420000000002 98.99715071232191 196.16420000000002 98.99715071232191 196.16420000000002M108.22774306423393 186.4487C108.22774306423393 186.4487 85.53851537115722 165.6588 85.53851537115722 165.6588 85.53851537115722 165.6588 89.51262184453886 162.4203 89.51262184453886 162.4203 89.51262184453886 162.4203 112.26533366658335 182.61329999999998 112.26533366658335 182.61329999999998 111.17340664833792 183.59120000000001 109.77675581104722 184.8993 108.18965258685327 186.4487 108.18965258685327 186.4487 108.22774306423393 186.4487 108.22774306423393 186.4487M134.30702324418894 189.4967C134.30702324418894 189.4967 120.61984503874031 177.4317 120.61984503874031 177.4317 125.47003249187702 172.85970000000003 133.62139465133714 165.1381 143.55031242189452 155.65120000000002 143.55031242189452 155.65120000000002 134.30702324418894 189.4967 134.30702324418894 189.4967M144.6295426143464 152.06980000000001C133.5325168707823 162.67430000000002 124.41619595101224 171.323 119.23589102724318 176.1998 119.23589102724318 176.1998 98.28612846788302 157.5943 98.28612846788302 157.5943 98.28612846788302 157.5943 105.38365408647837 131.2291 105.38365408647837 131.2291 105.38365408647837 131.2291 147.44823794051487 141.732 147.44823794051487 141.732 147.44823794051487 141.732 144.6295426143464 152.06980000000001 144.6295426143464 152.06980000000001M153.35226193451638 120.4595C153.35226193451638 120.4595 147.98150462384402 139.90320000000003 147.98150462384402 139.90320000000003 147.98150462384402 139.90320000000003 105.91692076980753 129.40030000000002 105.91692076980753 129.40030000000002 105.91692076980753 129.40030000000002 111.28767808047986 109.38510000000001 111.28767808047986 109.38510000000001 111.28767808047986 109.38510000000001 153.35226193451638 120.4595 153.35226193451638 120.4595M111.73206698325419 107.5563C111.73206698325419 107.5563 121.88952761809547 69.6849 121.88952761809547 69.6849 121.88952761809547 69.6849 164.24613846538367 80.73389999999999 164.24613846538367 80.73389999999999 164.24613846538367 80.73389999999999 153.79665083729068 118.63069999999999 153.79665083729068 118.63069999999999 153.79665083729068 118.63069999999999 111.73206698325419 107.5563 111.73206698325419 107.5563M206.50117470632338 91.75750000000001C187.45593601599597 110.8075 165.1476130967258 132.3975 147.24508872781803 149.5171 147.24508872781803 149.5171 149.51782054486375 141.2748 149.51782054486375 141.2748 149.51782054486375 141.2748 149.51782054486375 141.2748 149.51782054486375 141.2748 149.51782054486375 141.2748 155.3837540614846 120.04039999999999 155.3837540614846 120.04039999999999 155.3837540614846 120.04039999999999 155.3837540614846 120.04039999999999 155.3837540614846 120.04039999999999 155.3837540614846 120.04039999999999 166.09987503124216 81.28 166.09987503124216 81.28 166.09987503124216 81.28 206.50117470632338 91.75750000000001 206.50117470632338 91.75750000000001M177.75556110972255 32.0548C177.75556110972255 32.0548 172.4228942764309 51.2191 172.4228942764309 51.2191 172.4228942764309 51.2191 153.25068732816797 46.5836 153.25068732816797 46.5836 153.25068732816797 46.5836 158.430992251937 26.67 158.430992251937 26.67 158.430992251937 26.67 177.75556110972255 32.0548 177.75556110972255 32.0548M135.22119470132466 20.193C135.22119470132466 20.193 156.60264933766558 26.1493 156.60264933766558 26.1493 156.60264933766558 26.1493 151.20649837540614 47.1043 151.20649837540614 47.1043 151.10394567133505 47.60467215946232 151.41971362719985 48.09536287535477 151.91752061984505 48.2092 151.91752061984505 48.2092 171.91502124468883 53.047900000000006 171.91502124468883 53.047900000000006 171.91502124468883 53.047900000000006 164.7794051487128 78.9178 164.7794051487128 78.9178 164.7794051487128 78.9178 122.41009747563108 67.8688 122.41009747563108 67.8688 122.41009747563108 67.8688 135.22119470132466 20.193 135.22119470132466 20.193M92.75031242189452 8.331199999999999C92.75031242189452 8.331199999999999 133.38015496125968 19.685 133.38015496125968 19.685 133.38015496125968 19.685 120.61984503874031 67.3862 120.61984503874031 67.3862 120.61984503874031 67.3862 79.52021994501375 56.6801 79.52021994501375 56.6801 79.52021994501375 56.6801 92.75031242189452 8.331199999999999 92.75031242189452 8.331199999999999M79.01234691327167 58.4962C79.01234691327167 58.4962 120.08657835541113 69.215 120.08657835541113 69.215 120.08657835541113 69.215 109.92911772056985 107.0737 109.92911772056985 107.0737 109.92911772056985 107.0737 68.68982754311422 96.22789999999999 68.68982754311422 96.22789999999999 68.68982754311422 96.22789999999999 79.01234691327167 58.4962 79.01234691327167 58.4962M68.18195451137215 98.04400000000001C68.18195451137215 98.04400000000001 109.4212446888278 108.9025 109.4212446888278 108.9025 109.4212446888278 108.9025 104.03779055236193 128.94310000000002 104.03779055236193 128.94310000000002 104.03779055236193 128.94310000000002 62.5572606848288 118.57990000000001 62.5572606848288 118.57990000000001 62.5572606848288 118.57990000000001 68.18195451137215 98.04400000000001 68.18195451137215 98.04400000000001M62.06208447888028 120.396C62.06208447888028 120.396 103.55531117220694 130.81 103.55531117220694 130.81 103.55531117220694 130.81 96.72441889527619 156.21 96.72441889527619 156.21 96.72441889527619 156.21 60.944763809047735 124.46000000000001 60.944763809047735 124.46000000000001 60.944763809047735 124.46000000000001 62.06208447888028 120.396 62.06208447888028 120.396M55.65018745313672 132.38479999999998C60.944763809047735 137.16 72.68932766808298 147.4851 88.07788052986754 161.1376 88.07788052986754 161.1376 84.14186453386654 164.3761 84.14186453386654 164.3761 84.14186453386654 164.3761 52.39980004998751 135.2931 52.39980004998751 135.2931 52.39980004998751 135.2931 55.65018745313672 132.38479999999998 55.65018745313672 132.38479999999998M51.04123969007748 136.5631C51.04123969007748 136.5631 82.65633591602098 165.58259999999999 82.65633591602098 165.58259999999999 82.65633591602098 165.58259999999999 71.92751812046987 174.37099999999998 71.92751812046987 174.37099999999998 71.92751812046987 174.37099999999998 38.82689327668081 147.701 38.82689327668081 147.701 38.82689327668081 147.701 51.04123969007748 136.5631 51.04123969007748 136.5631M26.244338915271182 159.2072C26.244338915271182 159.2072 37.4175456135966 148.971 37.4175456135966 148.971 37.4175456135966 148.971 70.42929267683078 175.64100000000002 70.42929267683078 175.64100000000002 70.42929267683078 175.64100000000002 59.8528367908023 184.31510000000003 59.8528367908023 184.31510000000003 59.8528367908023 184.31510000000003 26.244338915271182 159.2072 26.244338915271182 159.2072" fill="rgb(255,255,255)" fill-rule="evenOdd"></path><svg x="50.040000000000006" y="139.20000000000002" width="22" height="32"><path d="M11.999999999999998 0C5.3657142857142865 0 0 5.321 0 11.899999999999999 0 20.825 11.999999999999998 34 11.999999999999998 34 11.999999999999998 34 24 20.825 24 11.899999999999999 24 5.321 18.63428571428571 0 11.999999999999998 0 11.999999999999998 0 11.999999999999998 0 11.999999999999998 0M11.999999999999998 16.150000000000002C8.700855604630709 16.150000000000002 6.638890357524902 12.608333333333336 8.288462555209547 9.775 9.054031676441328 8.460045423776364 10.46886175753644 7.649999999999999 11.999999999999998 7.649999999999999 15.299144395369288 7.649999999999999 17.3611096424751 11.191666666666666 15.71153744479045 14.025 14.945968323558672 15.339954576223638 13.531138242463557 16.150000000000002 11.999999999999998 16.150000000000002 11.999999999999998 16.150000000000002 11.999999999999998 16.150000000000002 11.999999999999998 16.150000000000002" stroke-width="1" stroke="rgb(122,122,122)" fill="rgb(35,35,35)" fill-rule="evenOdd"></path><ellipse rx="9" ry="2.5" cx="16" cy="34.5" fill="rgba(35,35,35,0.2)"></ellipse></svg><rect x="0" y="0" rx="0" ry="0" width="254" height="224" stroke-width="1" stroke="rgb(170,170,170)" stroke-dasharray="none" fill="none"></rect></svg>
+  `;
+  return html;
+}
+
+function createStencilTabs(width, height) {
+  // original 260x29
+  html = `
+    <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
+      <defs></defs>
+      <svg x="0" y="0">
+        <path d="M8 0 L${width/4-8} 0 C${width/4-3.64} 0 ${width/4} 3.64 ${width/4} 8 L${width/4} ${height} C${width/4} ${height} ${width/4} ${height} ${width/4} ${height} L0 ${height} C0 ${height} 0 ${height} 0 ${height} L0 8 C0 3.64 3.64 0 8 0 Z" stroke-width="1" stroke="rgb(0,0,0)" stroke-dasharray="none" fill="rgb(255,255,255)"></path>
+        <path d="M${width/4+8} 0 L${2*width/4-8} 0 C${2*width/4-3.64} 0 ${2*width/4} 3.64 ${2*width/4} 8 L${2*width/4} ${height} C${2*width/4} ${height} ${2*width/4} ${height} ${2*width/4} ${height} L${width/4} ${height} C${width/4} ${height} ${width/4} ${height} ${width/4} ${height} L${width/4} 8 C${width/4} 3.64 ${width/4+3.64} 0 ${width/4+8} 0 Z" stroke-width="1" stroke="rgb(0,0,0)" stroke-dasharray="none" fill="rgb(230,230,230)"></path>
+        <path d="M${2*width/4+8} 0 L${3*width/4-8} 0 C${3*width/4-3.64} 0 ${3*width/4} 3.64 ${3*width/4} 8 L${3*width/4} ${height} C${3*width/4} ${height} ${3*width/4} ${height} ${3*width/4} ${height} L${2*width/4} ${height} C${2*width/4} ${height} ${2*width/4} ${height} ${2*width/4} ${height} L${2*width/4} 8 C${2*width/4} 3.64 ${2*width/4+3.64} 0 ${2*width/4+8} 0 Z" stroke-width="1" stroke="rgb(0,0,0)" stroke-dasharray="none" fill="rgb(255,255,255)"></path>
+        <path d="M${3*width/4+8} 0 L${width-8} 0 C${width-3.64} 0 ${width} 3.64 ${width} 8 L${width} ${height} C${width} ${height} ${width} ${height} ${width} ${height} L${3*width/4} ${height} C${3*width/4} ${height} ${3*width/4} ${height} ${3*width/4} ${height} L${3*width/4} 8 C${3*width/4} 3.64 ${3*width/4+3.64} 0 ${3*width/4+8} 0 Z" stroke-width="1" stroke="rgb(0,0,0)" stroke-dasharray="none" fill="rgb(255,255,255)"></path>
+      </svg>
+      <foreignObject class="editable-fo" width="${width}" height="${height}" x="0" y="0" style="color: rgb(0, 0, 0);">
+        <div style="width: ${width}px; height: ${height}px; padding-left: 0px; padding-right: 0px; display: flex; align-items: center; align-content: stretch; flex-direction: row; white-space: nowrap;">
+          <div style="color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 14px; text-align: center; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; padding: 0px 5px; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+            <div class="text-item-label">Home</div>
+          </div>
+          <div style="color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 14px; text-align: center; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; padding: 0px 5px; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+            <div class="text-item-label">Products</div>
+          </div>
+          <div style="color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 14px; text-align: center; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; padding: 0px 5px; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+            <div class="text-item-label">About</div>
+          </div>
+          <div style="color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 14px; text-align: center; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; padding: 0px 5px; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+            <div class="text-item-label">Contact</div>
+          </div>
+        </div>
+      </foreignObject>
+    </svg>
+  `;
+  return html;
+}
+
+function createStencilTable(width, height) {
+  // original size 460x180
+  // XXX - table resizing but a kind of wrong
+  html = `
+    <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
+      <defs></defs>
+      <foreignObject width="${width}" height="${height}" style="overflow: visible;">
+        <table class="grid__table" style="width: ${width}px; height: ${height}px; table-layout: fixed; border-collapse: collapse; border-width: 1px; border-style: solid; border-color: rgb(192, 192, 192);">
+          <colgroup>
+            <col span="1" style="width: ${(width-4)/3}px;">
+            <col span="1" style="width: ${(width-4)/3}px;">
+            <col span="1" style="width: ${(width-4)/3}px;">
+          </colgroup>
+          <tbody>
+            <tr style="height: 34.8px;">
+              <td colspan="1" rowspan="1" data-cellid="3eedc42f" style="height: 34.8px; width: 152px; overflow: hidden; box-sizing: border-box; padding: 6px 8px; line-height: 34.8px; background-color: rgb(229, 229, 229); border-bottom: 1px solid rgb(192, 192, 192); border-left: 1px solid rgb(192, 192, 192);">
+                <div>
+                  <svg width="135.999999999848px" height="22.800000000000004px" style="display: block;">
+                    <foreignObject class="editable-fo" width="135.999999999848" height="22.800000000000004" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; line-height: 1.2; cursor: default;">
+                      <div class="fo__content " data-gramm="false" spellcheck="false" style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; line-height: 1.2; width: 136px; height: 22.8px; max-width: 136px; padding: 0px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word; display: table-cell; word-break: break-word;"></div>
+                    </foreignObject>
+                  </svg>
+                </div>
+              </td>
+              <td colspan="1" rowspan="1" data-cellid="b3980dfe" style="height: 34.8px; width: 152px; overflow: hidden; box-sizing: border-box; padding: 6px 8px; line-height: 34.8px; background-color: rgb(229, 229, 229); border-bottom: 1px solid rgb(192, 192, 192); border-left: 1px solid rgb(192, 192, 192);"><div><svg width="135.999999999848px" height="22.800000000000004px" style="display: block;"><foreignObject class="editable-fo" width="135.999999999848" height="22.800000000000004" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; line-height: 1.2; cursor: default;"><div class="fo__content " data-gramm="false" spellcheck="false" style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; line-height: 1.2; width: 136px; height: 22.8px; max-width: 136px; padding: 0px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word; display: table-cell; word-break: break-word;"></div></foreignObject></svg></div>
+              </td>
+              <td colspan="1" rowspan="1" data-cellid="5e01d25b" style="height: 34.8px; width: 152px; overflow: hidden; box-sizing: border-box; padding: 6px 8px; line-height: 34.8px; background-color: rgb(229, 229, 229); border-bottom: 1px solid rgb(192, 192, 192); border-left: 1px solid rgb(192, 192, 192);"><div><svg width="135.999999999848px" height="22.800000000000004px" style="display: block;"><foreignObject class="editable-fo" width="135.999999999848" height="22.800000000000004" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; line-height: 1.2; cursor: default;"><div class="fo__content " data-gramm="false" spellcheck="false" style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; line-height: 1.2; width: 136px; height: 22.8px; max-width: 136px; padding: 0px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word; display: table-cell; word-break: break-word;"></div></foreignObject></svg></div>
+              </td>
+            </tr>
+            <tr style="height: 34.8px;"><td colspan="1" rowspan="1" data-cellid="0fb1ba7a" style="height: 34.8px; width: 152px; overflow: hidden; box-sizing: border-box; padding: 6px 8px; line-height: 34.8px; background-color: rgb(255, 255, 255); border-bottom: 1px solid rgb(192, 192, 192); border-left: 1px solid rgb(192, 192, 192);"><div><svg width="135.999999999848px" height="22.800000000000004px" style="display: block;"><foreignObject class="editable-fo" width="135.999999999848" height="22.800000000000004" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; line-height: 1.2; cursor: default;"><div class="fo__content " data-gramm="false" spellcheck="false" style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; line-height: 1.2; width: 136px; height: 22.8px; max-width: 136px; padding: 0px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word; display: table-cell; word-break: break-word;"></div></foreignObject></svg></div></td><td colspan="1" rowspan="1" data-cellid="22b84632" style="height: 34.8px; width: 152px; overflow: hidden; box-sizing: border-box; padding: 6px 8px; line-height: 34.8px; background-color: rgb(255, 255, 255); border-bottom: 1px solid rgb(192, 192, 192); border-left: 1px solid rgb(192, 192, 192);"><div><svg width="135.999999999848px" height="22.800000000000004px" style="display: block;"><foreignObject class="editable-fo" width="135.999999999848" height="22.800000000000004" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; line-height: 1.2; cursor: default;"><div class="fo__content " data-gramm="false" spellcheck="false" style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; line-height: 1.2; width: 136px; height: 22.8px; max-width: 136px; padding: 0px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word; display: table-cell; word-break: break-word;"></div></foreignObject></svg></div></td><td colspan="1" rowspan="1" data-cellid="860d0861" style="height: 34.8px; width: 152px; overflow: hidden; box-sizing: border-box; padding: 6px 8px; line-height: 34.8px; background-color: rgb(255, 255, 255); border-bottom: 1px solid rgb(192, 192, 192); border-left: 1px solid rgb(192, 192, 192);"><div><svg width="135.999999999848px" height="22.800000000000004px" style="display: block;"><foreignObject class="editable-fo" width="135.999999999848" height="22.800000000000004" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; line-height: 1.2; cursor: default;"><div class="fo__content " data-gramm="false" spellcheck="false" style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; line-height: 1.2; width: 136px; height: 22.8px; max-width: 136px; padding: 0px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word; display: table-cell; word-break: break-word;"></div></foreignObject></svg></div></td>
+            </tr>
+            <tr style="height: 34.8px;"><td colspan="1" rowspan="1" data-cellid="16116c07" style="height: 34.8px; width: 152px; overflow: hidden; box-sizing: border-box; padding: 6px 8px; line-height: 34.8px; background-color: rgb(255, 255, 255); border-bottom: 1px solid rgb(192, 192, 192); border-left: 1px solid rgb(192, 192, 192);"><div><svg width="135.999999999848px" height="22.800000000000004px" style="display: block;"><foreignObject class="editable-fo" width="135.999999999848" height="22.800000000000004" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; line-height: 1.2; cursor: default;"><div class="fo__content " data-gramm="false" spellcheck="false" style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; line-height: 1.2; width: 136px; height: 22.8px; max-width: 136px; padding: 0px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word; display: table-cell; word-break: break-word;"></div></foreignObject></svg></div></td><td colspan="1" rowspan="1" data-cellid="ad94d6bc" style="height: 34.8px; width: 152px; overflow: hidden; box-sizing: border-box; padding: 6px 8px; line-height: 34.8px; background-color: rgb(255, 255, 255); border-bottom: 1px solid rgb(192, 192, 192); border-left: 1px solid rgb(192, 192, 192);"><div><svg width="135.999999999848px" height="22.800000000000004px" style="display: block;"><foreignObject class="editable-fo" width="135.999999999848" height="22.800000000000004" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; line-height: 1.2; cursor: default;"><div class="fo__content " data-gramm="false" spellcheck="false" style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; line-height: 1.2; width: 136px; height: 22.8px; max-width: 136px; padding: 0px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word; display: table-cell; word-break: break-word;"></div></foreignObject></svg></div></td><td colspan="1" rowspan="1" data-cellid="d5585fba" style="height: 34.8px; width: 152px; overflow: hidden; box-sizing: border-box; padding: 6px 8px; line-height: 34.8px; background-color: rgb(255, 255, 255); border-bottom: 1px solid rgb(192, 192, 192); border-left: 1px solid rgb(192, 192, 192);"><div><svg width="135.999999999848px" height="22.800000000000004px" style="display: block;"><foreignObject class="editable-fo" width="135.999999999848" height="22.800000000000004" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; line-height: 1.2; cursor: default;"><div class="fo__content " data-gramm="false" spellcheck="false" style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; line-height: 1.2; width: 136px; height: 22.8px; max-width: 136px; padding: 0px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word; display: table-cell; word-break: break-word;"></div></foreignObject></svg></div></td>
+            </tr>
+            <tr style="height: 34.8px;"><td colspan="1" rowspan="1" data-cellid="5329793c" style="height: 34.8px; width: 152px; overflow: hidden; box-sizing: border-box; padding: 6px 8px; line-height: 34.8px; background-color: rgb(255, 255, 255); border-bottom: 1px solid rgb(192, 192, 192); border-left: 1px solid rgb(192, 192, 192);"><div><svg width="135.999999999848px" height="22.800000000000004px" style="display: block;"><foreignObject class="editable-fo" width="135.999999999848" height="22.800000000000004" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; line-height: 1.2; cursor: default;"><div class="fo__content " data-gramm="false" spellcheck="false" style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; line-height: 1.2; width: 136px; height: 22.8px; max-width: 136px; padding: 0px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word; display: table-cell; word-break: break-word;"></div></foreignObject></svg></div></td><td colspan="1" rowspan="1" data-cellid="5a55ab5a" style="height: 34.8px; width: 152px; overflow: hidden; box-sizing: border-box; padding: 6px 8px; line-height: 34.8px; background-color: rgb(255, 255, 255); border-bottom: 1px solid rgb(192, 192, 192); border-left: 1px solid rgb(192, 192, 192);"><div><svg width="135.999999999848px" height="22.800000000000004px" style="display: block;"><foreignObject class="editable-fo" width="135.999999999848" height="22.800000000000004" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; line-height: 1.2; cursor: default;"><div class="fo__content " data-gramm="false" spellcheck="false" style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; line-height: 1.2; width: 136px; height: 22.8px; max-width: 136px; padding: 0px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word; display: table-cell; word-break: break-word;"></div></foreignObject></svg></div></td><td colspan="1" rowspan="1" data-cellid="a869013a" style="height: 34.8px; width: 152px; overflow: hidden; box-sizing: border-box; padding: 6px 8px; line-height: 34.8px; background-color: rgb(255, 255, 255); border-bottom: 1px solid rgb(192, 192, 192); border-left: 1px solid rgb(192, 192, 192);"><div><svg width="135.999999999848px" height="22.800000000000004px" style="display: block;"><foreignObject class="editable-fo" width="135.999999999848" height="22.800000000000004" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; line-height: 1.2; cursor: default;"><div class="fo__content " data-gramm="false" spellcheck="false" style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; line-height: 1.2; width: 136px; height: 22.8px; max-width: 136px; padding: 0px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word; display: table-cell; word-break: break-word;"></div></foreignObject></svg></div></td>
+            </tr>
+            <tr style="height: 34.8px;"><td colspan="1" rowspan="1" data-cellid="6fb06cc2" style="height: 34.8px; width: 152px; overflow: hidden; box-sizing: border-box; padding: 6px 8px; line-height: 34.8px; background-color: rgb(255, 255, 255); border-bottom: 1px solid rgb(192, 192, 192); border-left: 1px solid rgb(192, 192, 192);"><div><svg width="135.999999999848px" height="22.800000000000004px" style="display: block;"><foreignObject class="editable-fo" width="135.999999999848" height="22.800000000000004" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; line-height: 1.2; cursor: default;"><div class="fo__content " data-gramm="false" spellcheck="false" style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; line-height: 1.2; width: 136px; height: 22.8px; max-width: 136px; padding: 0px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word; display: table-cell; word-break: break-word;"></div></foreignObject></svg></div></td><td colspan="1" rowspan="1" data-cellid="1ed2aa6f" style="height: 34.8px; width: 152px; overflow: hidden; box-sizing: border-box; padding: 6px 8px; line-height: 34.8px; background-color: rgb(255, 255, 255); border-bottom: 1px solid rgb(192, 192, 192); border-left: 1px solid rgb(192, 192, 192);"><div><svg width="135.999999999848px" height="22.800000000000004px" style="display: block;"><foreignObject class="editable-fo" width="135.999999999848" height="22.800000000000004" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; line-height: 1.2; cursor: default;"><div class="fo__content " data-gramm="false" spellcheck="false" style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; line-height: 1.2; width: 136px; height: 22.8px; max-width: 136px; padding: 0px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word; display: table-cell; word-break: break-word;"></div></foreignObject></svg></div></td><td colspan="1" rowspan="1" data-cellid="1d1643cf" style="height: 34.8px; width: 152px; overflow: hidden; box-sizing: border-box; padding: 6px 8px; line-height: 34.8px; background-color: rgb(255, 255, 255); border-bottom: 1px solid rgb(192, 192, 192); border-left: 1px solid rgb(192, 192, 192);"><div><svg width="135.999999999848px" height="22.800000000000004px" style="display: block;"><foreignObject class="editable-fo" width="135.999999999848" height="22.800000000000004" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; line-height: 1.2; cursor: default;"><div class="fo__content " data-gramm="false" spellcheck="false" style="font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; line-height: 1.2; width: 136px; height: 22.8px; max-width: 136px; padding: 0px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word; display: table-cell; word-break: break-word;"></div></foreignObject></svg></div></td>
+            </tr>
+          </tbody>
+        </table>
+      </foreignObject>
+    </svg>
+  `;
+  return html;
+}
+
+function createStencilCalendar(width, height) {
+  // original 180x155
+  html = `
+    <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
+      <defs></defs>
+      <path d="M3 0 L${width-3} 0 C${width-1.365} 0 ${width} 1.365 ${width} 3 L${width} ${height-3} C${width} ${height-1.365} ${width-1.365} ${height} ${width-3} ${height} L3 ${height} C1.365 ${height} 0 ${height-1.365} 0 ${height-3} L0 3 C0 1.365 1.365 0 3 0 Z" stroke-width="1" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(255,255,255)"></path>
+      <path d="M3.5 0.5 L${width-3.5} 0.5 C${width-1.865} 0.5 ${width-0.5} 1.865 ${width-0.5} 3.5 L${width-0.5} 28.46 C${width-0.5} 28.46 ${width-0.5} 28.46 ${width-0.5} 28.46 L0.5 28.46 C0.5 28.46 0.5 28.46 0.5 28.46 L0.5 3.5 C0.5 1.865 1.865 0.5 3.5 0.5 Z" stroke="rgb(35,35,35)" fill="rgb(235,235,235)"></path>
+      <svg x="9" y="9.98" width="5" height="8">
+        <path d="M5.431795382973925 0.9375439743191355C5.431795382973925 0.9375439743191355 5.431795382973925 7.861739784654075 5.431795382973925 7.861739784654075 5.431795382973925 8.338279771600863 4.793155925817463 8.579419764995645 4.420096242918193 8.240669774274561 4.420096242918193 8.240669774274561 0.6072614838277387 4.778579869106873 0.6072614838277387 4.778579869106873 0.3733066826893197 4.571879874768724 0.3733066826893197 4.227399884204596 0.6072614838277387 4.0149598900236745 0.6072614838277387 4.0149598900236745 4.420096242918193 0.5586079846988127 4.420096242918193 0.5586079846988127 4.793155925817463 0.2198629939775926 5.431795382973925 0.4552619875296287 5.431795382973925 0.9375439743191355 5.431795382973925 0.9375439743191355 5.431795382973925 0.9375439743191355 5.431795382973925 0.9375439743191355" fill="rgb(35,35,35)" fill-rule="evenOdd"></path>
+      </svg>
+      <svg x="${width-14}" y="9.98" width="5" height="8">
+        <path d="M0.4355701188942586 0.9375439743191355C0.4355701188942586 0.9375439743191355 0.4355701188942586 7.861739784654075 0.4355701188942586 7.861739784654075 0.4355701188942586 8.338279771600865 1.0742095847734336 8.579419764995645 1.4472692669265843 8.240669774274561 1.4472692669265843 8.240669774274561 5.260104018391376 4.778579869106873 5.260104018391376 4.778579869106873 5.494058819061886 4.571879874768724 5.494058819061886 4.227399884204595 5.260104018391376 4.0149598900236745 5.260104018391376 4.0149598900236745 1.4472692669265843 0.5586079846988127 1.4472692669265843 0.5586079846988127 1.0742095847734336 0.2198629939775926 0.4355701188942586 0.4552619875296287 0.4355701188942586 0.9375439743191355 0.4355701188942586 0.9375439743191355 0.4355701188942586 0.9375439743191355 0.4355701188942586 0.9375439743191355" fill="rgb(35,35,35)" fill-rule="evenOdd"></path>
+      </svg>
+      <foreignObject class="editable-fo" width="${width}" height="27.96" x="0" y="0" style="font-size: 12px; text-align: center; font-style: normal; color: rgb(0, 0, 0);">
+        <div class="fo__content " data-gramm="false" spellcheck="false" style="color: rgb(0, 0, 0); font-family: Helvetica, Arial, sans-serif; font-size: 12px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: center; text-decoration: none; vertical-align: middle; width: ${width}px; height: 27.96px; padding: 0px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word; display: table-cell; word-break: break-word;">March 07, 2024</div>
+      </foreignObject>
+      <foreignObject x="0" y="30" width="${width}" height="${height-30}">
+        <table style="width: 100%; height: 27.96px;">
+          <tbody>
+            <tr>
+              <td style="text-align: center; vertical-align: bottom; font-weight: bold; color: rgb(0, 0, 0); font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; padding: 0px;">
+                Su
+              </td>
+              <td style="text-align: center; vertical-align: bottom; font-weight: bold; color: rgb(0, 0, 0); font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; padding: 0px;">
+                Mo
+              </td>
+              <td style="text-align: center; vertical-align: bottom; font-weight: bold; color: rgb(0, 0, 0); font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; padding: 0px;">
+                Tu
+              </td>
+              <td style="text-align: center; vertical-align: bottom; font-weight: bold; color: rgb(0, 0, 0); font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; padding: 0px;">
+                We
+              </td>
+              <td style="text-align: center; vertical-align: bottom; font-weight: bold; color: rgb(0, 0, 0); font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; padding: 0px;">
+                Th
+              </td>
+              <td style="text-align: center; vertical-align: bottom; font-weight: bold; color: rgb(0, 0, 0); font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; padding: 0px;">
+                Fr
+              </td>
+              <td style="text-align: center; vertical-align: bottom; font-weight: bold; color: rgb(0, 0, 0); font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; padding: 0px;">
+                Sa
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <table style="width: 100%; height: ${height-57.96}px;">
+          <tbody>
+            <tr>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;"></td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;"></td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;"></td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;"></td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;"></td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">1</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">2</td>
+            </tr>
+            <tr>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">3</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">4</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">5</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">6</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;"><div style="background-color: rgb(35, 35, 35); width: 85%; margin: 0px auto; border: 1px solid rgb(35, 35, 35); color: rgb(255, 255, 255); border-radius: 3px;">7</div></td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">8</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">9</td>
+            </tr>
+            <tr>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">10</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">11</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">12</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">13</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">14</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">15</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">16</td>
+            </tr>
+            <tr>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">17</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">18</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">19</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">20</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">21</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">22</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">23</td>
+            </tr>
+            <tr>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">24</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">25</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">26</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">27</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">28</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">29</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">30</td>
+            </tr>
+            <tr>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;">31</td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;"></td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;"></td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;"></td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;"></td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;"></td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;"></td>
+              <td style="text-align: center; color: rgb(0, 0, 0); font-weight: 400; font-style: normal; font-size: 12px; font-family: Helvetica, Arial, sans-serif; letter-spacing: 0px; text-decoration: none; vertical-align: middle; padding: 0px;"></td>
+            </tr>
+          </tbody>
+        </table>
+      </foreignObject>
+    </svg>
+  `;
+  return html;
+}
+
+function createStencilToggle(width, height) {
+  // original size 36x20
+  html = `
+    <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
+      <defs></defs>
+      <path d="M10 0 L${width-10} 0 C${width-4.55} 0 ${width} 4.55 ${width} ${height/2} L${width} ${height/2} C${width} ${height-4.55} ${width-4.55} ${height} ${width-10} ${height} L${height/2} ${height} C4.55 ${height} 0 ${height-4.55} 0 ${height/2} L0 ${height/2} C0 4.55 4.55 0 ${height/2} 0 Z" stroke-width="1" stroke="#232323" stroke-dasharray="none" fill="#ebebeb"></path>
+      <ellipse rx="${height/2-3}" ry="${height/2-3}" cx="${height/2}" cy="${height/2}" stroke="#232323" fill="#FFF"></ellipse>
+      <path d="M13.333333333333332 7.338095238095237C13.333333333333332 7.338095238095237 12.661904761904761 6.666666666666666 12.661904761904761 6.666666666666666 12.661904761904761 6.666666666666666 10 9.328571428571427 10 9.328571428571427 10 9.328571428571427 7.338095238095237 6.666666666666666 7.338095238095237 6.666666666666666 7.338095238095237 6.666666666666666 6.666666666666666 7.338095238095237 6.666666666666666 7.338095238095237 6.666666666666666 7.338095238095237 9.328571428571427 10 9.328571428571427 10 9.328571428571427 10 6.666666666666666 12.661904761904761 6.666666666666666 12.661904761904761 6.666666666666666 12.661904761904761 7.338095238095237 13.333333333333332 7.338095238095237 13.333333333333332 7.338095238095237 13.333333333333332 10 10.67142857142857 10 10.67142857142857 10 10.67142857142857 12.661904761904761 13.333333333333332 12.661904761904761 13.333333333333332 12.661904761904761 13.333333333333332 13.333333333333332 12.661904761904761 13.333333333333332 12.661904761904761 13.333333333333332 12.661904761904761 10.67142857142857 10 10.67142857142857 10z" fill="#232323" fill-rule="evenOdd"></path>
+    </svg>
+  `;
+  return html;
+}
+
+function createStencilScrollbar(width, height) {
+  // original 18x200
+  html = `
+    <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
+      <defs></defs>
+      <rect x="0" y="0" rx="0" ry="0" width="${width}" height="${height}" stroke-width="1" stroke="rgb(0,0,0)" stroke-dasharray="none" fill="rgb(255,255,255)"></rect>
+      <path d="M${width/2} 72.28 L${width/2} 72.28 C${width-4.095} 72.28 ${width} 76.375 ${width} 81.28 L${width} 118.72 C${width} 123.625 ${width-4.095} 127.72 ${width/2} 127.72 L${width/2} 127.72 C4.095 127.72 0 123.625 0 118.72 L0 81.28 C0 76.375 4.095 72.28 ${width/2} 72.28 Z" stroke-width="1" stroke="rgb(0,0,0)" stroke-dasharray="none" fill="rgb(230,230,230)"></path>
+      <rect x="0" y="0" rx="0" ry="0" width="${width}" height="16" stroke-width="1" stroke="rgb(0,0,0)" stroke-dasharray="none" fill="rgb(230,230,230)"></rect>
+      <svg x="${(width-10)/2}" y="4" width="10" height="8">
+        <path d="M 5 0 L 10 8 L 0 8 Z" fill="rgb(68,68,68)" fill-rule="evenOdd"></path>
+      </svg>
+      <rect x="0" y="${height-16}" rx="0" ry="0" width="${width}" height="16" stroke-width="1" stroke="rgb(0,0,0)" stroke-dasharray="none" fill="rgb(230,230,230)"></rect>
+      <svg x="${(width-10)/2}" y="${height-12}" width="10" height="8">
+        <path d="M 0 0 L 10 0 L 5 8 Z" fill="rgb(68,68,68)" fill-rule="evenOdd"></path>
+      </svg>
+    </svg>
+  `;
+  return html;
+}
+
+function createStencilCircle(width, height) {
+  html = `
+  <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
+    <defs></defs>
+    <ellipse rx="${width/2}" ry="${height/2}" cx="${width/2}" cy="${height/2}" stroke-width="1" stroke="rgb(0,0,0)" stroke-dasharray="none" fill="rgb(255,255,255)"></ellipse>
+    <foreignObject class="editable-fo" width="${width}" height="${height}" x="0" y="0" style="font-size: 14px; text-align: center; font-style: normal; line-height: 1.3; color: rgb(0, 0, 0);">
+      <div class="fo__content " data-gramm="false" spellcheck="false" style="color: rgb(0, 0, 0); font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: center; text-decoration: none; vertical-align: middle; line-height: 1.3; width: 100px; height: 100px; padding: 0px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word; display: table-cell; word-break: break-word;">
+      </div>
+    </foreignObject>
+  </svg>
+  `;
+  return html;
+}
+
+function createStencilHorizontalLine(width, height) {
+  html = `
+  <svg class="stencil--easier-to-select " width="100" height="1" x="0.5" y="0.5" style="opacity: 1;"><defs><marker id="StartMarker3c05e1d3" viewBox="0 0 0 0" refX="0" refY="5" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto"><path fill="rgb(0,0,0)"></path></marker><marker id="EndMarker3c05e1d3" viewBox="0 0 0 0" refX="0" refY="5" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto"><path fill="rgb(0,0,0)"></path></marker></defs><path class="stencil__selection-helper" d="M 0 0 L 100 0" stroke-width="11" stroke="transparent" fill="none" fill-rule="evenOdd"></path><path d="M 0 0 L 100 0" stroke-width="1" stroke="rgb(0,0,0)" stroke-dasharray="none" stroke-dashoffset="none" marker-start="url(#StartMarker3c05e1d3)" marker-end="url(#EndMarker3c05e1d3)" fill="none" fill-rule="evenOdd"></path></svg>
+  `;
+  return html;
+}
+
+function createStencilVerticalLine(width, height) {
+  html = `
+  <svg class="stencil--easier-to-select " width="1" height="100" x="0.5" y="0.5" style="opacity: 1;"><defs><marker id="StartMarker8c406383" viewBox="0 0 0 0" refX="0" refY="5" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto"><path fill="rgb(0,0,0)"></path></marker><marker id="EndMarker8c406383" viewBox="0 0 0 0" refX="0" refY="5" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto"><path fill="rgb(0,0,0)"></path></marker></defs><path class="stencil__selection-helper" d="M 0 0 L 0 100" stroke-width="11" stroke="transparent" fill="none" fill-rule="evenOdd"></path><path d="M 0 0 L 0 100" stroke-width="1" stroke="rgb(0,0,0)" stroke-dasharray="none" stroke-dashoffset="none" marker-start="url(#StartMarker8c406383)" marker-end="url(#EndMarker8c406383)" fill="none" fill-rule="evenOdd"></path></svg>
+  `;
+  return html;
+}
+
+
+function createStencilRadio(width, height, label) {
+  // 61x19 original
+  html = `
+    <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
+      <defs></defs>
+      <circle r="7" cx="7" cy="${height/2}" stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(255,255,255)"></circle>
+      <circle r="3.5" cx="7" cy="${height/2}" fill="rgb(35,35,35)"></circle>
+      <foreignObject class="editable-fo" width="${width-24}" height="${height}" x="24" y="0" style="font-size: 14px; text-align: left; font-style: normal; color: rgb(35, 35, 35);">
+        <div class="fo__content " data-gramm="false" spellcheck="false" style="color: rgb(35, 35, 35); font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; width: auto; height: ${height}px; padding: 0px; min-width: 1px; min-height: 1px; white-space: pre; display: table-cell;">Radio</div>
+      </foreignObject>
+    </svg>
+  `;
+  return html;
+}
+    
+function onObjectNameChanged() {
+  // get value
+  let newValue = document.getElementById("object-name-input").value;
+
+  if (selectionId !== "") {
+    let targetTelement = document.getElementById(selectionId);
+    targetTelement.id = newValue;
+    targetTelement.onclick = function(e) {handleStencilMouseDown(e, newValue );};
+    selectionId = newValue;
+  }
+}
+
+function onObjectLocationChanged() {
+  selectionX1 = parseFloat(document.getElementById("object-left-input").value);
+  selectionY1 = parseFloat(document.getElementById("object-top-input").value);
+
+  selectionX2 = parseFloat(document.getElementById("object-width-input").value) + selectionX1;
+  selectionY2 = parseFloat(document.getElementById("object-height-input").value) + selectionY1;
+
+  //document.getElementById("object-name-input").value = selectionX1.toString() + " " + selectionX2.toString() + " " + selectionY1.toString() + " " + selectionY2.toString();
+
+  repositionStencil(true);
+  updateSelector();
+}
+
+var usedIds = new Set();
+
+function createObjectId(prefix) {
+  var count = 1;
+  while (usedIds.has(prefix + count.toString())) {
+    count++;
+  }
+
+  var finalId = prefix + count.toString();
+  usedIds.add(finalId);
+  return finalId;
+}
+
+</script>

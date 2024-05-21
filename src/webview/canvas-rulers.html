@@ -1,0 +1,157 @@
+<style>
+  .ruler {
+    background: var(--vscode-menu-background);
+    border-bottom: 1px solid var(--vscode-menu-border);
+    border-right: 1px solid var(--vscode-menu-border);
+    left: 0;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    -webkit-user-select: none;
+    user-select: none;
+    z-index: 10
+  }
+
+  .ruler path {
+    stroke: var(--vscode-menu-border) !important
+  }
+
+  .ruler-numbers {
+    color: var(--vscode-tab-inactiveForeground);
+    font-size: 9px;
+    letter-spacing: 1px;
+    position: absolute;
+    white-space: nowrap
+  }
+
+  .ruler-numbers span {
+    box-sizing: border-box;
+    cursor: default;
+    padding: 0 3px;
+    position: absolute
+  }
+
+  .horizontal-ruler .ruler-numbers span {
+    display: inline-block
+  }
+
+  .vertical-ruler .ruler-numbers span {
+    display: block;
+    transform: rotate(-90deg);
+    transform-origin: top left
+  }
+</style>
+<script>
+  function getCanvasRulersHtml() {
+      var html = `
+        <div class="ruler corner-ruler" style="height: 16px; width: 16px"></div>
+        <div
+          class="ruler horizontal-ruler"
+          style="height: 16px; left: 17px; width: 100%;"
+        >
+          <span id="horizontal-ruler-numbers" class="ruler-numbers" ></span>
+          <svg id="horizontal-ruler-svg" height="16" width="4006">
+          </svg>
+        </div>
+        <div
+          class="ruler vertical-ruler"
+          style="width: 16px; top: 17px; height: 100%;"
+        >
+          <span id="vertical-ruler-numbers" class="ruler-numbers">BB</span>
+          <svg id="vertical-ruler-svg" width="16" height="3754">
+          </svg>
+        </div>
+    `;
+    return html;
+  };
+
+function positionRulers(firstX, firstY) {
+
+  var offsetX = firstX % 100;
+  var offsetY = firstY % 100;
+  firstX = firstX - offsetX;
+  firstY = firstY - offsetY;
+
+  document.getElementById("horizontal-ruler-numbers").innerHTML = "XXX";
+  document.getElementById("vertical-ruler-numbers").innerHTML = "YYY";
+
+  var horizontalNumbers = "";
+  var start = firstX;
+  var left = -offsetX;
+  for (var i = 0; i < 20; i++) {
+    horizontalNumbers += `<span style="width: 100px; left: ${left.toString()}px">${start.toString()}</span>`
+    start += 100;
+    left += 100;
+  }
+
+  var verticalNumbers = "";
+  var top = -offsetY;
+  start = firstY;
+  for (var i = 0; i < 20; i++) {
+    verticalNumbers += `<span style="height: 100px; top: ${top.toString()}px">${start.toString()}</span>`;
+    start += 100;
+    top += 100;
+  }
+
+  // horizontal
+  var horizontalPath = "";
+
+  start = firstX - offsetX;
+  for (var i = 0; i < 200; i++) {
+    if (i % 10 === 0) {
+      horizontalPath += `M ${start.toString()} 16 v -16 Z `;
+    } else {
+      horizontalPath += `M ${start.toString()} 16 v -4 Z `;
+    }
+    start += 10;
+  }
+
+  var horizontalSvg = `
+    <path
+              stroke="#1071f2"
+              stroke-width="1"
+              shape-rendering="crispEdges"
+              fill="none"
+              pointer-events="none"
+              d="${horizontalPath}">
+    </path>
+  `;
+
+  // vertical
+  var verticalPath = "";
+
+  start = firstY - offsetY;
+  for (var i = 0; i < 200; i++) {
+    if (i % 10 === 0) {
+      verticalPath   += `M 16 ${start.toString()} h -16 Z `;
+    } else {
+      verticalPath += `M 16 ${start.toString()} h -4 Z `;
+    }
+
+    start += 10;
+  }
+
+  var verticalSvg = `
+  <path
+              stroke="#1071f2"
+              stroke-width="1"
+              shape-rendering="crispEdges"
+              fill="none"
+              pointer-events="none"
+              d="${verticalPath}">
+  </path>
+  `;
+
+  document.getElementById("horizontal-ruler-numbers").innerHTML = horizontalNumbers;
+  document.getElementById("vertical-ruler-numbers").innerHTML = verticalNumbers;
+
+  document.getElementById("horizontal-ruler-svg").innerHTML = horizontalSvg;
+  document.getElementById("vertical-ruler-svg").innerHTML = verticalSvg;
+
+};
+
+function canvasMoved(left, top) {
+  positionRulers(left - 50, top - 50);
+}
+
+</script>

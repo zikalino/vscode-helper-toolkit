@@ -1,0 +1,294 @@
+<style>
+.resize-handle {
+	stroke: var(--vscode-button-background);
+	fill: #fff;
+	stroke-width: 1px
+}
+
+.move-rect {
+	stroke: var(--vscode-button-background);
+	fill: rgba(255,255,255,0.1);
+	stroke-width: 1px
+}
+
+.transform-border {
+	stroke: var(--vscode-button-background);
+	stroke-width: 1px;
+	fill: none;
+	pointer-events: none
+}
+
+.individual-border {
+	stroke: var(--vscode-button-background);
+	stroke-width: 1px;
+	fill: none;
+	pointer-events: none
+}
+</style>
+<script>
+
+
+function createSelector() {
+  var selectorHtml = `
+            <path
+              fill="#0B53AE"
+              stroke="#1071f2"
+              stroke-width="1"
+              pointer-events="none"
+              fill-opacity="0.5"
+              shape-rendering="crispEdges"
+              d="M 0 0"
+            ></path>
+            <path class="individual-border"></path>
+            <path
+              id="resize-border-path"
+              class="transform-border"
+              style=""
+              d="M 846.5 832.5 L 1026.5 832.5 L 1026.5 930.5 L 846.5 930.5 z"
+            ></path>
+            <rect id="resize-border-rect"
+                  style="cursor: move"
+                  class="move-rect"
+                  onmousedown="resizerOnMouseDown(event, 'M')"
+            >
+            </rect>
+            <path
+              class="transform-border"
+              style=""
+              d="
+            M 936.5 832.5
+            L 936.5 812.5
+          z"
+            ></path>
+            <!-- below are all the selector corners-->
+            <g>
+              <rect
+                id="resize-handle-n"
+                onmousedown="resizerOnMouseDown(event, 'N')"
+                class="resize-handle"
+                style="cursor: n-resize"
+                x="932.5"
+                y="828.5"
+                width="8"
+                height="8"
+              ></rect>
+              <rect
+                id="resize-handle-e"
+                onmousedown="resizerOnMouseDown(event, 'E')"
+                class="resize-handle"
+                style="cursor: e-resize"
+                x="1022.5"
+                y="877.5"
+                width="8"
+                height="8"
+              ></rect>
+              <rect
+                id="resize-handle-s"
+                onmousedown="resizerOnMouseDown(event, 'S')"
+                class="resize-handle"
+                style="cursor: s-resize"
+                x="932.5"
+                y="926.5"
+                width="8"
+                height="8"
+              ></rect>
+              <rect
+                id="resize-handle-w"
+                onmousedown="resizerOnMouseDown(event, 'W')"
+                class="resize-handle"
+                style="cursor: w-resize"
+                x="842.5"
+                y="877.5"
+                width="8"
+                height="8"
+              ></rect>
+              <rect
+                id="resize-handle-nw"
+                onmousedown="resizerOnMouseDown(event, 'NW')"
+                class="resize-handle"
+                style="cursor: nw-resize"
+                x="842.5"
+                y="828.5"
+                width="8"
+                height="8"
+              ></rect>
+              <rect
+                id="resize-handle-sw"
+                onmousedown="resizerOnMouseDown(event, 'SW')"
+                class="resize-handle"
+                style="cursor: sw-resize"
+                x="842.5"
+                y="926.5"
+                width="8"
+                height="8"
+              ></rect>
+              <rect
+                id="resize-handle-ne"
+                onmousedown="resizerOnMouseDown(event, 'NE')"
+                class="resize-handle"
+                style="cursor: ne-resize"
+                x="1022.5"
+                y="828.5"
+                width="8"
+                height="8"
+              ></rect>
+              <rect
+                id="resize-handle-se"
+                onmousedown="resizerOnMouseDown(event, 'SE')"
+                class="resize-handle"
+                style="cursor: se-resize"
+                x="1022.5"
+                y="926.5"
+                width="8"
+                height="8"
+              ></rect>
+              <rect
+                id="resize-handle-rot"
+                onmousedown="resizerOnMouseDown(event, 'ROT')"
+                class="resize-handle resize-handle--rotate"
+                width="8"
+                height="8"
+                rx="4"
+                ry="4"
+                x="932.5"
+                y="808.5"
+                style="cursor: crosshair"
+              ></rect>
+            </g>
+  
+  `;
+  
+  document.getElementById("canvas-svg").insertAdjacentHTML("beforeend", selectorHtml);
+}
+
+var moveType = null;
+var moveStartX = 0;
+var moveStartY = 0;
+
+var selectionX1 = 0;
+var selectionX2 = 0;
+var selectionY1 = 0;
+var selectionY2 = 0;
+var selectionId = "";
+
+function deleteCurrentSelection() {
+  if (selectionId !== "") {
+    const element = document.getElementById(selectionId);
+    element.remove();
+    selectionX1 = 0;
+    selectionX2 = 0;
+    selectionY1 = 0;
+    selectionY2 = 0;
+    selectionId = "";
+    updateSelector();
+  }
+}
+
+function initializeSelection() {
+  selectionX1 = getSvgAttribute("resize-handle-w", "x") + 4;
+  selectionX2 = getSvgAttribute("resize-handle-e", "x") + 4;
+  selectionY1 = getSvgAttribute("resize-handle-n", "y") + 4;
+  selectionY2 = getSvgAttribute("resize-handle-s", "y") + 4;
+}
+
+function updateSelector()
+{
+  setSvgAttribute("resize-handle-w", "x", selectionX1 - 4);
+  setSvgAttribute("resize-handle-e", "x", selectionX2 - 4);
+  setSvgAttribute("resize-handle-n", "x", (selectionX2 + selectionX1) / 2 - 4);
+  setSvgAttribute("resize-handle-s", "x", (selectionX2 + selectionX1) / 2 - 4);
+  setSvgAttribute("resize-handle-w", "y", (selectionY2 + selectionY1) / 2 - 4);
+  setSvgAttribute("resize-handle-e", "y", (selectionY2 + selectionY1) / 2 - 4);
+  setSvgAttribute("resize-handle-n", "y", selectionY1 - 4);
+  setSvgAttribute("resize-handle-s", "y", selectionY2 - 4);
+
+  setSvgAttribute("resize-handle-nw", "x", selectionX1 - 4);
+  setSvgAttribute("resize-handle-nw", "y", selectionY1 - 4);
+
+  setSvgAttribute("resize-handle-ne", "x", selectionX2 - 4);
+  setSvgAttribute("resize-handle-ne", "y", selectionY1 - 4);
+
+  setSvgAttribute("resize-handle-sw", "x", selectionX1 - 4);
+  setSvgAttribute("resize-handle-sw", "y", selectionY2 - 4);
+
+  setSvgAttribute("resize-handle-se", "x", selectionX2 - 4);
+  setSvgAttribute("resize-handle-se", "y", selectionY2 - 4);
+
+  setSvgAttribute("resize-border-path", "d", "M " + (selectionX1).toString() + " " + (selectionY1).toString() +" " +
+                                             "L " + (selectionX2).toString() + " " + (selectionY1).toString() +" " +
+                         "L " + (selectionX2).toString() + " " + (selectionY2).toString() +" " +
+                         "L " + (selectionX1).toString() + " " + (selectionY2).toString() +" " +
+                         "z");
+  setSvgAttribute("resize-border-rect", "x", selectionX1);
+  setSvgAttribute("resize-border-rect", "y", selectionY1);
+  setSvgAttribute("resize-border-rect", "width", selectionX2 - selectionX1);
+  setSvgAttribute("resize-border-rect", "height", selectionY2 - selectionY1);
+}
+
+function resizerOnMouseDown(e, t) {
+  moveType = t;
+  moveStartX = e.pageX;
+  moveStartY = e.pageY;
+  initializeSelection();
+  // document.getElementById("moo").innerText = t + " " + e.pageX + " " + e.pageY + "[" + selectionX1 + ", " + selectionX2 + ", " + selectionY1 + ", " + selectionY2 + "]";
+  window.addEventListener('mousemove', whileMove);
+  window.addEventListener('mouseup', endMove);
+}
+
+function whileMove(e) {
+  // document.getElementById("moo").innerText = "move " + e.pageX + " " + e.pageY + " [" + moveStartX + " " + moveStartY + " " + moveType + "]";
+  if (moveType == "N") {
+    selectionY1 -= moveStartY - e.pageY;
+  } else if (moveType == "S") {
+    selectionY2 -= moveStartY - e.pageY;
+  } else if (moveType == "W") {
+    selectionX1 -= moveStartX - e.pageX;
+  } else if (moveType == "E") {
+    selectionX2 -= moveStartX - e.pageX;
+  } else if (moveType == "NW") {
+    selectionY1 -= moveStartY - e.pageY;
+    selectionX1 -= moveStartX - e.pageX;
+  } else if (moveType == "NE") {
+    selectionY1 -= moveStartY - e.pageY;
+    selectionX2 -= moveStartX - e.pageX;
+  } else if (moveType == "SW") {
+    selectionY2 -= moveStartY - e.pageY;
+    selectionX1 -= moveStartX - e.pageX;
+  } else if (moveType == "SE") {
+    selectionY2 -= moveStartY - e.pageY;
+    selectionX2 -= moveStartX - e.pageX;
+  } else if (moveType == "M") {
+    selectionX1 -= moveStartX - e.pageX;
+    selectionX2 -= moveStartX - e.pageX;
+    selectionY1 -= moveStartY - e.pageY;
+    selectionY2 -= moveStartY - e.pageY;
+  }
+  moveStartY = e.pageY;
+  moveStartX = e.pageX;
+  updateSelector();
+  repositionStencil(false);
+}
+
+function endMove() {
+  // document.getElementById("moo").innerText = "end";
+  window.removeEventListener('mousemove', whileMove);
+  window.removeEventListener('mouseup', endMove);
+  
+  repositionStencil(true);
+  updateSelector();
+}
+
+document.addEventListener(
+  "keydown",
+  (event) => {
+    const keyName = event.key;
+
+    if (keyName === "Delete") {
+      deleteCurrentSelection();
+    }
+  },
+  false,
+);
+
+
+</script>
