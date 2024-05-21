@@ -20,5 +20,6 @@
   "bugs": {
     "url": "https://github.com/zikalino/vscode-helper-toolkit/issues"
   },
-  "homepage": "https://github.com/zikalino/vscode-helper-toolkit#readme"
+  "homepage": "https://github.com/zikalino/vscode-helper-toolkit#readme",
+  "files": [ "out/index.js" ]
 }
