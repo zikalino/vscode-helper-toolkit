@@ -31,8 +31,7 @@ function getCanvasHtml(width, height, minor, major) {
               y="50"
               id="white-canvas"
             >
-              <!-- This is white background -->
-
+              <!-- grid definition -->
               <defs>
                 <pattern id="smallGrid" width="${minor}" height="${minor}" patternUnits="userSpaceOnUse">
                   <path d="M ${minor} 0 L 0 0 0 ${minor}" fill="none" stroke="gray" stroke-width="0.5"/>
@@ -43,35 +42,11 @@ function getCanvasHtml(width, height, minor, major) {
                 </pattern>
               </defs>                  
               
+              <!-- white background -->
               <rect fill="rgb(255, 255, 255)" width="${width}" height="${height}" />
+
+              <!-- actual grid -->
               <rect width="${width}" height="${height}" fill="url(#grid)" />
-              <path
-                stroke="rgba(192,192,192,0.2)"
-                stroke-width="1"
-                shape-rendering="crispEdges"
-                fill="none"
-                pointer-events="none"
-                d=" M 0 0 h ${width} M 0 10 h ${width} M 0 20 h ${width} M 0 30 h ${width} M 0 40 h ${width} M 0 50 h ${width} M 0 60 h ${width} M 0 70 h ${width} M 0 80 h ${width} M 0 90 h ${width} M 0 100 h ${width} M 0 110 h ${width} M 0 120 h ${width} M 0 130 h ${width} M 0 140 h ${width} M 0 150 h ${width} M 0 160 h ${width} M 0 170 h ${width} M 0 180 h ${width} M 0 190 h ${width} M 0 200 h ${width} M 0 210 h ${width} M 0 220 h ${width} M 0 230 h ${width} M 0 240 h ${width} M 0 250 h ${width} M 0 260 h ${width} M 0 270 h ${width} M 0 280 h ${width} M 0 290 h ${width} M 0 300 h ${width} M 0 310 h ${width} M 0 320 h ${width} M 0 330 h ${width} M 0 340 h ${width} M 0 350 h ${width} M 0 360 h ${width} M 0 370 h ${width} M 0 380 h ${width} M 0 390 h ${width} M 0 400 h ${width} M 0 410 h ${width} M 0 420 h ${width} M 0 430 h ${width} M 0 440 h ${width} M 0 450 h ${width} M 0 460 h ${width} M 0 470 h ${width} M 0 480 h ${width} M 0 490 h ${width} M 0 500 h ${width} M 0 510 h ${width} M 0 520 h ${width} M 0 530 h ${width} M 0 540 h ${width} M 0 550 h ${width} M 0 560 h ${width} M 0 570 h ${width} M 0 580 h ${width} M 0 590 h ${width} M 0 600 h ${width} M 0 610 h ${width} M 0 620 h ${width} M 0 630 h ${width} M 0 640 h ${width} M 0 650 h ${width} M 0 660 h ${width} M 0 670 h ${width} M 0 680 h ${width} M 0 690 h ${width} M 0 700 h ${width} M 0 710 h ${width} M 0 720 h ${width} M 0 730 h ${width} M 0 740 h ${width} M 0 750 h ${width} M 0 760 h ${width} M 0 770 h ${width} M 0 780 h ${width} M 0 790 h ${width} M 0 800 h ${width} M 0 810 h ${width} M 0 820 h ${width} M 0 830 h ${width} M 0 840 h ${width} M 0 850 h ${width} M 0 860 h ${width} M 0 870 h ${width} M 0 880 h ${width} M 0 890 h ${width} M 0 0 v ${height} M 10 0 v ${height} M 20 0 v ${height} M 30 0 v ${height} M 40 0 v ${height} M 50 0 v ${height} M 60 0 v ${height} M 70 0 v ${height} M 80 0 v ${height} M 90 0 v ${height} M 100 0 v ${height} M 110 0 v ${height} M 120 0 v ${height} M 130 0 v ${height} M 140 0 v ${height} M 150 0 v ${height} M 160 0 v ${height} M 170 0 v ${height} M 180 0 v ${height} M 190 0 v ${height} M 200 0 v ${height} M 210 0 v ${height} M 220 0 v ${height} M 230 0 v ${height} M 240 0 v ${height} M 250 0 v ${height} M 260 0 v ${height} M 270 0 v ${height} M 280 0 v ${height} M 290 0 v ${height} M 300 0 v ${height} M 310 0 v ${height} M 320 0 v ${height} M 330 0 v ${height} M 340 0 v ${height} M 350 0 v ${height} M 360 0 v ${height} M 370 0 v ${height} M 380 0 v ${height} M 390 0 v ${height} M 400 0 v ${height} M 410 0 v ${height} M 420 0 v ${height} M 430 0 v ${height} M 440 0 v ${height} M 450 0 v ${height} M 460 0 v ${height} M 470 0 v ${height} M 480 0 v ${height} M 490 0 v ${height} M 500 0 v ${height} M 510 0 v ${height} M 520 0 v ${height} M 530 0 v ${height} M 540 0 v ${height} M 550 0 v ${height} M 560 0 v ${height} M 570 0 v ${height} M 580 0 v ${height} M 590 0 v ${height} M 600 0 v ${height} M 610 0 v ${height} M 620 0 v ${height} M 630 0 v ${height} M 640 0 v ${height} M 650 0 v ${height} M 660 0 v ${height} M 670 0 v ${height} M 680 0 v ${height} M 690 0 v ${height} M 700 0 v ${height} M 710 0 v ${height} M 720 0 v ${height} M 730 0 v ${height} M 740 0 v ${height} M 750 0 v ${height} M 760 0 v ${height} M 770 0 v ${height} M 780 0 v ${height} M 790 0 v ${height} M 800 0 v ${height} M 810 0 v ${height} M 820 0 v ${height} M 830 0 v ${height} M 840 0 v ${height} M 850 0 v ${height} M 860 0 v ${height} M 870 0 v ${height} M 880 0 v ${height} M 890 0 v ${height} M 900 0 v ${height} M 910 0 v ${height} M 920 0 v ${height} M 930 0 v ${height} M 940 0 v ${height} M 950 0 v ${height} M 960 0 v ${height} M 970 0 v ${height} M 980 0 v ${height} M 990 0 v ${height} M 1000 0 v ${height} M 1010 0 v ${height} M 1020 0 v ${height} M 1030 0 v ${height} M 1040 0 v ${height} M 1050 0 v ${height} M 1060 0 v ${height} M 1070 0 v ${height} M 1080 0 v ${height} M 1090 0 v ${height} M 1100 0 v ${height} M 1110 0 v ${height} M 1120 0 v ${height} M 1130 0 v ${height} M 1140 0 v ${height} M 1150 0 v ${height} M 1160 0 v ${height} M 1170 0 v ${height} M 1180 0 v ${height} M 1190 0 v ${height} M 1200 0 v ${height} M 1210 0 v ${height} M 1220 0 v ${height} M 1230 0 v ${height} M 1240 0 v ${height} M 1250 0 v ${height} M 1260 0 v ${height} M 1270 0 v ${height} M 1280 0 v ${height} M 1290 0 v ${height} M 1300 0 v ${height} M 1310 0 v ${height} M 1320 0 v ${height} M 1330 0 v ${height} M 1340 0 v ${height} M 1350 0 v ${height}"
-                style="display: none"
-              ></path>
-              <path
-                stroke="rgba(192,192,192,0.3)"
-                stroke-width="1"
-                shape-rendering="crispEdges"
-                fill="none"
-                pointer-events="none"
-                d=" M 0 0 h ${width} M 0 50 h ${width} M 0 100 h ${width} M 0 150 h ${width} M 0 200 h ${width} M 0 250 h ${width} M 0 300 h ${width} M 0 350 h ${width} M 0 400 h ${width} M 0 450 h ${width} M 0 500 h ${width} M 0 550 h ${width} M 0 600 h ${width} M 0 650 h ${width} M 0 700 h ${width} M 0 750 h ${width} M 0 800 h ${width} M 0 850 h ${width} M 0 0 v ${height} M 50 0 v ${height} M 100 0 v ${height} M 150 0 v ${height} M 200 0 v ${height} M 250 0 v ${height} M 300 0 v ${height} M 350 0 v ${height} M 400 0 v ${height} M 450 0 v ${height} M 500 0 v ${height} M 550 0 v ${height} M 600 0 v ${height} M 650 0 v ${height} M 700 0 v ${height} M 750 0 v ${height} M 800 0 v ${height} M 850 0 v ${height} M 900 0 v ${height} M 950 0 v ${height} M 1000 0 v ${height} M 1050 0 v ${height} M 1100 0 v ${height} M 1150 0 v ${height} M 1200 0 v ${height} M 1250 0 v ${height} M 1300 0 v ${height} M 1350 0 v ${height}"
-                style="display: none"
-              ></path>
-              <path
-                stroke="rgba(0,108,229,0.1)"
-                stroke-width="1"
-                shape-rendering="crispEdges"
-                fill="rgba(0,108,229,0.05)"
-                pointer-events="none"
-                d=" M 0 0 h 271 v ${height} h -271 v -${height} M 285 0 h 271 v ${height} h -271 v -${height} M 570 0 h 271 v ${height} h -271 v -${height} M 855 0 h 271 v ${height} h -271 v -${height} M 1140 0 h 217 v ${height} h -217 v -${height}"
-                style="display: none"
-              ></path>
 
               <!-- AND THIS GROUP CONTAINS ALL THE OBJECTS -->
               <g transform="scale(1,1)" id="canvas-object-group">
@@ -81,11 +56,10 @@ function getCanvasHtml(width, height, minor, major) {
                 fill="none"
                 stroke="var(--vscode-editor-foreground)"
                 stroke-width="1"
-                stroke-opacity="0.1"
+                stroke-opacity="0.5"
                 pointer-events="none"
-                d="M 0 0 h ${width} v ${height} h -${width} v -${height}"
-                class="page-border"
-              ></path>
+                d="M 0 0 h ${width} v ${height} h -${width} v -${height}">
+              </path>
             </svg>
           </svg>
         </div>
