@@ -289,15 +289,7 @@ function repositionStencil(align) {
 
   let e = document.getElementById(selectionId);
   let stencil_type = e.getAttribute("data-stencil-type");//("data-stencil-type");
-    if (stencil_type === "button") {
-      document.getElementById(selectionId).innerHTML = createStencilButton(selectionX2 - selectionX1, selectionY2 -selectionY1, "Button");
-    } else if (stencil_type === "checkbox") {
-      document.getElementById(selectionId).innerHTML = createStencilCheckbox(selectionX2 - selectionX1, selectionY2 -selectionY1, "Checkbox");
-    } else if (stencil_type === "combobox") {
-      document.getElementById(selectionId).innerHTML = createStencilCombo(selectionX2 - selectionX1, selectionY2 -selectionY1, "Combo");
-    } else if (stencil_type === "progressbar") {
-      document.getElementById(selectionId).innerHTML = createStencilProgressBar(selectionX2 - selectionX1, selectionY2 -selectionY1);
-    } else if (stencil_type === "slider") {
+    if (stencil_type === "slider") {
       document.getElementById(selectionId).innerHTML = createStencilSlider(selectionX2 - selectionX1, selectionY2 -selectionY1);
     } else if (stencil_type === "radio") {
       document.getElementById(selectionId).innerHTML = createStencilRadio(selectionX2 - selectionX1, selectionY2 -selectionY1), "radio";
@@ -325,16 +317,6 @@ function repositionStencil(align) {
       document.getElementById(selectionId).innerHTML = createStencilKeyboard(selectionX2 - selectionX1, selectionY2 -selectionY1);
     } else if (stencil_type === "window") {
       document.getElementById(selectionId).innerHTML = createStencilWindow(selectionX2 - selectionX1, selectionY2 -selectionY1);
-    } else if (stencil_type === "text") {
-      document.getElementById(selectionId).innerHTML = createStencilText(selectionX2 - selectionX1, selectionY2 -selectionY1);
-    } else if (stencil_type === "textarea") {
-      document.getElementById(selectionId).innerHTML = createStencilTextArea(selectionX2 - selectionX1, selectionY2 -selectionY1);
-    } else if (stencil_type === "datepicker") {
-      document.getElementById(selectionId).innerHTML = createStencilDatePicker(selectionX2 - selectionX1, selectionY2 -selectionY1);
-    } else if (stencil_type === "stepperinput") {
-      document.getElementById(selectionId).innerHTML = createStencilStepperInput(selectionX2 - selectionX1, selectionY2 -selectionY1);
-    } else if (stencil_type === "videoplayer") {
-      document.getElementById(selectionId).innerHTML = createStencilVideoPlayer(selectionX2 - selectionX1, selectionY2 -selectionY1);
     } else {
       document.getElementById(selectionId).innerHTML = createGenericStencil(stencil_type, selectionX2 - selectionX1, selectionY2 -selectionY1, {});
     }
@@ -348,48 +330,6 @@ function updatePropertiesFromCanvas() {
   document.getElementById("object-top-input").value = Math.round(selectionY1).toString();
   document.getElementById("object-width-input").value = Math.round(selectionX2 - selectionX1).toString();
   document.getElementById("object-height-input").value = Math.round(selectionY2 - selectionY1).toString();
-}
-
-function onToolbarButtonClicked() {
-  var id = createObjectId('Button');
-  var html_to_insert = `
-    <g class="stencil" data-stencil-type="button" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
-    ${createStencilButton(200, 100, "BBB")}
-    </g>
-  `;
-  // XXX - add button to the canvas
-  var e = document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
-}
-
-function onToolbarCheckboxClicked() {
-  var id = createObjectId('CheckBox');
-  var html_to_insert = `
-    <g class="stencil" data-stencil-type="checkbox" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
-    ${createStencilCheckbox(86, 19, "Checkbox")}
-    </g>
-  `;
-  // XXX - add button to the canvas
-  var e = document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
-}
-
-function onToolbarComboBoxClicked() {
-  var id = createObjectId('ComboBox');
-  var html_to_insert = `
-    <g class="stencil" data-stencil-type="combobox" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
-    ${createStencilCombo(180, 32, "ComboBox")}
-    </g>
-  `;
-  var e = document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
-}
-
-function onToolbarProgressBarClicked() {
-  var id = createObjectId('ProgressBar');
-  var html_to_insert = `
-    <g class="stencil" data-stencil-type="progressbar" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
-    ${createStencilProgressBar(200, 20)}
-    </g>
-  `;
-  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
 }
 
 function onToolbarSliderClicked() {
@@ -417,46 +357,6 @@ function onToolbarLabelClicked() {
   var html_to_insert = `
     <g class="stencil" data-stencil-type="label" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
     ${createStencilLabel(180, 24, "Label")}
-    </g>
-  `;
-  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
-}
-
-function onToolbarTextAreaClicked() {
-  var id = createObjectId('TextArea');
-  var html_to_insert = `
-    <g class="stencil" data-stencil-type="textarea" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
-    ${createStencilTextArea(180, 100)}
-    </g>
-  `;
-  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
-}
-
-function onToolbarTextClicked() {
-  var id = createObjectId('Text');
-  var html_to_insert = `
-    <g class="stencil" data-stencil-type="text" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
-      ${createStencilText(180, 32)}
-    </g>
-  `;
-  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
-}
-
-function onToolbarDatePickerClicked() {
-  var id = createObjectId('DatePicker');
-  var html_to_insert = `
-    <g class="stencil" data-stencil-type="datepicker" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
-      ${createStencilDatePicker(180, 32)}
-    </g>
-  `;
-  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
-}
-
-function onToolbarStepperInputClicked() {
-  var id = createObjectId('Input');
-  var html_to_insert = `
-    <g class="stencil" data-stencil-type="stepperinput" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
-      ${createStencilStepperInput(90, 32)}
     </g>
   `;
   document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
@@ -491,16 +391,6 @@ function onToolbarTextPlaceholderClicked() {
   `;
   document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
 }
-
-function onToolbarVideoPlayerClicked() {
-  var id = createObjectId('Video');
-  var html_to_insert = `
-    <g class="stencil" data-stencil-type="videoplayer" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
-      ${createStencilVideoPlayer(320, 240)}
-    </g>
-  `;
-  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
-} // ImagePlaceholder
 
 function onToolbarMapClicked() {
   var id = createObjectId('Map');
@@ -622,87 +512,6 @@ function onToolbarWindowClicked() {
   document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
 }
 
-
-function createStencilButton(width, height, label) {
-
-  var html = 
-    ` <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
-        <defs></defs>
-        <path
-            d="M3 0 L${width-3} 0 ${width-1.365} 0 ${width} 1.365 ${width} 3 L${width} ${height-3} C${width} ${height-1.365} ${width-1.365} ${height} ${width-3} ${height} L3 ${height} C1.365 ${height} 0 ${height-1.365} 0 ${height-3} L0 3 C0 1.365 1.365 0 3 0 Z"
-            stroke-width="1" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(235,235,235)"></path>
-        <foreignObject class="editable-fo" width="${width}" height="${height}" x="0" y="0"
-            style="font-size: 14px; text-align: center; font-style: normal; color: rgb(35, 35, 35);">
-          <div class="fo__content "
-                data-gramm="false"
-                spellcheck="false"
-                style="color: rgb(35, 35, 35); font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: center; text-decoration: none; vertical-align: middle; width: ${width}px; height: ${height}px; padding: 0px 10px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word; display: table-cell; word-break: break-word;">${label}</div>
-        </foreignObject>
-      </svg>`;
-
-  return html;
-}
-
-function createStencilCheckbox(width, height, label) {
-  // original 86x19
-  html = `
-  <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
-    <defs></defs>
-      <path d="M14 ${height/2+7} C14 ${height/2+6.1} 13.1 ${height/2+7} 12 ${height/2+7} 12 ${height/2+7} 2 ${height/2+7} 2 ${height/2+7} 0.9 ${height/2+7} 0 ${height/2+6.1} 0 ${height/2+5} 0 ${height/2+5} 0 ${height/2-5} 0 ${height/2-5} 0 ${height/2-6.1} 0.9 ${height/2-7} 2 ${height/2-7} 2 ${height/2-7} 12 ${height/2-7} 12 ${height/2-7} 13.1 ${height/2-7} 14 ${height/2-6.1} 14 ${height/2-7} 14 ${height/2-5} 14 ${height/2+5} 14 ${height/2+5} 14 ${height/2+5} 14 ${height/2+5} 14 ${height/2+5}" stroke-width="1.5" stroke="rgb(35,35,35)" stroke-dasharray="none" stroke-dashoffset="none" fill="rgb(255,255,255)" fill-rule="evenOdd"></path>      d="M3.5 9.945919044459208C3.5 9.945919044459208 5.770330368487933 13 5.770330368487933 13 5.770330368487933 13 10.5 6 10.5 6"
-        stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="rgb(35,35,35)"
-        stroke-dasharray="none" stroke-dashoffset="none" fill="none" fill-rule="evenOdd"></path>
-        <path d="M3.5 ${height/2+0.445919044459208} C3.5 ${height/2+0.445919044459208} 5.770330368487933 ${height/2+3.5} 5.770330368487933 ${height/2+3.5} 5.770330368487933 ${height/2+3.5} 10.5 ${height/2-3.5} 10.5 ${height/2-3.5}" stroke-linejoin="round" stroke-linecap="round" stroke-width="1.5" stroke="rgb(35,35,35)" stroke-dasharray="none" stroke-dashoffset="none" fill="none" fill-rule="evenOdd"></path>
-      <foreignObject class="editable-fo" width="${width-24}" height="${height}" x="24" y="0"
-      style="font-size: 14px; text-align: left; font-style: normal; color: rgb(35, 35, 35);">
-      <div class="fo__content " data-gramm="false" spellcheck="false"
-        style="color: rgb(35, 35, 35); font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; width: auto; height: ${height}px; padding: 0px; min-width: 1px; min-height: 1px; white-space: pre; display: table-cell;">${label}</div>
-    </foreignObject>
-  </svg>`;
-
-  return html;
-}
-
-function createStencilCombo(width, height, label) {
-  // original size 180x32
-  html = `
-  <svg class=" " width="${width}" height="${height}" x="0.5"
-  y="0.5" style="opacity: 1;">
-  <defs></defs>
-  <path
-    d="M4 0 L${width-4} 0 C${width-1.82} 0 ${width} 1.82 ${width} 4 L${width} ${height-4} C${width} ${height-1.82} ${width-1.82} ${height} ${width-4} ${height} L4 ${height} C1.82 ${height} 0 ${height-1.82} 0 ${height-4} L0 4 C0 1.82 1.82 0 4 0 Z"
-    stroke-width="1" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(255,255,255)"></path>
-  <svg x="${width-25}" y="0" width="25" height="${height}">
-    <path
-      d="M0 0 L21 0 C23.18 0 25 1.82 25 4 L25 ${height-4} C25 ${height-1.82} 23.18 ${height} 21 ${height} L0 ${height} C0 ${height} 0 ${height} 0 ${height} L0 0 C0 0 0 0 0 0 Z"
-      stroke-width="1" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(235,235,235)"></path>
-      
-      <svg width="8" height="5" x="8.5" y="${(height-5)/2}">
-        <path d="M0.2,1.3l3.2,3.2c0.3,0.3,0.8,0.3,1.1,0l3.2-3.2C8.1,0.8,7.8,0,7.1,0H0.8C0.1,0-0.3,0.8,0.2,1.3z" style="fill: rgb(68, 68, 68);"></path>
-      </svg>
-  </svg>b
-  <foreignObject class="editable-fo" width="155" height="${height}" x="0" y="0"
-    style="font-size: 14px; text-align: left; font-style: normal; color: rgb(35, 35, 35);">
-    <div class="fo__content " data-gramm="false" spellcheck="false"
-      style="color: rgb(35, 35, 35); font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; width: 155px; height: ${height}px; padding: 4px 8px; min-width: 1px; min-height: 1px; white-space: pre; overflow-wrap: break-word; display: table-cell; word-break: break-word;">Select</div>
-  </foreignObject>
-</svg>`;
-
-  return html;
-}
-
-function createStencilProgressBar(width, height) {
-  html = `
-    <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
-      <defs>
-        <clipPath id="pr_clippath-1690fc45"><path d="M 0 0 L 100 0 L 100 ${height} L 0 ${height} L 0 0 Z"></path></clipPath>
-        </defs>
-      <path d="M6 0 L${width-6} 0 C${width-2.73} 0 ${width} 2.73 ${width} 6 L${width} ${height-6} C${width} ${height-2.73} ${width-2.73} ${height} ${width-6} ${height} L6 ${height} C2.73 ${height} 0 ${height-2.73} 0 ${height-6} L0 6 C0 2.73 2.73 0 6 0 Z" stroke-width="1" stroke="rgb(0,0,0)" stroke-dasharray="none" fill="rgb(255,255,255)"></path>
-      <path d="M6 0 L${width-6} 0 C${width-2.73} 0 ${width} 2.73 ${width} 6 L${width} ${height-6} C${width} ${height-2.73} ${width-2.73} ${height} ${width-6} ${height} L6 ${height} C2.73 ${height} 0 ${height-2.73} 0 ${height-6} L0 6 C0 2.73 2.73 0 6 0 Z" stroke-width="1" stroke="rgb(0,0,0)" stroke-dasharray="none" fill="rgb(170,170,170)" clip-path="url(#pr_clippath-1690fc45)"></path>
-    </svg>
-    `;
-  return html;
-}
-
 function createStencilSlider(width, height) {
   // original size 180x18
   html = `
@@ -730,78 +539,6 @@ function createStencilLabel(width, height, label) {
         </foreignObject>
       </svg>
     `;
-  return html;
-}
-
-function createStencilTextArea(width, height) {
-  // original 180x100
-  html = `
-    <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
-      <defs></defs>
-      <path d="M3 0 L${width-3} 0 C${width-1.365} 0 ${width} 1.365 ${width} 3 L${width} ${height-3} C${width} ${height-1.365} ${width-1.365} ${height} ${width-3} ${height} L3 ${height} C1.365 ${height} 0 ${height-1.365} 0 ${height-3} L0 3 C0 1.365 1.365 0 3 0 Z" stroke-width="1" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(255,255,255)"></path>
-      <foreignObject class="editable-fo" width="${width}" height="${height}" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; line-height: 1.3; color: rgb(192, 192, 192);">
-        <div class="fo__content " data-gramm="false" spellcheck="false" style="color: rgb(192, 192, 192); font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: top; line-height: 1.3; width: ${width}px; height: ${height}px; padding: 4px 8px; min-width: 1px; min-height: 1px; white-space: pre-wrap; overflow-wrap: break-word;">Type here</div>
-      </foreignObject>
-    </svg>
-  `;
-  return html;
-}
-
-function createStencilText(width, height) {
-  // original 180x32
-  html = `
-    <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
-      <defs></defs>
-      <path d="M3 0 L${width-3} 0 C${width-1.365} 0 ${width} 1.365 ${width} 3 L${width} ${height-3} C${width} ${height-1.365} ${width-1.365} ${height} ${width-3} ${height} L3 ${height} C1.365 ${height} 0 ${height-1.365} 0 ${height-3} L0 3 C0 1.365 1.365 0 3 0 Z" stroke-width="1" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(255,255,255)"></path>
-      <foreignObject class="editable-fo" width="${width}" height="${height}" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; color: rgb(192, 192, 192);">
-        <div class="fo__content " data-gramm="false" spellcheck="false" style="color: rgb(192, 192, 192); font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; width: ${width}px; height: ${height}px; padding: 4px 8px; min-width: 1px; min-height: 1px; white-space: pre; overflow-wrap: break-word; display: table-cell; word-break: break-word;">Placeholder</div>
-      </foreignObject>
-    </svg>
-  `;
-  return html;
-}
-
-function createStencilDatePicker(width, height) {
-  // original size 180x32
-  html = `
-    <svg class=" " width="$width" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
-      <defs></defs>
-      <path d="M3 0 L${width-3} 0 C${width-1.365} 0 ${width} 1.365 ${width} 3 L${width} ${height-3} C${width} ${height-1.365} ${width-1.365} ${height} ${width-3} ${height} L3 ${height} C1.365 ${height} 0 ${height-1.365} 0 ${height-3} L0 3 C0 1.365 1.365 0 3 0 Z" stroke-width="1" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(255,255,255)"></path>
-      <svg x="${width-34}" y="0" width="${34}" height="${height}" style="overflow: hidden;">
-      <path d="M1 0.5 L${height-1.5} 0.5 C${height+0.135} 0.5 ${height+1.5} 1.865 ${height+1.5} 3.5 L${height+1.5} ${height-3.5} C${height+1.5} ${height-1.865} ${height+0.135} ${height-0.5} ${height-1.5} ${height-0.5} L1 ${height-0.5} C1 ${height-0.5} 1 ${height-0.5} 1 ${height-0.5} L1 0.5 C1 0.5 1 0.5 1 0.5 Z" stroke-width="0" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(235,235,235)"></path>
-        <svg x="9" y="${height/2-9}" width="15" height="17">
-          <path d="M5 7.6499999999999995C5 7.6499999999999995 3.333333333333334 7.6499999999999995 3.333333333333334 7.6499999999999995 3.333333333333334 7.6499999999999995 3.333333333333334 9.35 3.333333333333334 9.35 3.333333333333334 9.35 5 9.35 5 9.35 5 9.35 5 7.6499999999999995 5 7.6499999999999995 5 7.6499999999999995 5 7.6499999999999995 5 7.6499999999999995M8.333333333333334 7.6499999999999995C8.333333333333334 7.6499999999999995 6.666666666666668 7.6499999999999995 6.666666666666668 7.6499999999999995 6.666666666666668 7.6499999999999995 6.666666666666668 9.35 6.666666666666668 9.35 6.666666666666668 9.35 8.333333333333334 9.35 8.333333333333334 9.35 8.333333333333334 9.35 8.333333333333334 7.6499999999999995 8.333333333333334 7.6499999999999995 8.333333333333334 7.6499999999999995 8.333333333333334 7.6499999999999995 8.333333333333334 7.6499999999999995M11.666666666666668 7.6499999999999995C11.666666666666668 7.6499999999999995 10 7.6499999999999995 10 7.6499999999999995 10 7.6499999999999995 10 9.35 10 9.35 10 9.35 11.666666666666668 9.35 11.666666666666668 9.35 11.666666666666668 9.35 11.666666666666668 7.6499999999999995 11.666666666666668 7.6499999999999995 11.666666666666668 7.6499999999999995 11.666666666666668 7.6499999999999995 11.666666666666668 7.6499999999999995M13.333333333333334 1.7C13.333333333333334 1.7 12.5 1.7 12.5 1.7 12.5 1.7 12.5 0 12.5 0 12.5 0 10.833333333333334 0 10.833333333333334 0 10.833333333333334 0 10.833333333333334 1.7 10.833333333333334 1.7 10.833333333333334 1.7 4.166666666666667 1.7 4.166666666666667 1.7 4.166666666666667 1.7 4.166666666666667 0 4.166666666666667 0 4.166666666666667 0 2.5 0 2.5 0 2.5 0 2.5 1.7 2.5 1.7 2.5 1.7 1.666666666666667 1.7 1.666666666666667 1.7 0.7416666666666667 1.7 0.008333333333333304 2.465 0.008333333333333304 3.3999999999999995 0.008333333333333304 3.3999999999999995 0 15.3 0 15.3 0 16.23888407471235 0.7461920836153446 17 1.666666666666667 17 1.666666666666667 17 13.333333333333334 17 13.333333333333334 17 14.250000000000004 17 15 16.235000000000003 15 15.3 15 15.3 15 3.3999999999999995 15 3.3999999999999995 15 2.465 14.250000000000004 1.7 13.333333333333334 1.7 13.333333333333334 1.7 13.333333333333334 1.7 13.333333333333334 1.7M13.333333333333334 15.3C13.333333333333334 15.3 1.666666666666667 15.3 1.666666666666667 15.3 1.666666666666667 15.3 1.666666666666667 5.949999999999999 1.666666666666667 5.949999999999999 1.666666666666667 5.949999999999999 13.333333333333334 5.949999999999999 13.333333333333334 5.949999999999999 13.333333333333334 5.949999999999999 13.333333333333334 15.3 13.333333333333334 15.3 13.333333333333334 15.3 13.333333333333334 15.3 13.333333333333334 15.3" fill="rgb(35,35,35)" fill-rule="evenOdd"></path>
-        </svg>
-      </svg>
-      <foreignObject class="editable-fo" width="${width-34}" height="${height}" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; color: rgb(35, 35, 35);">
-        <div class="fo__content " data-gramm="false" spellcheck="false" style="color: rgb(35, 35, 35); font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; width: ${width-34}px; height: ${height}px; padding: 4px 8px; min-width: 1px; min-height: 1px; white-space: pre; overflow-wrap: break-word; display: table-cell; word-break: break-word;">03/07/2024</div>
-      </foreignObject>
-    </svg>
-  `;
-  return html;
-}
-
-function createStencilStepperInput(width, height) {
-  // original 90x32
-  html = `
-  <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
-    <defs></defs>
-    <path d="M3 0 L${width-3} 0 C${width-1.365} 0 ${width} 1.365 ${width} 3 L${width} ${height-3} C${width} ${height-1.365} ${width-1.365} ${height} ${width-3} ${height} L3 ${height} C1.365 ${height} 0 ${height-1.365} 0 ${height-3} L0 3 C0 1.365 1.365 0 3 0 Z" stroke-width="1" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(255,255,255)"></path>
-    <svg x="${width-22}" y="0" width="22" height="${height}">
-      <path d="M0 0 L19 0 C20.635 0 22 1.365 22 3 L22 ${height-3} C22 ${height-1.365} 20.635 ${height} 19 ${height} L0 ${height} C0 ${height} 0 ${height} 0 ${height} L0 0 C0 0 0 0 0 0 Z" stroke-width="1" stroke="rgb(35,35,35)" stroke-dasharray="none" fill="rgb(235,235,235)"></path>
-      <svg x="8" y="${height/4-2}" width="6" height="4">
-        <path d="M3,0L6,4L0,4Z" fill="rgb(32,32,32)" fill-rule="evenOdd"></path>
-      </svg>
-      <rect x="0" y="${(height-1)/2}" rx="0" ry="0" width="22" height="1" fill="rgb(35,35,35)"></rect>
-      <svg x="8" y="${height/4*3-2}" width="6" height="4">
-        <path d="M0,0L6,0L3,4Z" fill="rgb(32,32,32)" fill-rule="evenOdd"></path>
-      </svg>
-    </svg>
-    <foreignObject class="editable-fo" width="${width-22}" height="${height}" x="0" y="0" style="font-size: 14px; text-align: left; font-style: normal; color: rgb(32, 32, 32);">
-      <div class="fo__content " data-gramm="false" spellcheck="false" style="color: rgb(32, 32, 32); font-family: Helvetica, Arial, sans-serif; font-size: 14px; font-style: normal; font-weight: 400; letter-spacing: 0px; text-align: left; text-decoration: none; vertical-align: middle; width: ${width-22}px; height: ${height}px; padding: 0px 5px; min-width: 1px; min-height: 1px; white-space: pre; overflow-wrap: break-word; display: table-cell; word-break: break-word;">12px</div>
-    </foreignObject>
-  </svg>
-  `;
   return html;
 }
 
@@ -890,31 +627,6 @@ function createStencilTextPlaceholder(width, height) {
   Ad voluptates incidunt non incidunt maiores id blanditiis ipsa sit excepturi nisi ea facere rerum et fugit pariatur. Ab dolor ipsum et veritatis nesciunt rem inventore quis et quae impedit. 
   
   Sed odio minus et impedit perferendis est accusantium reiciendis ut doloribus consequatur et placeat quia. Non expedita aperiam qui veritatis consequuntur est placeat inventore aut adipisci voluptas? </div></foreignObject></svg>  `;
-  return html;
-}
-
-function createStencilVideoPlayer(width, height) {
-  // original 320x240
-  html = `
-  <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
-    <defs></defs>
-    <rect x="0" y="0" rx="0" ry="0" width="${width}" height="${height}" stroke-width="1" stroke="rgb(122,122,122)" stroke-dasharray="none" fill="#ffffff"></rect>
-    <rect x="0" y="${height-34}" rx="0" ry="0" width="${width}" height="34" stroke-width="1" stroke="rgb(122,122,122)" stroke-dasharray="none" fill="rgb(230,230,230)"></rect>
-    <svg width="${width}" height="${height}" style="overflow: hidden;">
-      <svg x="14" y="${height-24}" width="11" height="14">
-        <path d="M 0 0 V 14 L 11 7 Z" fill="rgb(68,68,68)" fill-rule="evenOdd"></path>
-      </svg>
-      <rect x="40" y="${height-18.5}" rx="1.5" ry="1.5" width="${width-102}" height="3" fill="rgb(255,255,255)"></rect>
-      <circle r="5" cx="${width-180}" cy="${height-17}" fill="rgb(68,68,68)"></circle>
-      <svg x="${width-53}" y="${height-26}" width="18" height="18">
-        <path d="M 0 5.92132 V 12.0787 H 4 L 9 17.2098 V 0.790194 L 4 5.92132 H 0 Z M 13.5 9 C 13.5 7.18358 12.48 5.62372 11 4.86431 V 13.1254 C 12.48 12.3763 13.5 10.8164 13.5 9 Z M 11 0 V 2.11402 C 13.89 2.99658 16 5.74686 16 9 S 13.89 15.0034 11 15.886 V 18 C 15.01 17.0661 18 13.3922 18 9 S 15.01 0.933865 11 0 Z" fill="rgb(68,68,68)" fill-rule="evenOdd"></path>
-      </svg>
-      <svg x="${width-23}" y="${height-24}" width="14" height="14">
-        <path d="M 2 9 H 0 V 14 H 5 V 12 H 2 V 9 Z M 0 5 H 2 V 2 H 5 V 0 H 0 V 5 Z M 12 12 H 9 V 14 H 14 V 9 H 12 V 12 Z M 9 0 V 2 H 12 V 5 H 14 V 0 H 9 Z" fill="rgb(68,68,68)" fill-rule="evenOdd"></path>
-      </svg>
-    </svg>
-  </svg>
-  `;
   return html;
 }
 

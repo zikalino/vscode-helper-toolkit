@@ -1528,7 +1528,7 @@ function createLayoutCanvas(parent_id, entry) {
 
   html = "";
 
-  var code = `var html="";`;
+  var code = `var html="";var label = ((label in data) ? data.label : id);`;
 
   for (var i = 0; i < entry['toolbox'].length; i++) {
     var e = entry['toolbox'][i];
