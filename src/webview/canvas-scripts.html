@@ -335,6 +335,8 @@ function repositionStencil(align) {
       document.getElementById(selectionId).innerHTML = createStencilStepperInput(selectionX2 - selectionX1, selectionY2 -selectionY1);
     } else if (stencil_type === "videoplayer") {
       document.getElementById(selectionId).innerHTML = createStencilVideoPlayer(selectionX2 - selectionX1, selectionY2 -selectionY1);
+    } else {
+      document.getElementById(selectionId).innerHTML = createGenericStencil(stencil_type, selectionX2 - selectionX1, selectionY2 -selectionY1, {});
     }
 
     updatePropertiesFromCanvas();

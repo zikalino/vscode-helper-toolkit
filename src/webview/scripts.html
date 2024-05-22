@@ -1470,6 +1470,25 @@ function createTwoColumnLayout(parent_id, entry) {
   document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
 }
 
+var createGenericStencil = null;
+
+function onToolbarItemClicked(type_id) {
+  var id = createObjectId(type_id);
+  try {
+    var stencil_html = createGenericStencil(type_id, 180, 32, {});
+
+    var html_to_insert = `
+      <g class="stencil" data-stencil-type="${type_id}" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
+      ${stencil_html}
+      </g>
+    `;
+
+    var e = document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+  } catch (e) {
+    document.getElementById("toolbar-section-common").innerText = "QQQ " + e + " --- " + createGenericStencil;
+  }
+};
+
 function createLayoutCanvas(parent_id, entry) {
   var canvasWidth = 1024;
   var canvasHeight = 1024;
@@ -1509,15 +1528,7 @@ function createLayoutCanvas(parent_id, entry) {
 
   html = "";
 
-  var code = `
-            <script>
-              function onToolbarItemClicked(id) {
-                createGenericStencil(id, 50, 20, {});
-              };
-  
-              function createGenericStencil(id, width, height, data) {
-        `;
-
+  var code = `var html="";`;
 
   for (var i = 0; i < entry['toolbox'].length; i++) {
     var e = entry['toolbox'][i];
@@ -1542,20 +1553,22 @@ function createLayoutCanvas(parent_id, entry) {
           <li class="toolbar-panel-list-item" title="${name}"
                     onmousedown="onToolbarItemClicked('${id}')"
                   >
+                  <svg class="svg-icon">
                     ${thumbnail}
+                  </svg>
                     <span class="toolbar-panel-list-item-label">${name}</span>
                   </li>
       `;
-      code += `
-        if (id === '${id}') {
-          html = '${stencil}';
-        }
-      `;
+      code += 
+        "if (id === '" + id + "') {" + " html = `" + stencil + "`;" + "};"
     }
-
   }
   
+  code += ` return html;`;
+
   document.getElementById("toolbar-section-common").innerHTML = html;
+
+  createGenericStencil = new Function('id', 'width', 'height', 'data', code);
 }
 
 function folderSelectorClicked(id) {
