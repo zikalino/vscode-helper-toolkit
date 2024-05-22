@@ -303,8 +303,6 @@ function repositionStencil(align) {
       document.getElementById(selectionId).innerHTML = createStencilRadio(selectionX2 - selectionX1, selectionY2 -selectionY1), "radio";
     } else if (stencil_type === "label") {
       document.getElementById(selectionId).innerHTML = createStencilLabel(selectionX2 - selectionX1, selectionY2 -selectionY1, "label");
-    } else if (stencil_type === "rectangle") {
-      document.getElementById(selectionId).innerHTML = createStencilRectangle(selectionX2 - selectionX1, selectionY2 -selectionY1);
     } else if (stencil_type === "circle") {
       document.getElementById(selectionId).innerHTML = createStencilCircle(selectionX2 - selectionX1, selectionY2 -selectionY1);
     } else if (stencil_type === "toggle") {
@@ -417,16 +415,6 @@ function onToolbarLabelClicked() {
   var html_to_insert = `
     <g class="stencil" data-stencil-type="label" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
     ${createStencilLabel(180, 24, "Label")}
-    </g>
-  `;
-  document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
-}
-
-function onToolbarRectangleClicked() {
-  var id = createObjectId('Rectangle');
-  var html_to_insert = `
-    <g class="stencil" data-stencil-type="rectangle" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 50 50)">
-    ${createStencilRectangle(180, 24)}
     </g>
   `;
   document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
@@ -728,17 +716,6 @@ function createStencilSlider(width, height) {
     </svg>
   `;
 
-  return html;
-}
-
-
-function createStencilRectangle(width, height) {
-  html = `
-    <svg class=" " width="${width}" height="${height}" x="0.5" y="0.5" style="opacity: 1;">
-      <defs></defs>
-        <path d="M0 0 L${width} 0 C${width} 0 ${width} 0 ${width} 0 L${width} ${height} C${width} ${height} ${width} ${height} ${width} ${height} L0 ${height} C0 ${height} 0 ${height} 0 ${height} L0 0 C0 0 0 0 0 0 Z" stroke-width="1" stroke="rgb(0,0,0)" stroke-dasharray="none" fill="rgb(255,255,255)"></path>
-    </svg>
-  `;
   return html;
 }
 
@@ -1246,5 +1223,6 @@ function createObjectId(prefix) {
   usedIds.add(finalId);
   return finalId;
 }
+
 
 </script>

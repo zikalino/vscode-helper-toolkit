@@ -1508,21 +1508,53 @@ function createLayoutCanvas(parent_id, entry) {
   positionRulers(-50, -50);
 
   html = "";
+
+  var code = `
+            <script>
+              function onToolbarItemClicked(id) {
+                createGenericStencil(id, 50, 20, {});
+              };
+  
+              function createGenericStencil(id, width, height, data) {
+        `;
+
+
   for (var i = 0; i < entry['toolbox'].length; i++) {
     var e = entry['toolbox'][i];
     var name = e['name'];
-    var symbol = e['symbol'];
-    html += `
-        <li class="toolbar-panel-list-item" title="${name}"
-                  onmousedown="onToolbar${name}Clicked()"
-                >
-                  <svg class="svg-icon">
-                    <use xlink:href="#${symbol}"></use>
-                  </svg>
-                  <span class="toolbar-panel-list-item-label">${name}</span>
-                </li>
-    `;
+    if ('symbol' in e) {
+      var symbol = e['symbol'];
+      html += `
+          <li class="toolbar-panel-list-item" title="${name}"
+                    onmousedown="onToolbar${name}Clicked()"
+                  >
+                    <svg class="svg-icon">
+                      <use xlink:href="#${symbol}"></use>
+                    </svg>
+                    <span class="toolbar-panel-list-item-label">${name}</span>
+                  </li>
+      `;
+    } else {
+      var thumbnail = e['thumbnail'];
+      var stencil = e['stencil'];
+      var id = e['id'];
+      html += `
+          <li class="toolbar-panel-list-item" title="${name}"
+                    onmousedown="onToolbarItemClicked('${id}')"
+                  >
+                    ${thumbnail}
+                    <span class="toolbar-panel-list-item-label">${name}</span>
+                  </li>
+      `;
+      code += `
+        if (id === '${id}') {
+          html = '${stencil}';
+        }
+      `;
+    }
+
   }
+  
   document.getElementById("toolbar-section-common").innerHTML = html;
 }
 
