@@ -365,7 +365,25 @@ function canvasWidgetsFromDefinition(widgets) {
 function canvasWidgetsToDefinition() {
   var widgets = [];
 
-  // XXX - QUUERY ALL WIDGETS HERE
+  const elements = document.querySelector('.stencil');
+  var canvasEl = document.getElementById("canvas-svg");
+  var canvasBb = canvasEl.getBoundingClientRect(); 
+
+  for (var i = 0; i < elements.length; i++) {
+    var el = elements[i];
+    var id = getAttribute("id");
+    var type = getAttribute("data-stencil-type");
+
+    var bb = el.getBoundingClientRect();// getBBox();
+    var x = bb.x - canvasBb.x;
+    var w = bb.width;
+    var y = bb.y;
+    var h = bb.height;
+
+    widgets.push({"id": id, "type": type, "x": x, "y": y, "w": w, "h": h})
+  }
+
+  return widgets;
 }
 
 </script>
