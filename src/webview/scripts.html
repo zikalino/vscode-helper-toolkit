@@ -1569,6 +1569,11 @@ function createLayoutCanvas(parent_id, entry) {
   document.getElementById("toolbar-section-common").innerHTML = html;
 
   createGenericStencil = new Function('id', 'width', 'height', 'data', code);
+
+  // create widgets if defined
+  if ('widgets' in entry) {
+    canvasWidgetsFromDefinition(entry['widgets']);
+  }
 }
 
 function folderSelectorClicked(id) {

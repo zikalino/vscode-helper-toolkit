@@ -340,5 +340,32 @@ function createObjectId(prefix) {
   return finalId;
 }
 
+function canvasWidgetsFromDefinition(widgets) {
+  for (var i = 0; i < widgets.length; i++) {
+      var widget = widgets[i];
+
+
+      var type = widget['type'];
+      var id = createObjectId(type);
+      var w = widget['w'];
+      var h = widget['h'];
+      var x = widget['x'];
+      var y = widget['y'];
+    var stencil_html = createGenericStencil(type, widget['w'], widget['h'], widget);
+
+    var html_to_insert = `
+      <g class="stencil" data-stencil-type="${type}" onmousedown="handleStencilMouseDown(event, '${id}')" id="${id}" transform="matrix(1 0 0 1 ${x} ${y})">
+      ${stencil_html}
+      </g>
+    `;
+    var e = document.getElementById('canvas-object-group').insertAdjacentHTML('beforeend', html_to_insert);
+  }
+}
+
+function canvasWidgetsToDefinition() {
+  var widgets = [];
+
+  // XXX - QUUERY ALL WIDGETS HERE
+}
 
 </script>
