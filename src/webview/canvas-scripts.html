@@ -216,6 +216,11 @@ window.addEventListener('message', event => {
   }
 });
 
+var intervalId = window.setInterval(function(){
+  var definition = canvasWidgetsToDefinition();
+  vscode.postMessage({ command: 'save-definition', definition: definition});
+  
+} , 5000);
 
 var beforeList = "";
 
@@ -380,27 +385,31 @@ function canvasWidgetsFromDefinition(widgets) {
 }
 
 function canvasWidgetsToDefinition() {
-  var widgets = [];
 
-  const elements = document.querySelector('.stencil');
-  var canvasEl = document.getElementById("canvas-svg");
-  var canvasBb = canvasEl.getBoundingClientRect(); 
+  try {
+    var widgets = [];
 
-  for (var i = 0; i < elements.length; i++) {
-    var el = elements[i];
-    var id = getAttribute("id");
-    var type = getAttribute("data-stencil-type");
+    const elements = document.getElementsByClassName('stencil');
+    var canvasEl = document.getElementById("canvas-svg");
+    var canvasBb = canvasEl.getBoundingClientRect(); 
 
-    var bb = el.getBoundingClientRect();// getBBox();
-    var x = bb.x - canvasBb.x;
-    var w = bb.width;
-    var y = bb.y;
-    var h = bb.height;
+    for (var i = 0; i < elements.length; i++) {
+      var el = elements[i];
+      var id = el.getAttribute("id");
+      var type = el.getAttribute("data-stencil-type");
 
-    widgets.push({"id": id, "type": type, "x": x, "y": y, "w": w, "h": h})
+      var bb = el.getBoundingClientRect();// getBBox();
+      var x = bb.x - canvasBb.x;
+      var w = bb.width;
+      var y = bb.y;
+      var h = bb.height;
+
+      widgets.push({"id": id, "type": type, "x": x, "y": y, "w": w, "h": h})
+    }
+    return widgets;
+  } catch (e) {
+    return "EXCEPTION: " + e;
   }
-
-  return widgets;
 }
 
 </script>
