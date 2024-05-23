@@ -112,6 +112,14 @@ export class GenericWebView {
     this.postMessage({ command: 'enable', id: id});
   }
 
+  public setDefinition(definition: any) {
+    this.postMessage({ command: 'set-definition', definition: definition});
+  }
+
+  public requestDefinition() {
+    this.postMessage({ command: 'request-definition' });
+  }
+
   private async selectFolder(id: string) {
     const workspaceFolder = await vscode.window.showOpenDialog({ canSelectFiles: false, canSelectFolders: true });
     if (workspaceFolder) {

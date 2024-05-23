@@ -200,6 +200,23 @@
 </style>
 <script>
 
+// Handle the message inside the webviewonA
+window.addEventListener('message', event => {
+  const message = event.data;
+
+  switch (message.command) {
+    case 'set-definition':
+      definition = message.data;
+      // XXX - create new definition
+      break;
+    case 'request-definition':
+      definition = canvasWidgetsToDefinition();
+      vscode.postMessage({ command: 'save-definition', definition: definition });
+      break;
+  }
+});
+
+
 var beforeList = "";
 
 function updateSvgAttribute(e, a, delta) {
