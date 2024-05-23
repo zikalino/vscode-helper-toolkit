@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 var styles: any = require("./webview/styles.html");
 var stylesWorkbench: any = require("./webview/treeview-css.html");
 var script: string = require("./webview/scripts.html");
+var script_vscode: string = require("./webview/scripts-vscode.html");
 
 var canvasScript: string = require("./webview/canvas-scripts.html");
 var canvasSymbolsProperties: string = require("./webview/canvas-symbols-properties.html");
@@ -125,8 +126,7 @@ export class GenericWebView {
           <meta charset="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-          <!-- XXX clean up and move to scripts.js -->
-          <script type="module" src="${uiToolkitUri}"></script>
+          ${script_vscode}
 
           ${styles}
           ${script}
