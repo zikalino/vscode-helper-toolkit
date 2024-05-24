@@ -337,7 +337,7 @@ body[data-vscode-theme-id='Visual Studio Light'] {
   width: 330px;
 }
 
-/* this is hardware config row, currently has 3 columns and for some reason 4th column which is 20px */
+/* currently has 3 columns and for some reason 4th column which is 20px */
 .form-row>.three-column-row {
   grid-template-columns: 200px 200px 200px 20px;
 }
@@ -346,6 +346,18 @@ body[data-vscode-theme-id='Visual Studio Light'] {
   display: grid;
   grid-column-gap: 10px;
   grid-row-gap: 10px;
+}
+
+.action-row-icon { grid-area: icon; }
+.action-row-text { grid-area: action; }
+.action-row-button { grid-area: button; }
+
+.action-row {
+  display: grid;
+  grid-template-areas: 'icon action button';
+  gap: 10px;
+  grid-template-columns: 32px 300px 50px;
+  grid-template-rows: 32px;
 }
 
 .search-input-wrapper {

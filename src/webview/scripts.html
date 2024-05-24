@@ -77,6 +77,8 @@ function formPopulate(data, parent_id) {
     } else if (entry['type'] === 'row') {
       createRow(parent_id, entry);
       formPopulate(entry['subitems'], entry['id']);
+    } else if (entry['type'] === 'action-row') {
+      createActionRow(parent_id, entry);
     } else if (entry['type'] === 'checkbox') {
       createCheckBox(parent_id, entry);
     } else if (entry['type'] === 'combo') {
@@ -212,6 +214,20 @@ function createRow(parent_id, data) {
     </div>
     `;
   }
+  document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);
+}
+
+function createActionRow(parent_id, data) {
+  var html = '';
+  html = `
+  <div class="form-row" id="${data['id']}-wrapper">
+    <div class="action-row" id="${data['id']}">
+      <div class="action-row-icon">S</div>
+      <div class="action-row-text">ACTION</div>
+      <vscode-button class="action-row-button">Moo!</vscode-button>
+    </div>
+  </div>
+  `;
   document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);
 }
 
