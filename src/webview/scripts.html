@@ -475,8 +475,13 @@ function createBadge(parent_id, entry) {
 }
 
 function createTextBlock(parent_id, entry) {
-  var style = "padding-top: 10px; ";
+  var style = "";
+  var padding = "0px"
   
+  if ('padding-bottom' in entry) {
+    padding = entry['padding-bottom'];
+  }
+
   switch (entry['width']) {
     case 'narrow':
       style += 'max-width: 440px;';
@@ -504,7 +509,9 @@ function createTextBlock(parent_id, entry) {
   entry['width'];
 
   var html = `
+        <div style="height: ${padding};"></div>
         <vscode-text-block style='${style}'>${entry['content']}</vscode-textblock>
+        <div style="height: ${padding};"></div>
       `;
       document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
 }
@@ -1506,7 +1513,7 @@ function createLayoutCanvas(parent_id, entry) {
       canvasGridMajor = entry["grid"]["major"];
     }
     if ("minor" in entry["grid"]) {
-      canvasGridMajor = entry["grid"]["minor"];
+      canvasGridMinor = entry["grid"]["minor"];
     }
   }
 
