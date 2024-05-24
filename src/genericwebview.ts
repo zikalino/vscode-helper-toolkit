@@ -35,6 +35,7 @@ export class GenericWebView {
 
   createPanel(formDefinition: any) {
     
+    this.formDefinition = formDefinition;
     this.panel.iconPath = vscode.Uri.joinPath(
       this.context.extensionUri,
       'media',
@@ -166,6 +167,34 @@ export class GenericWebView {
       `;
   }
 
+  public runStepsVerification() {
+    //vscode.window.showInformationMessage('ACTION VERIFICATION: A');
+    this.actionsVerify(this.formDefinition);
+    vscode.window.showInformationMessage('ACTION VERIFICATION: EXIT');
+  }
+
+  private actionsVerify(data: any) {
+    if (typeof data === 'object') {
+      if (data instanceof Array) {
+        for (let i of data.keys()) {
+          this.actionsVerify(data[i]);
+        }
+      }
+      else {
+        if ('type' in data && data['type'] === 'action-row') {
+          vscode.window.showInformationMessage('ACTION VERIFICATION X: ' + data['check']);
+        } else {
+          for (let key in data) {
+            if (typeof data[key] === 'object' && data[key] instanceof Array) {
+              this.actionsVerify(data[key]);
+            }
+          }
+        }
+      }
+    }
+  }
+
   private context: vscode.ExtensionContext;
   private name: string;
+  private formDefinition: any;
 }
