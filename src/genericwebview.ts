@@ -98,11 +98,19 @@ export class GenericWebView {
   }
 
   public showElement(id: string) {
-    this.postMessage({ command: 'show', id: id});
+    var def = this.findElementDefinition(this.formDefinition, id);
+    if (def !== null) {
+      def['hidden'] = false;
+      this.postMessage({ command: 'show', id: id});
+    }
   }
 
   public hideElement(id: string) {
-    this.postMessage({ command: 'hide', id: id});
+    var def = this.findElementDefinition(this.formDefinition, id);
+    if (def !== null) {
+      def['hidden'] = true;
+      this.postMessage({ command: 'hide', id: id});
+    }
   }
 
   public disableElement(id: string) {
@@ -111,6 +119,34 @@ export class GenericWebView {
 
   public enableElement(id: string) {
     this.postMessage({ command: 'enable', id: id});
+  }
+
+  private findElementDefinition(data: any, id: string) {
+    if (typeof data === 'object') {
+      if (data instanceof Array) {
+        for (let i of data.keys()) {
+          var def: any = this.findElementDefinition(data[i], id);
+          if (def !== null) {
+            return def;
+          }
+        }
+      }
+      else {
+        if ('id' in data && data['id'] === id) {     
+          return data;
+        }
+
+        for (let key in data) {
+          if (typeof data[key] === 'object' && data[key] instanceof Array) {
+            var def = this.findElementDefinition(data[key], id);
+            if (def !== null) {
+              return def;
+            }
+          }
+        }
+      }
+    }
+    return null;
   }
 
   public setDefinition(definition: any) {
@@ -181,6 +217,10 @@ export class GenericWebView {
         }
       }
       else {
+        if ('hidden' in data && data['hidden']) {
+          return;
+        }
+
         if ('type' in data && data['type'] === 'action-row') {
           const cp = require('child_process');
 
