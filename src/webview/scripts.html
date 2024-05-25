@@ -11,7 +11,9 @@
         data = message.data;
         mediaFolder = message.mediaFolder;
         formPopulate(data, 'main-div');
-
+        break;
+      case 'set-action-status':
+        setActionStatus(message.id, message.status);
         break;
     }
   });
@@ -222,7 +224,7 @@ function createActionRow(parent_id, data) {
   html = `
   <div class="form-row" id="${data['id']}-wrapper">
     <div class="action-row" id="${data['id']}">
-      <div class="action-row-icon codicon codicon-watch" id="${data['id']}-icon"></div>
+      <div class="action-row-icon codicon codicon-watch" id="${data['id']}-icon" style=""></div>
       <div class="action-row-text">${data['action-name']}</div>
       <vscode-button class="action-row-button">Moo!</vscode-button>
     </div>
@@ -234,15 +236,21 @@ function createActionRow(parent_id, data) {
 function setActionStatus(id, status) {
   if (status === 'waiting') {
     // codicon-watch
+    //document.getElementById(id).innerText = "AAA";
     document.getElementById(id + "-icon").setAttribute("class", "action-row-icon codicon codicon-watch");
+    document.getElementById(id + "-icon").setAttribute("style", "color: grey; font-size: 24px;");
   } else if (status === 'verified') {
     // codicon-pass-filled    
+    //document.getElementById(id).innerText = "BBB";
     document.getElementById(id + "-icon").setAttribute("class", "action-row-icon codicon codicon-pass-filled");
+    document.getElementById(id + "-icon").setAttribute("style", "color: green; font-size: 24px;");
   } else if (status === 'installing') {
     // vscode progress
   } else if (status === 'failed') {
     // codicon-error
+    //document.getElementById(id).innerText = "CCC";
     document.getElementById(id + "-icon").setAttribute("class", "action-row-icon codicon codicon-error");
+    document.getElementById(id + "-icon").setAttribute("style", "color: red; font-size: 24px;");
   }
 }
 

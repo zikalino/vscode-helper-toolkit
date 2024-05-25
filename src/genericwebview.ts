@@ -187,9 +187,11 @@ export class GenericWebView {
               console.log('stdout: ' + stdout);
               console.log('stderr: ' + stderr);
               if (err) {
-                vscode.window.showInformationMessage(data['check'] + 'ERROR');
+                this.postMessage({ command: 'set-action-status', id: data['id'], status: 'failed' });
+                //vscode.window.showInformationMessage(data['check'] + 'ERROR');
               } else {
-                vscode.window.showInformationMessage(data['check'] + 'OK');
+                this.postMessage({ command: 'set-action-status', id: data['id'], status: 'verified' });
+                //vscode.window.showInformationMessage(data['check'] + 'OK');
               }
           });
 
