@@ -182,18 +182,30 @@ export class GenericWebView {
       }
       else {
         if ('type' in data && data['type'] === 'action-row') {
-          const cp = require('child_process')
-          cp.exec(data['check'], (err: any, stdout: any, stderr: any) => {
-              console.log('stdout: ' + stdout);
-              console.log('stderr: ' + stderr);
-              if (err) {
-                this.postMessage({ command: 'set-action-status', id: data['id'], status: 'failed' });
-                //vscode.window.showInformationMessage(data['check'] + 'ERROR');
-              } else {
-                this.postMessage({ command: 'set-action-status', id: data['id'], status: 'verified' });
-                //vscode.window.showInformationMessage(data['check'] + 'OK');
-              }
-          });
+          const cp = require('child_process');
+
+          try {
+            var result = cp.execSync(data['check']);
+            this.postMessage({ command: 'set-action-status', id: data['id'], status: 'verified' });
+          } catch (e) {
+            this.postMessage({ command: 'set-action-status', id: data['id'], status: 'failed' });
+          }
+
+          //var child = cp.exec(data['check'], (err: any, stdout: any, stderr: any) => {
+          //    console.log('stdout: ' + stdout);
+          //    console.log('stderr: ' + stderr);
+          //    if (err) {
+          //      this.postMessage({ command: 'set-action-status', id: data['id'], status: 'failed' });
+          //      //vscode.window.showInformationMessage(data['check'] + 'ERROR');
+          //    } else {
+          //      this.postMessage({ command: 'set-action-status', id: data['id'], status: 'verified' });
+          //      vscode.window.showInformationMessage(data['check'] + 'OK');
+          //    }
+          //});
+
+          //await new Promise( (resolve) => {
+          //  child.on('close', resolve);
+          //})
 
         } else {
           for (let key in data) {
