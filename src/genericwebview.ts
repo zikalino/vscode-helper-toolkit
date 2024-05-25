@@ -210,52 +210,52 @@ export class GenericWebView {
   }
 
   private actionsVerify(data: any) {
+    try {
+        
+      let actionList: any[] = this.getActionList(data);
+
+      vscode.window.showInformationMessage('ACTION VERIFICATION: ' + actionList.length);
+
+      for (let a of actionList) {
+        vscode.window.showInformationMessage('ACTION VERIFICATION: ' + a['id']);
+        const cp = require('child_process');
+        try {
+          var result = cp.execSync(a['check']);
+          this.postMessage({ command: 'set-action-status', id: a['id'], status: 'verified' });
+        } catch (e) {
+          this.postMessage({ command: 'set-action-status', id: a['id'], status: 'failed' });
+        }
+      }
+    } catch (e) {
+      vscode.window.showInformationMessage('EXCEPTION: ' + e);
+    }
+  }
+
+  private getActionList(data: any): any[] {
+    let ret : any[] = [];
     if (typeof data === 'object') {
       if (data instanceof Array) {
         for (let i of data.keys()) {
-          this.actionsVerify(data[i]);
+          ret = ret.concat(this.getActionList(data[i]));
         }
       }
       else {
         if ('hidden' in data && data['hidden']) {
-          return;
+          return [];
         }
 
         if ('type' in data && data['type'] === 'action-row') {
-          const cp = require('child_process');
-
-          try {
-            var result = cp.execSync(data['check']);
-            this.postMessage({ command: 'set-action-status', id: data['id'], status: 'verified' });
-          } catch (e) {
-            this.postMessage({ command: 'set-action-status', id: data['id'], status: 'failed' });
-          }
-
-          //var child = cp.exec(data['check'], (err: any, stdout: any, stderr: any) => {
-          //    console.log('stdout: ' + stdout);
-          //    console.log('stderr: ' + stderr);
-          //    if (err) {
-          //      this.postMessage({ command: 'set-action-status', id: data['id'], status: 'failed' });
-          //      //vscode.window.showInformationMessage(data['check'] + 'ERROR');
-          //    } else {
-          //      this.postMessage({ command: 'set-action-status', id: data['id'], status: 'verified' });
-          //      vscode.window.showInformationMessage(data['check'] + 'OK');
-          //    }
-          //});
-
-          //await new Promise( (resolve) => {
-          //  child.on('close', resolve);
-          //})
-
+          ret.push(data);
         } else {
           for (let key in data) {
             if (typeof data[key] === 'object' && data[key] instanceof Array) {
-              this.actionsVerify(data[key]);
+              ret = ret.concat(this.getActionList(data[key]));
             }
           }
         }
       }
     }
+    return ret;
   }
 
   private context: vscode.ExtensionContext;
