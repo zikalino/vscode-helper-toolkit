@@ -222,13 +222,28 @@ function createActionRow(parent_id, data) {
   html = `
   <div class="form-row" id="${data['id']}-wrapper">
     <div class="action-row" id="${data['id']}">
-      <div class="action-row-icon">S</div>
-      <div class="action-row-text">ACTION</div>
+      <div class="action-row-icon codicon codicon-watch" id="${data['id']}-icon"></div>
+      <div class="action-row-text">${data['action-name']}</div>
       <vscode-button class="action-row-button">Moo!</vscode-button>
     </div>
   </div>
   `;
   document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);
+}
+
+function setActionStatus(id, status) {
+  if (status === 'waiting') {
+    // codicon-watch
+    document.getElementById(id + "-icon").setAttribute("class", "action-row-icon codicon codicon-watch");
+  } else if (status === 'verified') {
+    // codicon-pass-filled    
+    document.getElementById(id + "-icon").setAttribute("class", "action-row-icon codicon codicon-pass-filled");
+  } else if (status === 'installing') {
+    // vscode progress
+  } else if (status === 'failed') {
+    // codicon-error
+    document.getElementById(id + "-icon").setAttribute("class", "action-row-icon codicon codicon-error");
+  }
 }
 
 function createCheckBox(parent_id, data) {

@@ -182,7 +182,17 @@ export class GenericWebView {
       }
       else {
         if ('type' in data && data['type'] === 'action-row') {
-          vscode.window.showInformationMessage('ACTION VERIFICATION X: ' + data['check']);
+          const cp = require('child_process')
+          cp.exec(data['check'], (err: any, stdout: any, stderr: any) => {
+              console.log('stdout: ' + stdout);
+              console.log('stderr: ' + stderr);
+              if (err) {
+                vscode.window.showInformationMessage(data['check'] + 'ERROR');
+              } else {
+                vscode.window.showInformationMessage(data['check'] + 'OK');
+              }
+          });
+
         } else {
           for (let key in data) {
             if (typeof data[key] === 'object' && data[key] instanceof Array) {
