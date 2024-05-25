@@ -204,9 +204,14 @@ export class GenericWebView {
   }
 
   public runStepsVerification() {
-    //vscode.window.showInformationMessage('ACTION VERIFICATION: A');
     this.actionsVerify(this.formDefinition);
     vscode.window.showInformationMessage('ACTION VERIFICATION: EXIT');
+  }
+
+  public runStepsInstallation() {
+    this.actionsInstall(this.formDefinition);
+
+    vscode.window.showInformationMessage('ACTION INSTALLATION: EXIT');
   }
 
   private actionsVerify(data: any) {
@@ -222,6 +227,28 @@ export class GenericWebView {
         try {
           var result = cp.execSync(a['check']);
           this.postMessage({ command: 'set-action-status', id: a['id'], status: 'verified' });
+        } catch (e) {
+          this.postMessage({ command: 'set-action-status', id: a['id'], status: 'failed' });
+        }
+      }
+    } catch (e) {
+      vscode.window.showInformationMessage('EXCEPTION: ' + e);
+    }
+  }
+
+  private actionsInstall(data: any) {
+    try {
+        
+      let actionList: any[] = this.getActionList(data);
+
+      vscode.window.showInformationMessage('ACTION INSTALLATION: ' + actionList.length);
+
+      for (let a of actionList) {
+        const cp = require('child_process');
+        try {
+          this.postMessage({ command: 'set-action-status', id: a['id'], status: 'installing' });
+          var result = cp.execSync(a['check']);
+          //this.postMessage({ command: 'set-action-status', id: a['id'], status: 'verified' });
         } catch (e) {
           this.postMessage({ command: 'set-action-status', id: a['id'], status: 'failed' });
         }

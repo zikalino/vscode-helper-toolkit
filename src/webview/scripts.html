@@ -245,7 +245,9 @@ function setActionStatus(id, status) {
     document.getElementById(id + "-icon").setAttribute("class", "action-row-icon codicon codicon-pass-filled");
     document.getElementById(id + "-icon").setAttribute("style", "color: green; font-size: 24px;");
   } else if (status === 'installing') {
-    // vscode progress
+    // XXX - vscode progress
+    document.getElementById(id + "-icon").setAttribute("class", "action-row-icon codicon codicon-cloud-download");
+    document.getElementById(id + "-icon").setAttribute("style", "color: red; font-size: 24px;");
   } else if (status === 'failed') {
     // codicon-error
     //document.getElementById(id).innerText = "CCC";
