@@ -224,9 +224,11 @@ function createActionRow(parent_id, data) {
   html = `
   <div class="form-row" id="${data['id']}-wrapper">
     <div class="action-row" id="${data['id']}">
-      <div class="action-row-icon codicon codicon-watch" id="${data['id']}-icon" style=""></div>
+      <div class="action-row-icon codicon codicon-watch" id="${data['id']}-icon" style="">
+        <vscode-progress-ring id="${data['id']}-ring" style="visibility: hidden;"></vscode-progress-ring>
+      </div>
       <div class="action-row-text">${data['action-name']}</div>
-      <vscode-button class="action-row-button">Moo!</vscode-button>
+      <vscode-button class="action-row-button"><div class="codicon codicon-debug-restart" ></div></vscode-button>
     </div>
   </div>
   `;
@@ -239,20 +241,24 @@ function setActionStatus(id, status) {
     //document.getElementById(id).innerText = "AAA";
     document.getElementById(id + "-icon").setAttribute("class", "action-row-icon codicon codicon-watch");
     document.getElementById(id + "-icon").setAttribute("style", "color: grey; font-size: 24px;");
+    document.getElementById(id + "-ring").style.visibility = 'hidden';
   } else if (status === 'verified') {
     // codicon-pass-filled    
     //document.getElementById(id).innerText = "BBB";
     document.getElementById(id + "-icon").setAttribute("class", "action-row-icon codicon codicon-pass-filled");
     document.getElementById(id + "-icon").setAttribute("style", "color: green; font-size: 24px;");
+    document.getElementById(id + "-ring").style.visibility = 'hidden';
   } else if (status === 'installing') {
     // XXX - vscode progress
-    document.getElementById(id + "-icon").setAttribute("class", "action-row-icon codicon codicon-cloud-download");
-    document.getElementById(id + "-icon").setAttribute("style", "color: red; font-size: 24px;");
+    document.getElementById(id + "-icon").setAttribute("class", "action-row-icon");
+    document.getElementById(id + "-ring").style.visibility = 'visible';
+    
   } else if (status === 'failed') {
     // codicon-error
     //document.getElementById(id).innerText = "CCC";
     document.getElementById(id + "-icon").setAttribute("class", "action-row-icon codicon codicon-error");
     document.getElementById(id + "-icon").setAttribute("style", "color: red; font-size: 24px;");
+    document.getElementById(id + "-ring").style.visibility = 'hidden';
   }
 }
 

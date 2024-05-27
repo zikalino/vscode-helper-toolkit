@@ -205,13 +205,10 @@ export class GenericWebView {
 
   public runStepsVerification() {
     this.actionsVerify(this.formDefinition);
-    vscode.window.showInformationMessage('ACTION VERIFICATION: EXIT');
   }
 
   public runStepsInstallation() {
     this.actionsInstall(this.formDefinition);
-
-    vscode.window.showInformationMessage('ACTION INSTALLATION: EXIT');
   }
 
   private actionsVerify(data: any) {
@@ -219,15 +216,14 @@ export class GenericWebView {
         
       let actionList: any[] = this.getActionList(data);
 
-      vscode.window.showInformationMessage('ACTION VERIFICATION: ' + actionList.length);
-
       for (let a of actionList) {
-        vscode.window.showInformationMessage('ACTION VERIFICATION: ' + a['id']);
         const cp = require('child_process');
         try {
           var result = cp.execSync(a['check']);
+          a['status'] = 'verified';
           this.postMessage({ command: 'set-action-status', id: a['id'], status: 'verified' });
         } catch (e) {
+          a['status'] = 'missing';
           this.postMessage({ command: 'set-action-status', id: a['id'], status: 'failed' });
         }
       }
@@ -236,21 +232,40 @@ export class GenericWebView {
     }
   }
 
-  private actionsInstall(data: any) {
+  private async actionsInstall(data: any) {
     try {
         
       let actionList: any[] = this.getActionList(data);
 
-      vscode.window.showInformationMessage('ACTION INSTALLATION: ' + actionList.length);
-
       for (let a of actionList) {
-        const cp = require('child_process');
-        try {
-          this.postMessage({ command: 'set-action-status', id: a['id'], status: 'installing' });
-          var result = cp.execSync(a['check']);
-          //this.postMessage({ command: 'set-action-status', id: a['id'], status: 'verified' });
-        } catch (e) {
-          this.postMessage({ command: 'set-action-status', id: a['id'], status: 'failed' });
+        if (!('status' in a) || a['status'] !== 'verified') {
+          const { watch } = require('node:fs/promises');
+          try { 
+            this.postMessage({ command: 'set-action-status', id: a['id'], status: 'installing' });
+            //var result = cp.execSync(a['install']);
+
+            let filename = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
+
+            this.terminal.show();
+            this.terminal.sendText(a['install']);
+            this.terminal.sendText("$? | Out-File " + filename + " -Encoding ASCII");
+
+            while (!require('fs').existsSync(filename)) {
+              await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            const data = require('fs').readFileSync(filename, 'utf8').toString();
+
+            if (data.startsWith('True')) {
+              a['status'] = 'verified';
+              this.postMessage({ command: 'set-action-status', id: a['id'], status: 'verified' });
+            } else {
+              a['status'] = 'failed';
+              this.postMessage({ command: 'set-action-status', id: a['id'], status: 'failed' });
+            }
+          } catch (e) {
+            a['status'] = 'missing';
+            this.postMessage({ command: 'set-action-status', id: a['id'], status: 'failed' });
+          }
         }
       }
     } catch (e) {
@@ -288,4 +303,6 @@ export class GenericWebView {
   private context: vscode.ExtensionContext;
   private name: string;
   private formDefinition: any;
+
+  private terminal = vscode.window.createTerminal("Installer", "powershell");
 }
