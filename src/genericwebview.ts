@@ -76,7 +76,9 @@ export class GenericWebView {
           case 'select-folder':
             this.selectFolder(message.id);
             return;
-      
+          case 'button-clicked':
+            this.runStepReRun(message.id);
+            return;
           default:
             console.log('XXX');
         }
@@ -211,6 +213,10 @@ export class GenericWebView {
     this.actionsInstall(this.formDefinition);
   }
 
+  public runStepReRun(step_id: string) {
+    this.actionReRun(this.formDefinition, step_id);
+  }
+
   private actionsVerify(data: any) {
     try {
         
@@ -254,6 +260,46 @@ export class GenericWebView {
               await new Promise(resolve => setTimeout(resolve, 1000));
             }
             const data = require('fs').readFileSync(filename, 'utf8').toString();
+
+            if (data.startsWith('True')) {
+              a['status'] = 'verified';
+              this.postMessage({ command: 'set-action-status', id: a['id'], status: 'verified' });
+            } else {
+              a['status'] = 'failed';
+              this.postMessage({ command: 'set-action-status', id: a['id'], status: 'failed' });
+            }
+          } catch (e) {
+            a['status'] = 'missing';
+            this.postMessage({ command: 'set-action-status', id: a['id'], status: 'failed' });
+          }
+        }
+      }
+    } catch (e) {
+      vscode.window.showInformationMessage('EXCEPTION: ' + e);
+    }
+  }
+
+  private async actionReRun(data: any, id: string) {
+    try {
+        
+      let actionList: any[] = this.getActionList(data);
+
+      for (let a of actionList) {
+        if (a['id'] === id) {
+          try { 
+            this.postMessage({ command: 'set-action-status', id: a['id'], status: 'installing' });
+
+            let filename = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
+
+            this.terminal.show();
+            this.terminal.sendText(a['install']);
+            this.terminal.sendText("$? | Out-File " + filename + " -Encoding ASCII");
+
+            while (!require('fs').existsSync(filename)) {
+              await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            const data = require('fs').readFileSync(filename, 'utf8').toString();
+            require('fs').unlinkSync(filename);
 
             if (data.startsWith('True')) {
               a['status'] = 'verified';

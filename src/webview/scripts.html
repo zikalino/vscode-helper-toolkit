@@ -228,7 +228,7 @@ function createActionRow(parent_id, data) {
         <vscode-progress-ring id="${data['id']}-ring" style="visibility: hidden;"></vscode-progress-ring>
       </div>
       <div class="action-row-text">${data['action-name']}</div>
-      <vscode-button class="action-row-button"><div class="codicon codicon-debug-restart" ></div></vscode-button>
+      <vscode-button class="action-row-button" onclick="onButtonClicked('${data['id']}');"><div class="codicon codicon-debug-restart" ></div></vscode-button>
     </div>
   </div>
   `;
@@ -236,18 +236,32 @@ function createActionRow(parent_id, data) {
 }
 
 function setActionStatus(id, status) {
+
+  var buttons = document.getElementsByTagName("vscode-button")
+  for (var k in buttons) {
+    buttons[k].disabled = (status === 'installing');
+  }
+  
+  var buttons = document.getElementsByTagName("vscode-dropdown")
+  for (var k in buttons) {
+    buttons[k].disabled = (status === 'installing');
+  }
+  
+  
+  //document.getElementById(id + "-wrapper").parentElement.disabled = (status === 'installing');
+  //document.getElementById(id + "-button").innerText = status;
+
   if (status === 'waiting') {
     // codicon-watch
-    //document.getElementById(id).innerText = "AAA";
+    document.getElementById(id + "-ring").style.visibility = 'hidden';
     document.getElementById(id + "-icon").setAttribute("class", "action-row-icon codicon codicon-watch");
     document.getElementById(id + "-icon").setAttribute("style", "color: grey; font-size: 24px;");
-    document.getElementById(id + "-ring").style.visibility = 'hidden';
   } else if (status === 'verified') {
     // codicon-pass-filled    
     //document.getElementById(id).innerText = "BBB";
+    document.getElementById(id + "-ring").style.visibility = 'hidden';
     document.getElementById(id + "-icon").setAttribute("class", "action-row-icon codicon codicon-pass-filled");
     document.getElementById(id + "-icon").setAttribute("style", "color: green; font-size: 24px;");
-    document.getElementById(id + "-ring").style.visibility = 'hidden';
   } else if (status === 'installing') {
     // XXX - vscode progress
     document.getElementById(id + "-icon").setAttribute("class", "action-row-icon");
@@ -256,10 +270,11 @@ function setActionStatus(id, status) {
   } else if (status === 'failed') {
     // codicon-error
     //document.getElementById(id).innerText = "CCC";
+    document.getElementById(id + "-ring").style.visibility = 'hidden';
     document.getElementById(id + "-icon").setAttribute("class", "action-row-icon codicon codicon-error");
     document.getElementById(id + "-icon").setAttribute("style", "color: red; font-size: 24px;");
-    document.getElementById(id + "-ring").style.visibility = 'hidden';
   }
+
 }
 
 function createCheckBox(parent_id, data) {
