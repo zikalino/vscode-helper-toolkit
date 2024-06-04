@@ -419,6 +419,7 @@ export class GenericWebView {
         if ('id' in data && data['id'] === combo_id) {
           if ('variable' in data) {
             this.variables[data['variable']] = value;
+            this.runStepsVerification();
           }
           return;
         }
