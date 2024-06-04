@@ -34,6 +34,8 @@ export class GenericWebView {
   private panel: vscode.WebviewPanel;
 
   createPanel(formDefinition: any) {
+
+    this.pruneFormDefinition(formDefinition);
     
     this.formDefinition = formDefinition;
     this.panel.iconPath = vscode.Uri.joinPath(
@@ -253,6 +255,8 @@ export class GenericWebView {
             let filename = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
 
             this.terminal.show();
+            this.terminal.sendText("===========================================================", false);
+            this.terminal.sendText("", false);
             this.terminal.sendText(a['install']);
             this.terminal.sendText("$? | Out-File " + filename + " -Encoding ASCII");
 
@@ -292,6 +296,8 @@ export class GenericWebView {
             let filename = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
 
             this.terminal.show();
+            this.terminal.sendText("# ===========================================================");
+            this.terminal.sendText("#");
             this.terminal.sendText(a['install']);
             this.terminal.sendText("$? | Out-File " + filename + " -Encoding ASCII");
 
@@ -345,6 +351,33 @@ export class GenericWebView {
     }
     return ret;
   }
+
+  private pruneFormDefinition(data: any): boolean {
+
+    if (typeof data === 'object') {
+      if (Array.isArray(data)) {
+        for (let i = data.length - 1; i >= 0; i--) {
+          if (this.pruneFormDefinition(data[i])) {
+            data.splice(i, 1);
+          }
+        }
+      }
+      else {
+        if ('platform' in data) {
+            var platforms: string[] = (typeof data['platform'] === 'string') ? [ data['platform'] ] : data['platform'];
+            if (!platforms.includes(process.platform)) {
+                return true;
+            }
+        }
+        for (let key in data) {
+          if (typeof data[key] === 'object') {
+            this.pruneFormDefinition(data[key]);
+          }
+        }
+      }
+    }
+    return false;
+}
 
   private context: vscode.ExtensionContext;
   private name: string;
