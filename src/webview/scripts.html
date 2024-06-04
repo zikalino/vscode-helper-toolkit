@@ -335,7 +335,7 @@ function createCombo(parent_id, data) {
 
     for (var i in data['items']) {
       html += `
-              <li onclick="comboClicked('${data['id']}', '${data['items'][i]['name']}');">
+              <li onclick="dropdownClicked('${data['id']}', '${data['items'][i]['name']}');">
               <section class="template-entry">
                 <header>${data['items'][i]['name']}</header>
                 <p>${data['items'][i]['description']}</p>
@@ -358,7 +358,7 @@ function createCombo(parent_id, data) {
     </div>
       <vscode-dropdown id='${data.id}'
                        style="display: flex;"
-                       onchange="comboClicked(this.value);">
+                       onchange="dropdownClicked('${data.id}', this.value);">
           `;
 
     for (var i in data['items']) {
@@ -1649,8 +1649,8 @@ function folderSelectorClicked(id) {
   vscode.postMessage({ command: 'select-folder', id: id });
 }
 
-function comboClicked(id, value) {
-  vscode.postMessage({ command: 'dropdown-clicked', id: id });
+function dropdownClicked(id, value) {
+  vscode.postMessage({ command: 'dropdown-clicked', combo_id: id, id: value });
 
   document.getElementById(id + '-list').hidden = true;
   document.getElementById(id + '-box').innerText = value;

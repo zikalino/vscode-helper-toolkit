@@ -35,7 +35,7 @@ export class GenericWebView {
 
   createPanel(formDefinition: any) {
 
-    this.pruneFormDefinition(formDefinition);
+    this.processFormDefinition(formDefinition);
     
     this.formDefinition = formDefinition;
     this.panel.iconPath = vscode.Uri.joinPath(
@@ -81,6 +81,9 @@ export class GenericWebView {
           case 'button-clicked':
             this.runStepReRun(message.id);
             return;
+          case 'dropdown-clicked':
+            this.handleVariable(this.formDefinition, message.combo_id, message.id);
+            break;
           default:
             console.log('XXX');
         }
@@ -227,7 +230,12 @@ export class GenericWebView {
       for (let a of actionList) {
         const cp = require('child_process');
         try {
-          var result = cp.execSync(a['check']);
+          var cmd = "powershell ";
+          for (let v in this.variables) {
+           cmd += " $" + v + "='" + this.variables[v] + "';";
+          }
+          cmd += a['check'];
+          var result = cp.execSync(cmd);
           a['status'] = 'verified';
           this.postMessage({ command: 'set-action-status', id: a['id'], status: 'verified' });
         } catch (e) {
@@ -257,6 +265,11 @@ export class GenericWebView {
             this.terminal.show();
             this.terminal.sendText("===========================================================", false);
             this.terminal.sendText("", false);
+
+            for (let v in this.variables) {
+              this.terminal.sendText("$" + v + "='" + this.variables[v] + "'");
+            }
+
             this.terminal.sendText(a['install']);
             this.terminal.sendText("$? | Out-File " + filename + " -Encoding ASCII");
 
@@ -298,6 +311,11 @@ export class GenericWebView {
             this.terminal.show();
             this.terminal.sendText("# ===========================================================");
             this.terminal.sendText("#");
+
+            for (let v in this.variables) {
+              this.terminal.sendText("$" + v + "='" + this.variables[v] + "'");
+            }
+
             this.terminal.sendText(a['install']);
             this.terminal.sendText("$? | Out-File " + filename + " -Encoding ASCII");
 
@@ -352,12 +370,12 @@ export class GenericWebView {
     return ret;
   }
 
-  private pruneFormDefinition(data: any): boolean {
+  private processFormDefinition(data: any): boolean {
 
     if (typeof data === 'object') {
       if (Array.isArray(data)) {
         for (let i = data.length - 1; i >= 0; i--) {
-          if (this.pruneFormDefinition(data[i])) {
+          if (this.processFormDefinition(data[i])) {
             data.splice(i, 1);
           }
         }
@@ -369,19 +387,54 @@ export class GenericWebView {
                 return true;
             }
         }
+
+        // set initial value of all variables - now just assume we deal with combo
+        if ('variable' in data) {
+          this.variables[data['variable']] = data['items'][0];
+        }
+
         for (let key in data) {
           if (typeof data[key] === 'object') {
-            this.pruneFormDefinition(data[key]);
+            this.processFormDefinition(data[key]);
           }
         }
       }
     }
     return false;
-}
+  }
+
+  private handleVariable(data: any, combo_id: string, value: string) {
+
+    if (typeof data === 'object') {
+      if (Array.isArray(data)) {
+        for (let i = data.length - 1; i >= 0; i--) {
+          this.handleVariable(data[i], combo_id, value);
+        }
+      }
+      else {
+        if ('hidden' in data && data['hidden']) {
+          return;
+        }
+
+        if ('id' in data && data['id'] === combo_id) {
+          if ('variable' in data) {
+            this.variables[data['variable']] = value;
+          }
+          return;
+        }
+
+        for (let key in data) {
+          if (typeof data[key] === 'object') {
+            this.handleVariable(data[key], combo_id, value);
+          }
+        }
+      }
+    }
+  }
 
   private context: vscode.ExtensionContext;
   private name: string;
   private formDefinition: any;
-
+  private variables: any = {};
   private terminal = vscode.window.createTerminal("Installer", "powershell");
 }
