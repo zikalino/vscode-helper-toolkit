@@ -234,11 +234,11 @@ export class GenericWebView {
           if (process.platform === "win32") {
             cmd += "powershell ";
             for (let v in this.variables) {
-              cmd += v + "='" + this.variables[v] + "';";
+              cmd += " $" + v + "='" + this.variables[v] + "';";
             }
           } else {
             for (let v in this.variables) {
-              cmd += " $" + v + "='" + this.variables[v] + "';";
+              cmd += v + "='" + this.variables[v] + "';";
             }
           }
 
