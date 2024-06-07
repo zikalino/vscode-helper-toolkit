@@ -230,15 +230,31 @@ export class GenericWebView {
       for (let a of actionList) {
         const cp = require('child_process');
         try {
-          var cmd = "powershell ";
-          for (let v in this.variables) {
-           cmd += " $" + v + "='" + this.variables[v] + "';";
+          var cmd = (process.platform === "win32") ? "powershell ": "";
+          if (process.platform === "win32") {
+            cmd += "powershell ";
+            for (let v in this.variables) {
+              cmd += v + "='" + this.variables[v] + "';";
+            }
+          } else {
+            for (let v in this.variables) {
+              cmd += " $" + v + "='" + this.variables[v] + "';";
+            }
           }
+
           cmd += a['check'];
           var result = cp.execSync(cmd);
           a['status'] = 'verified';
           this.postMessage({ command: 'set-action-status', id: a['id'], status: 'verified' });
-        } catch (e) {
+        } catch (e: any) {
+          this.terminal.show();
+          var lines = e.toString().split(/\r?\n/);
+          this.terminal.sendText("# ===========================================================");
+          for (var i = 0; i < lines.length; i++) {
+            this.terminal.sendText("# " + lines[i]);
+          }
+          this.terminal.sendText("# ===========================================================");
+
           a['status'] = 'missing';
           this.postMessage({ command: 'set-action-status', id: a['id'], status: 'failed' });
         }
@@ -250,15 +266,12 @@ export class GenericWebView {
 
   private async actionsInstall(data: any) {
     try {
-        
       let actionList: any[] = this.getActionList(data);
 
       for (let a of actionList) {
         if (!('status' in a) || a['status'] !== 'verified') {
-          const { watch } = require('node:fs/promises');
           try { 
             this.postMessage({ command: 'set-action-status', id: a['id'], status: 'installing' });
-            //var result = cp.execSync(a['install']);
 
             let filename = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
 
@@ -266,19 +279,30 @@ export class GenericWebView {
             this.terminal.sendText("===========================================================", false);
             this.terminal.sendText("", false);
 
-            for (let v in this.variables) {
-              this.terminal.sendText("$" + v + "='" + this.variables[v] + "'");
+            if (process.platform === "win32") {
+              for (let v in this.variables) {
+                this.terminal.sendText("$" + v + "='" + this.variables[v] + "'");
+              }
+            } else {
+              for (let v in this.variables) {
+                this.terminal.sendText(v + "='" + this.variables[v] + "'");
+              }
             }
 
             this.terminal.sendText(a['install']);
-            this.terminal.sendText("$? | Out-File " + filename + " -Encoding ASCII");
+            if (process.platform === "win32") {
+              this.terminal.sendText("$? | Out-File " + filename + " -Encoding ASCII");
+            } else {
+              this.terminal.sendText("$? > " + filename);
+            }
 
             while (!require('fs').existsSync(filename)) {
               await new Promise(resolve => setTimeout(resolve, 1000));
             }
             const data = require('fs').readFileSync(filename, 'utf8').toString();
 
-            if (data.startsWith('True')) {
+            let verified = (process.platform === "win32") ? data.startsWith('True') : data.startsWith('0');
+            if (verified) {
               a['status'] = 'verified';
               this.postMessage({ command: 'set-action-status', id: a['id'], status: 'verified' });
             } else {
@@ -437,5 +461,7 @@ export class GenericWebView {
   private name: string;
   private formDefinition: any;
   private variables: any = {};
-  private terminal = vscode.window.createTerminal("Installer", "powershell");
+  // what is actually created here?
+  private terminal = (process.platform === "win32") ? vscode.window.createTerminal("Installer", "powershell") :
+                                                      vscode.window.createTerminal("Installer");
 }
