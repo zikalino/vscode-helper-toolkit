@@ -341,7 +341,11 @@ export class GenericWebView {
             }
 
             this.terminal.sendText(a['install']);
-            this.terminal.sendText("$? | Out-File " + filename + " -Encoding ASCII");
+            if (process.platform === "win32") {
+              this.terminal.sendText("$? | Out-File " + filename + " -Encoding ASCII");
+            } else {
+              this.terminal.sendText("$? > " + filename);
+            }
 
             while (!require('fs').existsSync(filename)) {
               await new Promise(resolve => setTimeout(resolve, 1000));
