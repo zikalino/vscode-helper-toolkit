@@ -230,7 +230,7 @@ export class GenericWebView {
       for (let a of actionList) {
         const cp = require('child_process');
         try {
-          var cmd = (process.platform === "win32") ? "powershell ": "";
+          var cmd = (process.platform === "win32") ? "powershell ": "bash";
           if (process.platform === "win32") {
             cmd += "powershell ";
             for (let v in this.variables) {
@@ -293,7 +293,7 @@ export class GenericWebView {
             if (process.platform === "win32") {
               this.terminal.sendText("$? | Out-File " + filename + " -Encoding ASCII");
             } else {
-              this.terminal.sendText("$? > " + filename);
+              this.terminal.sendText("echo $? > " + filename);
             }
 
             while (!require('fs').existsSync(filename)) {
@@ -344,7 +344,7 @@ export class GenericWebView {
             if (process.platform === "win32") {
               this.terminal.sendText("$? | Out-File " + filename + " -Encoding ASCII");
             } else {
-              this.terminal.sendText("$? > " + filename);
+              this.terminal.sendText("echo $? > " + filename);
             }
 
             while (!require('fs').existsSync(filename)) {
