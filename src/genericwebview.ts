@@ -80,7 +80,7 @@ export class GenericWebView {
             return;
           case 'button-clicked':
             this.runStepReRun(message.id);
-            return;
+            break;
           case 'dropdown-clicked':
             this.handleVariable(this.formDefinition, message.combo_id, message.id);
             break;
@@ -230,7 +230,7 @@ export class GenericWebView {
       for (let a of actionList) {
         const cp = require('child_process');
         try {
-          var cmd = (process.platform === "win32") ? "powershell ": "bash";
+          var cmd = "";
           if (process.platform === "win32") {
             cmd += "powershell ";
             for (let v in this.variables) {
@@ -243,7 +243,11 @@ export class GenericWebView {
           }
 
           cmd += a['check'];
-          var result = cp.execSync(cmd);
+          if (process.platform === "win32") {
+            cp.execSync(cmd);
+          } else {
+            cp.execSync(cmd, { shell: '/bin/bash' });
+          }
           a['status'] = 'verified';
           this.postMessage({ command: 'set-action-status', id: a['id'], status: 'verified' });
         } catch (e: any) {
@@ -353,7 +357,7 @@ export class GenericWebView {
             const data = require('fs').readFileSync(filename, 'utf8').toString();
             require('fs').unlinkSync(filename);
 
-            if (data.startsWith('True')) {
+            if (data.startsWith('True') || data.startsWith("0")) {
               a['status'] = 'verified';
               this.postMessage({ command: 'set-action-status', id: a['id'], status: 'verified' });
             } else {

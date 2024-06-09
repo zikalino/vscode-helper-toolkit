@@ -1,6 +1,6 @@
 {
   "name": "@zim.kalinowski/vscode-helper-toolkit",
-  "version": "0.0.10",
+  "version": "0.0.16",
   "description": "Visual Studio Code Extension Helpers",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
