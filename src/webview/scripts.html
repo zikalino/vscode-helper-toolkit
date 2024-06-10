@@ -228,8 +228,24 @@ function createActionRow(parent_id, data) {
         <vscode-progress-ring id="${data['id']}-ring" style="visibility: hidden;"></vscode-progress-ring>
       </div>
       <div class="action-row-text">${data['action-name']}</div>
-      <vscode-button class="action-row-button" onclick="onButtonClicked('${data['id']}');"><div class="codicon codicon-debug-restart" ></div></vscode-button>
+      <vscode-button class="action-row-button-1" onclick="onButtonClicked('${data['id']}');"><div class="codicon codicon-refresh" ></div></vscode-button>
+      <vscode-button class="action-row-button-2" onclick="onActionRowExpand('${data['id']}');"><div class="codicon codicon-edit" ></div></vscode-button>
     </div>
+    <div class="action-row-edit-area" id="${data['id']}-edit-area">
+      <vscode-label class="action-row-verify-edit-label">Verify</vscode-label>
+      <vscode-text-area class="action-row-verify-edit-edit" value="${data['verify']}"></vscode-text-area>
+      <vscode-button class="action-row-save-button" onclick="onActionRowSave('${data['id']}');"><div class="codicon codicon-save" ></div></vscode-button>
+
+      <vscode-label class="action-row-install-edit-label">Install</vscode-label>
+      <vscode-text-area class="action-row-install-edit-edit" value="${data['install']}"></vscode-text-area>
+
+      <vscode-label class="action-row-update-edit-label">Update</vscode-label>
+      <vscode-text-area class="action-row-update-edit-edit" value="${data['update']}"></vscode-text-area>
+
+      <vscode-label class="action-row-uninstall-edit-label">Unnstall</vscode-label>
+      <vscode-text-area class="action-row-uninstall-edit-edit" value="${data['uninstall']}"></vscode-text-area>
+    </div>
+
   </div>
   `;
   document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);
@@ -2241,6 +2257,16 @@ function onScrollableMouseDown(e, scrollbarId) {
 
 function onButtonClicked(id) {
   vscode.postMessage({ command: 'button-clicked', id: id })
+}
+
+function onActionRowExpand(id) {
+  var el = document.getElementById(id + "-edit-area");
+
+  if (el.style.display !== "grid") {
+    el.style.display = "grid";
+  } else {
+    el.style.display = "none";
+  }
 }
 
 function onRadioClicked(id) {

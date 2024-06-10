@@ -272,48 +272,7 @@ export class GenericWebView {
 
       for (let a of actionList) {
         if (!('status' in a) || a['status'] !== 'verified') {
-          try { 
-            this.postMessage({ command: 'set-action-status', id: a['id'], status: 'installing' });
-
-            let filename = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
-
-            this.terminalWriteLine("# ===========================================================");
-            this.terminalWriteLine("# ");
-
-            if (process.platform === "win32") {
-              for (let v in this.variables) {
-                this.terminalWriteLine("$" + v + "='" + this.variables[v] + "'");
-              }
-            } else {
-              for (let v in this.variables) {
-                this.terminalWriteLine(v + "='" + this.variables[v] + "'");
-              }
-            }
-
-            this.terminalWriteLine(a['install']);
-            if (process.platform === "win32") {
-              this.terminalWriteLine("$? | Out-File " + filename + " -Encoding ASCII");
-            } else {
-              this.terminalWriteLine("echo $? > " + filename);
-            }
-
-            while (!require('fs').existsSync(filename)) {
-              await new Promise(resolve => setTimeout(resolve, 1000));
-            }
-            const data = require('fs').readFileSync(filename, 'utf8').toString();
-
-            let verified = (process.platform === "win32") ? data.startsWith('True') : data.startsWith('0');
-            if (verified) {
-              a['status'] = 'verified';
-              this.postMessage({ command: 'set-action-status', id: a['id'], status: 'verified' });
-            } else {
-              a['status'] = 'failed';
-              this.postMessage({ command: 'set-action-status', id: a['id'], status: 'failed' });
-            }
-          } catch (e) {
-            a['status'] = 'missing';
-            this.postMessage({ command: 'set-action-status', id: a['id'], status: 'failed' });
-          }
+          if (!await this.runAction(a)) break;
         }
       }
     } catch (e) {
@@ -328,52 +287,68 @@ export class GenericWebView {
 
       for (let a of actionList) {
         if (a['id'] === id) {
-          try { 
-            this.postMessage({ command: 'set-action-status', id: a['id'], status: 'installing' });
-
-            let filename = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
-
-            this.terminalWriteLine("# ===========================================================");
-            this.terminalWriteLine("#");
-
-            if (process.platform === "win32") {
-              for (let v in this.variables) {
-                this.terminalWriteLine("$" + v + "='" + this.variables[v] + "'");
-              }
-            } else {
-              for (let v in this.variables) {
-                this.terminalWriteLine(v + "='" + this.variables[v] + "'");
-              }
-            }
-
-            this.terminalWriteLine(a['install']);
-            if (process.platform === "win32") {
-              this.terminalWriteLine("$? | Out-File " + filename + " -Encoding ASCII");
-            } else {
-              this.terminalWriteLine("echo $? > " + filename);
-            }
-
-            while (!require('fs').existsSync(filename)) {
-              await new Promise(resolve => setTimeout(resolve, 1000));
-            }
-            const data = require('fs').readFileSync(filename, 'utf8').toString();
-            require('fs').unlinkSync(filename);
-
-            if (data.startsWith('True') || data.startsWith("0")) {
-              a['status'] = 'verified';
-              this.postMessage({ command: 'set-action-status', id: a['id'], status: 'verified' });
-            } else {
-              a['status'] = 'failed';
-              this.postMessage({ command: 'set-action-status', id: a['id'], status: 'failed' });
-            }
-          } catch (e) {
-            a['status'] = 'missing';
-            this.postMessage({ command: 'set-action-status', id: a['id'], status: 'failed' });
-          }
+          await this.runAction(a);
         }
       }
     } catch (e) {
       vscode.window.showInformationMessage('EXCEPTION: ' + e);
+    }
+  }
+
+  private async runAction(action: any): Promise<boolean> {
+    try { 
+      this.postMessage({ command: 'set-action-status', id: action['id'], status: 'installing' });
+
+      let filename = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
+
+      this.terminalWriteLine("# ===========================================================");
+      this.terminalWriteLine("# Running: " + action['action-name']);
+      this.terminalWriteLine("# ===========================================================");
+
+      var lines: string[] = action['install'].toString().split(/\r?\n/);
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].trim() !== "") {
+          this.terminalWriteLine("#   " + lines[i]);
+        }
+      }
+      this.terminalWriteLine("# ===========================================================");
+
+      if (process.platform === "win32") {
+        for (let v in this.variables) {
+          this.terminalWriteLine("$" + v + "='" + this.variables[v] + "'");
+        }
+      } else {
+        for (let v in this.variables) {
+          this.terminalWriteLine(v + "='" + this.variables[v] + "'");
+        }
+      }
+
+      this.terminalWriteLine(action['install']);
+      if (process.platform === "win32") {
+        this.terminalWriteLine("$? | Out-File " + filename + " -Encoding ASCII");
+      } else {
+        this.terminalWriteLine("echo $? > " + filename);
+      }
+
+      while (!require('fs').existsSync(filename)) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      const data = require('fs').readFileSync(filename, 'utf8').toString();
+      require('fs').unlinkSync(filename);
+
+      if (data.startsWith('True') || data.startsWith("0")) {
+        action['status'] = 'verified';
+        this.postMessage({ command: 'set-action-status', id: action['id'], status: 'verified' });
+        return true;
+      } else {
+        action['status'] = 'failed';
+        this.postMessage({ command: 'set-action-status', id: action['id'], status: 'failed' });
+        return false;
+      }
+    } catch (e) {
+      action['status'] = 'missing';
+      this.postMessage({ command: 'set-action-status', id: action['id'], status: 'failed' });
+      return false;
     }
   }
 
