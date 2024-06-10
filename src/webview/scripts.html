@@ -233,17 +233,17 @@ function createActionRow(parent_id, data) {
     </div>
     <div class="action-row-edit-area" id="${data['id']}-edit-area">
       <vscode-label class="action-row-verify-edit-label">Verify</vscode-label>
-      <vscode-text-area class="action-row-verify-edit-edit" value="${data['verify']}"></vscode-text-area>
+      <vscode-text-area class="action-row-verify-edit-edit" id="${data['id']}-verify-edit" value="${data['verify']}"></vscode-text-area>
       <vscode-button class="action-row-save-button" onclick="onActionRowSave('${data['id']}');"><div class="codicon codicon-save" ></div></vscode-button>
 
       <vscode-label class="action-row-install-edit-label">Install</vscode-label>
-      <vscode-text-area class="action-row-install-edit-edit" value="${data['install']}"></vscode-text-area>
+      <vscode-text-area class="action-row-install-edit-edit"  id="${data['id']}-install-edit" value="${data['install']}"></vscode-text-area>
 
       <vscode-label class="action-row-update-edit-label">Update</vscode-label>
-      <vscode-text-area class="action-row-update-edit-edit" value="${data['update']}"></vscode-text-area>
+      <vscode-text-area class="action-row-update-edit-edit"  id="${data['id']}-update-edit" value="${data['update']}"></vscode-text-area>
 
       <vscode-label class="action-row-uninstall-edit-label">Unnstall</vscode-label>
-      <vscode-text-area class="action-row-uninstall-edit-edit" value="${data['uninstall']}"></vscode-text-area>
+      <vscode-text-area class="action-row-uninstall-edit-edit"  id="${data['id']}-uninstall-edit" value="${data['uninstall']}"></vscode-text-area>
     </div>
 
   </div>
@@ -2267,6 +2267,26 @@ function onActionRowExpand(id) {
   } else {
     el.style.display = "none";
   }
+}
+
+function onActionRowSave(id) {
+
+  var elVerify = document.getElementById(id + "-verify-edit").value;
+  var elInstall = document.getElementById(id + "-install-edit").value;
+  var elUpdate = document.getElementById(id + "-update-edit").value;
+  var elUninstall = document.getElementById(id + "-uninstall-edit").value;
+
+  vscode.postMessage({ command: 'action-scripts-save',
+                       id: id,
+                       script_verify: elVerify,
+                       script_install: elInstall,
+                       script_update: elUpdate,
+                       script_uninstall: elUninstall
+                     });
+
+  var el = document.getElementById(id + "-edit-area");
+  el.style.display = "none";
+
 }
 
 function onRadioClicked(id) {

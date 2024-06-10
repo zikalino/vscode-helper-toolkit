@@ -1,3 +1,4 @@
+import { verify } from 'crypto';
 import * as vscode from 'vscode';
 var styles: any = require("./webview/styles.html");
 var stylesWorkbench: any = require("./webview/treeview-css.html");
@@ -84,6 +85,13 @@ export class GenericWebView {
           case 'dropdown-clicked':
             this.handleVariable(this.formDefinition, message.combo_id, message.id);
             break;
+          case 'action-scripts-save':
+            this.saveStepScripts(message.id,
+                                 message.script_verify,
+                                 message.script_install,
+                                 message.script_update,
+                                 message.script_uninstall);
+            return;
           default:
             console.log('XXX');
         }
@@ -220,6 +228,23 @@ export class GenericWebView {
 
   public runStepReRun(step_id: string) {
     this.actionReRun(this.formDefinition, step_id);
+  }
+
+  private saveStepScripts(stepId: string, scriptVerify: string, scriptInstall: string, scriptUpdate: string, scriptUninstall: string) {
+    try {        
+      let actionList: any[] = this.getActionList(this.formDefinition);
+      this.terminalWriteLine("# SAVING SCRIPTS OF: " + stepId);
+      for (let a of actionList) {
+        if (a['id'] === stepId) {
+          a['check'] = scriptVerify;
+          a['install'] = scriptInstall;
+          a['update'] = scriptUpdate;
+          a['uninstall'] = scriptUninstall;
+        }
+      }
+    } catch (e) {
+      vscode.window.showInformationMessage('EXCEPTION: ' + e);
+    }
   }
 
   private actionsVerify(data: any) {
