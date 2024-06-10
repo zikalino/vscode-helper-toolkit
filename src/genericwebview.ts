@@ -243,7 +243,7 @@ export class GenericWebView {
 
           cmd += a['check'];
           if (process.platform === "win32") {
-            cp.execSync(cmd);
+            cp.execSync(cmd, { shell: 'powershell' });
           } else {
             cp.execSync(cmd, { shell: '/bin/bash' });
           }
