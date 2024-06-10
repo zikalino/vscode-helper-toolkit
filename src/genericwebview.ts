@@ -332,9 +332,20 @@ export class GenericWebView {
 
       let filename = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
 
-      this.terminalWriteLine("# ===========================================================");
+      this.terminalWriteLine("#============================================================");
       this.terminalWriteLine("# Running: " + action['action-name']);
-      this.terminalWriteLine("# ===========================================================");
+      this.terminalWriteLine("#------------------------------------------------------------");
+
+      if ('banner' in action) {
+        var lines: string[] = action['banner'].toString().split(/\r?\n/);
+        for (var i = 0; i < lines.length; i++) {
+          if (lines[i].trim() !== "") {
+            this.terminalWriteLine("# " + lines[i]);
+          }
+        }
+  
+        this.terminalWriteLine("#------------------------------------------------------------");
+      }
 
       var lines: string[] = action['install'].toString().split(/\r?\n/);
       for (var i = 0; i < lines.length; i++) {
@@ -342,7 +353,8 @@ export class GenericWebView {
           this.terminalWriteLine("#   " + lines[i]);
         }
       }
-      this.terminalWriteLine("# ===========================================================");
+
+      this.terminalWriteLine("#============================================================");
 
       if ('variables' in action) {
         if (process.platform === "win32") {
