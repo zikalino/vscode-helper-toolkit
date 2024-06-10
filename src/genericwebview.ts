@@ -256,13 +256,19 @@ export class GenericWebView {
         const cp = require('child_process');
         try {
           var cmd = "";
-          if (process.platform === "win32") {
-            for (let v in this.variables) {
-              cmd += " $" + v + "='" + this.variables[v] + "';";
-            }
-          } else {
-            for (let v in this.variables) {
-              cmd += v + "='" + this.variables[v] + "';";
+          if ('variables' in a) {
+            if (process.platform === "win32") {
+              for (let v in this.variables) {
+                if (a['variables'].includes(v)) {
+                  cmd += " $" + v + "='" + this.variables[v] + "';";
+                }
+              }
+            } else {
+              for (let v in this.variables) {
+                if (a['variables'].includes(v)) {
+                  cmd += v + "='" + this.variables[v] + "';";
+                }
+              }
             }
           }
 
@@ -338,13 +344,19 @@ export class GenericWebView {
       }
       this.terminalWriteLine("# ===========================================================");
 
-      if (process.platform === "win32") {
-        for (let v in this.variables) {
-          this.terminalWriteLine("$" + v + "='" + this.variables[v] + "'");
-        }
-      } else {
-        for (let v in this.variables) {
-          this.terminalWriteLine(v + "='" + this.variables[v] + "'");
+      if ('variables' in action) {
+        if (process.platform === "win32") {
+          for (let v in this.variables) {
+            if (action['variables'].includes(v)) {
+              this.terminalWriteLine("$" + v + "='" + this.variables[v] + "'");
+            }
+          }
+        } else {
+          for (let v in this.variables) {
+            if (action['variables'].includes(v)) {
+              this.terminalWriteLine(v + "='" + this.variables[v] + "'");
+            }
+          }
         }
       }
 
