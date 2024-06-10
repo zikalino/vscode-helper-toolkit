@@ -232,7 +232,6 @@ export class GenericWebView {
         try {
           var cmd = "";
           if (process.platform === "win32") {
-            cmd += "powershell ";
             for (let v in this.variables) {
               cmd += " $" + v + "='" + this.variables[v] + "';";
             }
@@ -251,13 +250,12 @@ export class GenericWebView {
           a['status'] = 'verified';
           this.postMessage({ command: 'set-action-status', id: a['id'], status: 'verified' });
         } catch (e: any) {
-          this.terminal.show();
           var lines = e.toString().split(/\r?\n/);
-          this.terminal.sendText("# ===========================================================");
+          this.terminalWriteLine("# ===========================================================");
           for (var i = 0; i < lines.length; i++) {
-            this.terminal.sendText("# " + lines[i]);
+            this.terminalWriteLine("# " + lines[i]);
           }
-          this.terminal.sendText("# ===========================================================");
+          this.terminalWriteLine("# ===========================================================");
 
           a['status'] = 'missing';
           this.postMessage({ command: 'set-action-status', id: a['id'], status: 'failed' });
@@ -279,25 +277,24 @@ export class GenericWebView {
 
             let filename = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
 
-            this.terminal.show();
-            this.terminal.sendText("===========================================================", false);
-            this.terminal.sendText("", false);
+            this.terminalWriteLine("# ===========================================================");
+            this.terminalWriteLine("# ");
 
             if (process.platform === "win32") {
               for (let v in this.variables) {
-                this.terminal.sendText("$" + v + "='" + this.variables[v] + "'");
+                this.terminalWriteLine("$" + v + "='" + this.variables[v] + "'");
               }
             } else {
               for (let v in this.variables) {
-                this.terminal.sendText(v + "='" + this.variables[v] + "'");
+                this.terminalWriteLine(v + "='" + this.variables[v] + "'");
               }
             }
 
-            this.terminal.sendText(a['install']);
+            this.terminalWriteLine(a['install']);
             if (process.platform === "win32") {
-              this.terminal.sendText("$? | Out-File " + filename + " -Encoding ASCII");
+              this.terminalWriteLine("$? | Out-File " + filename + " -Encoding ASCII");
             } else {
-              this.terminal.sendText("echo $? > " + filename);
+              this.terminalWriteLine("echo $? > " + filename);
             }
 
             while (!require('fs').existsSync(filename)) {
@@ -336,19 +333,24 @@ export class GenericWebView {
 
             let filename = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
 
-            this.terminal.show();
-            this.terminal.sendText("# ===========================================================");
-            this.terminal.sendText("#");
+            this.terminalWriteLine("# ===========================================================");
+            this.terminalWriteLine("#");
 
-            for (let v in this.variables) {
-              this.terminal.sendText("$" + v + "='" + this.variables[v] + "'");
+            if (process.platform === "win32") {
+              for (let v in this.variables) {
+                this.terminalWriteLine("$" + v + "='" + this.variables[v] + "'");
+              }
+            } else {
+              for (let v in this.variables) {
+                this.terminalWriteLine(v + "='" + this.variables[v] + "'");
+              }
             }
 
-            this.terminal.sendText(a['install']);
+            this.terminalWriteLine(a['install']);
             if (process.platform === "win32") {
-              this.terminal.sendText("$? | Out-File " + filename + " -Encoding ASCII");
+              this.terminalWriteLine("$? | Out-File " + filename + " -Encoding ASCII");
             } else {
-              this.terminal.sendText("echo $? > " + filename);
+              this.terminalWriteLine("echo $? > " + filename);
             }
 
             while (!require('fs').existsSync(filename)) {
@@ -465,11 +467,19 @@ export class GenericWebView {
     }
   }
 
+  private terminalWriteLine(line: string): void {
+    if (this.terminal === undefined || this.terminal.exitStatus !== undefined) {
+      this.terminal = (process.platform === "win32") ? vscode.window.createTerminal("Installer", "powershell") :
+                                                       vscode.window.createTerminal("Installer");   
+    }
+    this.terminal.show();
+    this.terminal.sendText(line);
+}
+
   private context: vscode.ExtensionContext;
   private name: string;
   private formDefinition: any;
   private variables: any = {};
   // what is actually created here?
-  private terminal = (process.platform === "win32") ? vscode.window.createTerminal("Installer", "powershell") :
-                                                      vscode.window.createTerminal("Installer");
+  private terminal: vscode.Terminal | undefined = undefined;
 }
