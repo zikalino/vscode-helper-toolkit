@@ -79,9 +79,6 @@ export class GenericWebView {
           case 'select-folder':
             this.selectFolder(message.id);
             return;
-          case 'button-clicked':
-            this.runStepReRun(message.id);
-            break;
           case 'dropdown-clicked':
             this.handleVariable(this.formDefinition, message.combo_id, message.id);
             break;
@@ -91,6 +88,12 @@ export class GenericWebView {
                                  message.script_install,
                                  message.script_update,
                                  message.script_uninstall);
+            return;
+          case 'action-update':
+            this.runStepReRun(message.id);
+            return;
+          case 'action-uninstall':
+            this.runStepUninstall(message.id);
             return;
           default:
             console.log('XXX');
@@ -230,13 +233,17 @@ export class GenericWebView {
     this.actionReRun(this.formDefinition, step_id);
   }
 
+  public runStepUninstall(step_id: string) {
+    this.actionUninstall(this.formDefinition, step_id);
+  }
+
   private saveStepScripts(stepId: string, scriptVerify: string, scriptInstall: string, scriptUpdate: string, scriptUninstall: string) {
     try {        
       let actionList: any[] = this.getActionList(this.formDefinition);
       this.terminalWriteLine("# SAVING SCRIPTS OF: " + stepId);
       for (let a of actionList) {
         if (a['id'] === stepId) {
-          a['check'] = scriptVerify;
+          a['verify'] = scriptVerify;
           a['install'] = scriptInstall;
           a['update'] = scriptUpdate;
           a['uninstall'] = scriptUninstall;
@@ -249,7 +256,6 @@ export class GenericWebView {
 
   private actionsVerify(data: any) {
     try {
-        
       let actionList: any[] = this.getActionList(data);
 
       for (let a of actionList) {
@@ -272,7 +278,7 @@ export class GenericWebView {
             }
           }
 
-          cmd += a['check'];
+          cmd += a['verify'];
           if (process.platform === "win32") {
             cp.execSync(cmd, { shell: 'powershell' });
           } else {
@@ -326,6 +332,21 @@ export class GenericWebView {
     }
   }
 
+  private async actionUninstall(data: any, id: string) {
+    try {
+        
+      let actionList: any[] = this.getActionList(data);
+
+      for (let a of actionList) {
+        if (a['id'] === id) {
+          await this.uninstallAction(a);
+        }
+      }
+    } catch (e) {
+      vscode.window.showInformationMessage('EXCEPTION: ' + e);
+    }
+  }
+
   private async runAction(action: any): Promise<boolean> {
     try { 
       this.postMessage({ command: 'set-action-status', id: action['id'], status: 'installing' });
@@ -333,7 +354,7 @@ export class GenericWebView {
       let filename = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
 
       this.terminalWriteLine("#============================================================");
-      this.terminalWriteLine("# Running: " + action['action-name']);
+      this.terminalWriteLine("# Running: " + action['name']);
       this.terminalWriteLine("#------------------------------------------------------------");
 
       if ('banner' in action) {
@@ -400,6 +421,60 @@ export class GenericWebView {
       return false;
     }
   }
+
+  private async runActionUninstall(action: any): Promise<boolean> {
+    try { 
+      this.postMessage({ command: 'set-action-status', id: action['id'], status: 'installing' });
+
+      let filename = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
+
+      this.terminalWriteLine("#============================================================");
+      this.terminalWriteLine("# Uninstalling: " + action['name']);
+      this.terminalWriteLine("#------------------------------------------------------------");
+
+      var lines: string[] = action['uninstall'].toString().split(/\r?\n/);
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].trim() !== "") {
+          this.terminalWriteLine("#   " + lines[i]);
+        }
+      }
+      this.terminalWriteLine("#============================================================");
+
+      if ('variables' in action) {
+        if (process.platform === "win32") {
+          for (let v in this.variables) {
+            if (action['variables'].includes(v)) {
+              this.terminalWriteLine("$" + v + "='" + this.variables[v] + "'");
+            }
+          }
+        } else {
+          for (let v in this.variables) {
+            if (action['variables'].includes(v)) {
+              this.terminalWriteLine(v + "='" + this.variables[v] + "'");
+            }
+          }
+        }
+      }
+
+      this.terminalWriteLine(action['uninstall']);
+      if (process.platform === "win32") {
+        this.terminalWriteLine("$? | Out-File " + filename + " -Encoding ASCII");
+      } else {
+        this.terminalWriteLine("echo $? > " + filename);
+      }
+
+      while (!require('fs').existsSync(filename)) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      const data = require('fs').readFileSync(filename, 'utf8').toString();
+      require('fs').unlinkSync(filename);
+
+    } catch (e) {
+    }
+    action['status'] = 'missing';
+    this.postMessage({ command: 'set-action-status', id: action['id'], status: 'failed' });
+    return true;
+}
 
   private getActionList(data: any): any[] {
     let ret : any[] = [];

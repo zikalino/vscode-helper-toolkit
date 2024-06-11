@@ -350,20 +350,20 @@ body[data-vscode-theme-id='Visual Studio Light'] {
 
 .action-row-icon { grid-area: icon; }
 .action-row-text { grid-area: action; }
-.action-row-button-1 { grid-area: button1; margin: 2px; }
-.action-row-button-2 { grid-area: button2; margin: 2px; }
+.action-row-button-1 { grid-area: button1; width: 40px; height: 32px; }
+.action-row-button-2 { grid-area: button2; width: 40px; height: 32px; }
+.action-row-button-3 { grid-area: button3; width: 40px; height: 32px; }
 
 .action-row {
   display: grid;
-  grid-template-areas: 'icon action button1 button2';
+  grid-template-areas: 'icon action button1 button2 button3';
   gap: 10px;
-  grid-template-columns: 32px 477px 50px 50px;
+  grid-template-columns: 32px 451px 42px 42px 42px;
   grid-template-rows: 32px;
 }
 
 .action-row-verify-edit-label  { grid-area: verify-label; }
 .action-row-verify-edit-edit   { grid-area: verify-edit; height: 100%; }
-.action-row-save-button { grid-area: save-button; margin: 2px; }
 .action-row-install-edit-label  { grid-area: install-label; }
 .action-row-install-edit-edit   { grid-area: install-edit; height: 100%; }
 .action-row-update-edit-label  { grid-area: update-label; }
@@ -373,12 +373,12 @@ body[data-vscode-theme-id='Visual Studio Light'] {
 
 .action-row-edit-area {
   display: none;
-  grid-template-areas: 'left verify-label  verify-edit  save-button'
-                       'left install-label install-edit right'
-                       'left update-label  update-edit  right'
-                       'left uninstall-label  uninstall-edit  right';
+  grid-template-areas: 'left verify-label  verify-edit'
+                       'left install-label install-edit'
+                       'left update-label  update-edit'
+                       'left uninstall-label  uninstall-edit';
   gap: 10px;
-  grid-template-columns: 32px 100px 427px 50px;
+  grid-template-columns: 32px 100px 477px;
   grid-template-rows: 64px 64px 64px 64px;
   margin-top: 10px;
   margin-bottom: 10px;
