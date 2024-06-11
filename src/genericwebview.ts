@@ -339,7 +339,7 @@ export class GenericWebView {
 
       for (let a of actionList) {
         if (a['id'] === id) {
-          await this.uninstallAction(a);
+          await this.runActionUninstall(a);
         }
       }
     } catch (e) {
