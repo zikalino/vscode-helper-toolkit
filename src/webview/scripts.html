@@ -229,7 +229,7 @@ function createActionRow(parent_id, data) {
   html = `
   <div class="form-row" id="${data['id']}-wrapper">
     <div class="action-row" id="${data['id']}">
-      <div class="action-row-icon codicon codicon-watch" id="${data['id']}-icon" style="">
+      <div class="action-row-icon codicon codicon-circle-large" id="${data['id']}-icon" style="color: lightgrey; font-size: 24px;">
         <vscode-progress-ring id="${data['id']}-ring" style="visibility: hidden;"></vscode-progress-ring>
       </div>
       <div class="action-row-text">${data['name']}</div>
@@ -279,7 +279,7 @@ function setActionStatus(id, status) {
   if (status === 'waiting') {
     // codicon-watch
     document.getElementById(id + "-ring").style.visibility = 'hidden';
-    document.getElementById(id + "-icon").setAttribute("class", "action-row-icon codicon codicon-watch");
+    document.getElementById(id + "-icon").setAttribute("class", "action-row-icon codicon codicon-circle-large");
     document.getElementById(id + "-icon").setAttribute("style", "color: grey; font-size: 24px;");
   } else if (status === 'verified') {
     // codicon-pass-filled    
@@ -296,8 +296,8 @@ function setActionStatus(id, status) {
     // codicon-error
     //document.getElementById(id).innerText = "CCC";
     document.getElementById(id + "-ring").style.visibility = 'hidden';
-    document.getElementById(id + "-icon").setAttribute("class", "action-row-icon codicon codicon-error");
-    document.getElementById(id + "-icon").setAttribute("style", "color: red; font-size: 24px;");
+    document.getElementById(id + "-icon").setAttribute("class", "action-row-icon codicon codicon-circle-slash");
+    document.getElementById(id + "-icon").setAttribute("style", "color: orange; font-size: 24px;");
   }
 
 }
@@ -2301,16 +2301,20 @@ function onActionRowDiscard(id) {
 }
 
 function onActionRowSave(id) {
+  var verifyScript = document.getElementById(id + "-verify-edit").value;
+  var installScript = document.getElementById(id + "-install-edit").value;
+  var uninstallScript = document.getElementById(id + "-uninstall-edit").value;
+  var updateScript = document.getElementById(id + "-update-edit").value;
 
-  onActionRowDiscard(id);
   vscode.postMessage({ command: 'action-scripts-save',
                        id: id,
-                       script_verify: elVerify,
-                       script_install: elInstall,
-                       script_update: elUpdate,
-                       script_uninstall: elUninstall
+                       script_verify: verifyScript,
+                       script_install: installScript,
+                       script_update: updateScript,
+                       script_uninstall: uninstallScript
                      });
 
+  onActionRowDiscard(id);
   var el = document.getElementById(id + "-edit-area");
   el.style.display = "none";
 }

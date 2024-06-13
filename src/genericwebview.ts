@@ -347,35 +347,68 @@ export class GenericWebView {
     }
   }
 
+  private displayBannerStart(operation: string, action: string, banner: string | undefined, script: string) : void {
+    this.terminalWriteLine("#============================================================");
+    this.terminalWriteLine("# " + operation + ": " + action);
+    this.terminalWriteLine("#------------------------------------------------------------");
+
+    if (banner) {
+      var lines: string[] = banner.toString().split(/\r?\n/);
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].trim() !== "") {
+          this.terminalWriteLine("# " + lines[i]);
+        }
+      }
+
+      this.terminalWriteLine("#------------------------------------------------------------");
+    }
+
+    var lines: string[] = script.toString().split(/\r?\n/);
+    for (var i = 0; i < lines.length; i++) {
+      if (lines[i].trim() !== "") {
+        this.terminalWriteLine("#   " + lines[i]);
+      }
+    }
+
+    this.terminalWriteLine("#============================================================");
+}
+
+  private async waitForCompletion(action: any): Promise<void> {
+    let filename = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
+
+    if (process.platform === "win32") {
+      this.terminalWriteLine("$? | Out-File " + filename + " -Encoding ASCII");
+    } else {
+      this.terminalWriteLine("echo $? > " + filename);
+    }
+
+    while (!require('fs').existsSync(filename)) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    const data = require('fs').readFileSync(filename, 'utf8').toString();
+    require('fs').unlinkSync(filename);
+
+    this.terminalWriteLine("#============================================================");
+
+    if (data.startsWith('True') || data.startsWith("0")) {
+      action['status'] = 'verified';
+      this.postMessage({ command: 'set-action-status', id: action['id'], status: 'verified' });
+      this.terminalWriteLine("# Result: SUCCESS");
+    } else {
+      action['status'] = 'failed';
+      this.postMessage({ command: 'set-action-status', id: action['id'], status: 'failed' });
+      this.terminalWriteLine("# Result: FAILED");
+    }
+    this.terminalWriteLine("#============================================================");
+
+  }
+
   private async runAction(action: any): Promise<boolean> {
     try { 
       this.postMessage({ command: 'set-action-status', id: action['id'], status: 'installing' });
 
-      let filename = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
-
-      this.terminalWriteLine("#============================================================");
-      this.terminalWriteLine("# Running: " + action['name']);
-      this.terminalWriteLine("#------------------------------------------------------------");
-
-      if ('banner' in action) {
-        var lines: string[] = action['banner'].toString().split(/\r?\n/);
-        for (var i = 0; i < lines.length; i++) {
-          if (lines[i].trim() !== "") {
-            this.terminalWriteLine("# " + lines[i]);
-          }
-        }
   
-        this.terminalWriteLine("#------------------------------------------------------------");
-      }
-
-      var lines: string[] = action['install'].toString().split(/\r?\n/);
-      for (var i = 0; i < lines.length; i++) {
-        if (lines[i].trim() !== "") {
-          this.terminalWriteLine("#   " + lines[i]);
-        }
-      }
-
-      this.terminalWriteLine("#============================================================");
+      this.displayBannerStart("Installing", action['id'], action['banner'], action['install']);
 
       if ('variables' in action) {
         if (process.platform === "win32") {
@@ -394,27 +427,9 @@ export class GenericWebView {
       }
 
       this.terminalWriteLine(action['install']);
-      if (process.platform === "win32") {
-        this.terminalWriteLine("$? | Out-File " + filename + " -Encoding ASCII");
-      } else {
-        this.terminalWriteLine("echo $? > " + filename);
-      }
 
-      while (!require('fs').existsSync(filename)) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
-      const data = require('fs').readFileSync(filename, 'utf8').toString();
-      require('fs').unlinkSync(filename);
-
-      if (data.startsWith('True') || data.startsWith("0")) {
-        action['status'] = 'verified';
-        this.postMessage({ command: 'set-action-status', id: action['id'], status: 'verified' });
-        return true;
-      } else {
-        action['status'] = 'failed';
-        this.postMessage({ command: 'set-action-status', id: action['id'], status: 'failed' });
-        return false;
-      }
+      await this.waitForCompletion(action);
+      return true;
     } catch (e) {
       action['status'] = 'missing';
       this.postMessage({ command: 'set-action-status', id: action['id'], status: 'failed' });
@@ -428,17 +443,7 @@ export class GenericWebView {
 
       let filename = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
 
-      this.terminalWriteLine("#============================================================");
-      this.terminalWriteLine("# Uninstalling: " + action['name']);
-      this.terminalWriteLine("#------------------------------------------------------------");
-
-      var lines: string[] = action['uninstall'].toString().split(/\r?\n/);
-      for (var i = 0; i < lines.length; i++) {
-        if (lines[i].trim() !== "") {
-          this.terminalWriteLine("#   " + lines[i]);
-        }
-      }
-      this.terminalWriteLine("#============================================================");
+      this.displayBannerStart("Unistalling", action['id'], undefined, action['uninstall']);
 
       if ('variables' in action) {
         if (process.platform === "win32") {
@@ -457,17 +462,9 @@ export class GenericWebView {
       }
 
       this.terminalWriteLine(action['uninstall']);
-      if (process.platform === "win32") {
-        this.terminalWriteLine("$? | Out-File " + filename + " -Encoding ASCII");
-      } else {
-        this.terminalWriteLine("echo $? > " + filename);
-      }
-
-      while (!require('fs').existsSync(filename)) {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
-      const data = require('fs').readFileSync(filename, 'utf8').toString();
-      require('fs').unlinkSync(filename);
+      
+      await this.waitForCompletion(action);
+      return true;
 
     } catch (e) {
     }
