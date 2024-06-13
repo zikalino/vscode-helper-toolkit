@@ -259,6 +259,10 @@ export class GenericWebView {
       let actionList: any[] = this.getActionList(data);
 
       for (let a of actionList) {
+        this.postMessage({ command: 'set-action-status', id: a['id'], status: 'waiting' });
+      }
+
+      for (let a of actionList) {
         const cp = require('child_process');
         try {
           var cmd = "";
