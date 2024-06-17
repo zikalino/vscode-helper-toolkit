@@ -273,19 +273,19 @@ function createActionRow(parent_id, data) {
     </div>
     <div class="action-row-edit-area" id="${data['id']}-edit-area">
 
-      <div class="action-row-verify-edit-icon codicon codicon-circle-large" id="${data['id']}-verify-icon" style="color: lightgrey; font-size: 24px;"></div>
+      <div class="action-row-verify-edit-icon codicon" id="${data['id']}-verify-icon" style="color: lightgrey; font-size: 24px;"></div>
       <vscode-label class="action-row-verify-edit-label">Verify</vscode-label>
       <vscode-text-area class="action-row-verify-edit-edit" style="${scriptVerifyOverrideStyle}" id="${data['id']}-verify-edit" value="${scriptVerify}" oninput="onActionRowEdited('${data['id']}')" ></vscode-text-area>
 
-      <div class="action-row-install-edit-icon codicon codicon-circle-large" id="${data['id']}-verify-icon" style="color: lightgrey; font-size: 24px;"></div>
+      <div class="action-row-install-edit-icon codicon" id="${data['id']}-install-icon" style="color: lightgrey; font-size: 24px;"></div>
       <vscode-label class="action-row-install-edit-label">Install</vscode-label>
       <vscode-text-area class="action-row-install-edit-edit" style="${scriptInstallOverrideStyle}" id="${data['id']}-install-edit" value="${scriptInstall}" oninput="onActionRowEdited('${data['id']}')"></vscode-text-area>
 
-      <div class="action-row-update-edit-icon codicon codicon-circle-large" id="${data['id']}-verify-icon" style="color: lightgrey; font-size: 24px;"></div>
+      <div class="action-row-update-edit-icon codicon" id="${data['id']}-update-icon" style="color: lightgrey; font-size: 24px;"></div>
       <vscode-label class="action-row-update-edit-label">Update</vscode-label>
       <vscode-text-area class="action-row-update-edit-edit" style="${scriptUpdateOverrideStyle}" id="${data['id']}-update-edit" value="${scriptUpdate}" oninput="onActionRowEdited('${data['id']}')"></vscode-text-area>
 
-      <div class="action-row-uninstall-edit-icon codicon codicon-circle-large" id="${data['id']}-verify-icon" style="color: lightgrey; font-size: 24px;"></div>
+      <div class="action-row-uninstall-edit-icon codicon" id="${data['id']}-uninstall-icon" style="color: lightgrey; font-size: 24px;"></div>
       <vscode-label class="action-row-uninstall-edit-label">Unistall</vscode-label>
       <vscode-text-area class="action-row-uninstall-edit-edit" style="${scriptUninstallOverrideStyle}" id="${data['id']}-uninstall-edit" value="${scriptUninstall}" oninput="onActionRowEdited('${data['id']}')"></vscode-text-area>
     </div>
@@ -2336,6 +2336,7 @@ function onActionRowDiscard(id) {
 }
 
 function onActionRowEdited(id) {
+
   var data = actionRows[id];
 
   var verifyScript = document.getElementById(id + "-verify-edit").value;
@@ -2349,19 +2350,31 @@ function onActionRowEdited(id) {
   var originalUpdateScript = ('update' in data) ? data['udpate'] : '';
 
   if (originalVerifyScript !== verifyScript) {
-    document.getElementById(id + "-edit-area").style.border = "dotted";
+    document.getElementById(id + "-verify-icon").classList.add("codicon-circle-filled");
+    document.getElementById(id + "-verify-icon").style.color = "orange";
+  } else {
+    document.getElementById(id + "-verify-icon").classList.remove("codicon-circle-filled");
   }
 
   if (originalInstallScript !== installScript) {
-    document.getElementById(id + "-install-edit").style.color = "red";
+    document.getElementById(id + "-install-icon").classList.add("codicon-circle-filled");
+    document.getElementById(id + "-install-icon").style.color = "orange";
+  } else {
+    document.getElementById(id + "-install-icon").classList.remove("codicon-circle-filled");
   }
 
   if (originalUninstallScript !== uninstallScript) {
-    document.getElementById(id + "-uninstall-edit").style.color = "red";
+    document.getElementById(id + "-uninstall-icon").classList.add("codicon-circle-filled");
+    document.getElementById(id + "-uninstall-icon").style.color = "orange";
+  } else {
+    document.getElementById(id + "-uninstall-icon").classList.remove("codicon-circle-filled");
   }
 
   if (originalUpdateScript !== updateScript) {
-    document.getElementById(id + "-update-edit").style.color = "red";
+    document.getElementById(id + "-update-icon").classList.add("codicon-circle-filled");
+    document.getElementById(id + "-update-icon").style.color = "orange";
+  } else {
+    document.getElementById(id + "-update-icon").classList.remove("codicon-circle-filled");
   }
 }
 
