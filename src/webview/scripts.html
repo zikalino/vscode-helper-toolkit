@@ -8,9 +8,9 @@
 
     switch (message.command) {
       case 'create':
-        data = message.data;
+        formData = message.data;
         mediaFolder = message.mediaFolder;
-        formPopulate(data, 'main-div');
+        formPopulate(formData, 'main-div');
         break;
       case 'set-action-status':
         setActionStatus(message.id, message.status);
@@ -219,11 +219,41 @@ function createRow(parent_id, data) {
   document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);
 }
 
+var actionRows = {};
+
 function createActionRow(parent_id, data) {
+
+  // store this action row for future use
+  actionRows[data['id']] = data;
+
   var scriptVerify = ('verify' in data) ? data['verify'] : "";
   var scriptInstall = ('install' in data) ? data['install'] : "";
   var scriptUpdate = ('update' in data) ? data['update'] : "";
   var scriptUninstall = ('uninstall' in data) ? data['uninstall'] : "";
+  var scriptVerifyOverrideStyle = "";
+  var scriptInstallOverrideStyle = "";
+  var scriptUpdateOverrideStyle = "";
+  var scriptUninstallOverrideStyle = "";
+
+  if ('verify-override' in data) {
+    scriptVerify = data['verify-override']
+    scriptVerifyOverrideStyle += "color: red;";
+  }
+
+  if ('install-override' in data) {
+    scriptInstall = data['install-override']
+    scriptInstallOverrideStyle += "color: red;";
+  }
+
+  if ('uninstall-override' in data) {
+    scriptUninstall = data['uninstall-override']
+    scriptUninstallOverrideStyle += "color: red;";
+  }
+
+  if ('update-override' in data) {
+    scriptUpdate = data['update-override']
+    scriptUpdateOverrideStyle += "color: red;";
+  }
 
   var html = '';
   html = `
@@ -242,17 +272,22 @@ function createActionRow(parent_id, data) {
 
     </div>
     <div class="action-row-edit-area" id="${data['id']}-edit-area">
+
+      <div class="action-row-verify-edit-icon codicon codicon-circle-large" id="${data['id']}-verify-icon" style="color: lightgrey; font-size: 24px;"></div>
       <vscode-label class="action-row-verify-edit-label">Verify</vscode-label>
-      <vscode-text-area class="action-row-verify-edit-edit" id="${data['id']}-verify-edit" value="${scriptVerify}"></vscode-text-area>
+      <vscode-text-area class="action-row-verify-edit-edit" style="${scriptVerifyOverrideStyle}" id="${data['id']}-verify-edit" value="${scriptVerify}" oninput="onActionRowEdited('${data['id']}')" ></vscode-text-area>
 
+      <div class="action-row-install-edit-icon codicon codicon-circle-large" id="${data['id']}-verify-icon" style="color: lightgrey; font-size: 24px;"></div>
       <vscode-label class="action-row-install-edit-label">Install</vscode-label>
-      <vscode-text-area class="action-row-install-edit-edit"  id="${data['id']}-install-edit" value="${scriptInstall}"></vscode-text-area>
+      <vscode-text-area class="action-row-install-edit-edit" style="${scriptInstallOverrideStyle}" id="${data['id']}-install-edit" value="${scriptInstall}" oninput="onActionRowEdited('${data['id']}')"></vscode-text-area>
 
+      <div class="action-row-update-edit-icon codicon codicon-circle-large" id="${data['id']}-verify-icon" style="color: lightgrey; font-size: 24px;"></div>
       <vscode-label class="action-row-update-edit-label">Update</vscode-label>
-      <vscode-text-area class="action-row-update-edit-edit"  id="${data['id']}-update-edit" value="${scriptUpdate}"></vscode-text-area>
+      <vscode-text-area class="action-row-update-edit-edit" style="${scriptUpdateOverrideStyle}" id="${data['id']}-update-edit" value="${scriptUpdate}" oninput="onActionRowEdited('${data['id']}')"></vscode-text-area>
 
+      <div class="action-row-uninstall-edit-icon codicon codicon-circle-large" id="${data['id']}-verify-icon" style="color: lightgrey; font-size: 24px;"></div>
       <vscode-label class="action-row-uninstall-edit-label">Unistall</vscode-label>
-      <vscode-text-area class="action-row-uninstall-edit-edit"  id="${data['id']}-uninstall-edit" value="${scriptUninstall}"></vscode-text-area>
+      <vscode-text-area class="action-row-uninstall-edit-edit" style="${scriptUninstallOverrideStyle}" id="${data['id']}-uninstall-edit" value="${scriptUninstall}" oninput="onActionRowEdited('${data['id']}')"></vscode-text-area>
     </div>
 
   </div>
@@ -1708,7 +1743,7 @@ document.addEventListener('click', function onBodyClick(e) {
 //---------------- BELOW IS THE CODE RELATED TO TREEVIEW
 //--------------------------------------------------------------------------------------------------------------
 
-var data = [];
+var formData = [];
 
 var config = {
   maxStickyHeadersVisible: 1
@@ -1720,14 +1755,14 @@ function onListItemClicked(id) {
   //document.getElementById('search-input-placeholder').innerText = "XXX - 1";
 
   document.getElementById('scrollable-toc').innerHTML = "";
-  toggleTreeItem(data, id, []);
-  treePopulate(data, 0);
+  toggleTreeItem(formData, id, []);
+  treePopulate(formData, 0);
   treeLayout();
   adjustScrollbar('toc');
 
   //document.getElementById('search-input-placeholder').innerText = "XXX - 2";
 
-  let focusedEntry = treeFindFocusedEntry(data);
+  let focusedEntry = treeFindFocusedEntry(formData);
   //document.getElementById('search-input-placeholder').innerText = "XXX - 2-A";
 
   let entryType = "leaf";
@@ -2300,19 +2335,86 @@ function onActionRowDiscard(id) {
   if (elDiscard) elDiscard.style.visibility = "hidden";
 }
 
-function onActionRowSave(id) {
+function onActionRowEdited(id) {
+  var data = actionRows[id];
+
   var verifyScript = document.getElementById(id + "-verify-edit").value;
   var installScript = document.getElementById(id + "-install-edit").value;
   var uninstallScript = document.getElementById(id + "-uninstall-edit").value;
   var updateScript = document.getElementById(id + "-update-edit").value;
 
-  vscode.postMessage({ command: 'action-scripts-save',
-                       id: id,
-                       script_verify: verifyScript,
-                       script_install: installScript,
-                       script_update: updateScript,
-                       script_uninstall: uninstallScript
-                     });
+  var originalVerifyScript = ('verify' in data) ? data['verify'] : '';
+  var originalInstallScript = ('install' in data) ? data['install'] : '';
+  var originalUninstallScript = ('uninstall' in data) ? data['uninstall'] : '';
+  var originalUpdateScript = ('update' in data) ? data['udpate'] : '';
+
+  if (originalVerifyScript !== verifyScript) {
+    document.getElementById(id + "-edit-area").style.border = "dotted";
+  }
+
+  if (originalInstallScript !== installScript) {
+    document.getElementById(id + "-install-edit").style.color = "red";
+  }
+
+  if (originalUninstallScript !== uninstallScript) {
+    document.getElementById(id + "-uninstall-edit").style.color = "red";
+  }
+
+  if (originalUpdateScript !== updateScript) {
+    document.getElementById(id + "-update-edit").style.color = "red";
+  }
+}
+
+function onActionRowSave(id) {
+
+  var data = actionRows[id];
+
+  var verifyScript = document.getElementById(id + "-verify-edit").value;
+  var installScript = document.getElementById(id + "-install-edit").value;
+  var uninstallScript = document.getElementById(id + "-uninstall-edit").value;
+  var updateScript = document.getElementById(id + "-update-edit").value;
+
+  var originalVerifyScript = ('verify' in data) ? data['verify'] : '';
+  var originalInstallScript = ('install' in data) ? data['install'] : '';
+  var originalUninstallScript = ('uninstall' in data) ? data['uninstall'] : '';
+  var originalUpdateScript = ('update' in data) ? data['udpate'] : '';
+
+  var savedVerifyScript = ('verify' in data) ? data['verify-override'] : '';
+  var savedInstallScript = ('install' in data) ? data['install-override'] : '';
+  var savedUninstallScript = ('uninstall' in data) ? data['uninstall-override'] : '';
+  var savedUpdateScript = ('update' in data) ? data['udpate-override'] : '';
+
+  var changed = false;
+
+  if (verifyScript !== savedVerifyScript) {
+    savedVerifyScript = verifyScript;
+    changed = true;
+  }
+
+  if (installScript !== savedInstallScript) {
+    savedInstallScript = installScript;
+    changed = true;
+  }
+
+  if (uninstallScript !== savedUninstallScript) {
+    savedUninstallScript = uninstallScript;
+    changed = true;
+  }
+
+  if (updateScript !== savedUpdateScript) {
+    savedUpdateScript = updateScript;
+    changed = true;
+  }
+
+  if (changed) {
+    vscode.postMessage({ command: 'action-scripts-save',
+                        id: id,
+                        script_verify: savedVerifyScript,
+                        script_install: curentInstallScript,
+                        script_update: savedUpdateScript,
+                        script_uninstall: savedUninstallScript
+                      });
+  }
 
   onActionRowDiscard(id);
   var el = document.getElementById(id + "-edit-area");
@@ -2381,17 +2483,17 @@ function treeGetNodeByIndex(entries, index) {
 
 function treeSelectPrevNode() {
   var indexes = [0, -1, -1];
-  treeCalculateIndexes(data, indexes, 0);
+  treeCalculateIndexes(formData, indexes, 0);
   if (indexes[1] >= 1) {
-    var current = treeGetNodeByIndex(data, indexes[1]);
-    var next = treeGetNodeByIndex(data, indexes[1] - 1);
+    var current = treeGetNodeByIndex(formData, indexes[1]);
+    var next = treeGetNodeByIndex(formData, indexes[1] - 1);
     current['focused'] = false;
     next['focused'] = true;
     current['selected'] = false;
     next['selected'] = true;
 
     // recalculate and return new level
-    treeCalculateIndexes(data, indexes, 0);
+    treeCalculateIndexes(formData, indexes, 0);
 
     setHeaderCount(indexes[2] + 1);
     setHeader(indexes[2], next['name']);
@@ -2400,18 +2502,18 @@ function treeSelectPrevNode() {
 
 function treeSelectNextNode() {
   var indexes = [0, -1, -1];
-  treeCalculateIndexes(data, indexes);
+  treeCalculateIndexes(formData, indexes);
 
   if (indexes[1] < indexes[0] - 1) {
-    var current = treeGetNodeByIndex(data, indexes[1]);
-    var next = treeGetNodeByIndex(data, indexes[1] + 1, 0);
+    var current = treeGetNodeByIndex(formData, indexes[1]);
+    var next = treeGetNodeByIndex(formData, indexes[1] + 1, 0);
     current['focused'] = false;
     next['focused'] = true;
     current['selected'] = false;
     next['selected'] = true;
 
     // recalculate and return new level
-    treeCalculateIndexes(data, indexes, 0);
+    treeCalculateIndexes(formData, indexes, 0);
 
     setHeaderCount(indexes[2] + 1);
     setHeader(indexes[2], next['name']);
@@ -2421,7 +2523,7 @@ function treeSelectNextNode() {
 function treeArrowUp() {
   document.getElementById('scrollable-toc').innerHTML = "";
   treeSelectPrevNode();
-  treePopulate(data, 0);
+  treePopulate(formData, 0);
   treeLayout();
   treeAdjustPosition();
   adjustScrollbar('toc');
@@ -2430,7 +2532,7 @@ function treeArrowUp() {
 function treeArrowDown() {
   document.getElementById('scrollable-toc').innerHTML = "";
   treeSelectNextNode();
-  treePopulate(data, 0);
+  treePopulate(formData, 0);
   treeLayout(); 
   treeAdjustPosition();
   adjustScrollbar('toc');
@@ -2438,8 +2540,8 @@ function treeArrowDown() {
 
 function treeArrowLeft() {
   document.getElementById('scrollable-toc').innerHTML = "";
-  treeArrowLeftInternal(data, 0);
-  treePopulate(data, 0);
+  treeArrowLeftInternal(formData, 0);
+  treePopulate(formData, 0);
   treeLayout();
   adjustScrollbar('toc');
 }
@@ -2482,8 +2584,8 @@ function treeArrowLeftInternal(entries, level) {
 
 function treeArrowRight() {
   document.getElementById('scrollable-toc').innerHTML = "";
-  treeArrowRightInternal(data, 0);
-  treePopulate(data, 0);
+  treeArrowRightInternal(formData, 0);
+  treePopulate(formData, 0);
   treeLayout();
   adjustScrollbar('toc');
 }
@@ -2541,7 +2643,7 @@ function treeFindFocusedEntry(entries) {
 }
 
 function treeFindFocusedEntryId() {
-  let entry = treeFindFocusedEntry(data);
+  let entry = treeFindFocusedEntry(formData);
   if (entry !== null) {
     return entry['id'];
   } else {
@@ -2697,10 +2799,10 @@ window.addEventListener('message', event => {
 
   switch (message.command) {
       case 'populate':
-          data = message.data;
+          formData = message.data;
           document.getElementById('scrollable-toc').innerHTML = "";
           setHeaderCount(0);
-          treePopulate(data, 0);
+          treePopulate(formData, 0);
           treeLayout();
           layout();
           adjustScrollbar('toc');

@@ -362,21 +362,25 @@ body[data-vscode-theme-id='Visual Studio Light'] {
   grid-template-rows: 32px;
 }
 
+.action-row-verify-edit-icon { grid-area: verify-icon; }
 .action-row-verify-edit-label  { grid-area: verify-label; }
 .action-row-verify-edit-edit   { grid-area: verify-edit;  }
+.action-row-install-edit-icon { grid-area: install-icon; }
 .action-row-install-edit-label  { grid-area: install-label; }
 .action-row-install-edit-edit   { grid-area: install-edit; }
+.action-row-update-edit-icon { grid-area: update-icon; }
 .action-row-update-edit-label  { grid-area: update-label; }
 .action-row-update-edit-edit   { grid-area: update-edit;  }
+.action-row-uninstall-edit-icon { grid-area: uninstall-icon; }
 .action-row-uninstall-edit-label  { grid-area: uninstall-label; }
 .action-row-uninstall-edit-edit   { grid-area: uninstall-edit; }
 
 .action-row-edit-area {
   display: none;
-  grid-template-areas: 'left verify-label  verify-edit'
-                       'left install-label install-edit'
-                       'left update-label  update-edit'
-                       'left uninstall-label  uninstall-edit';
+  grid-template-areas: 'verify-icon verify-label  verify-edit'
+                       'install-icon install-label install-edit'
+                       'update-icon update-label  update-edit'
+                       'uninstall-icon uninstall-label  uninstall-edit';
   gap: 10px;
   grid-template-columns: 32px 100px 497px;
   grid-template-rows: 64px 64px 64px 64px;

@@ -1,5 +1,6 @@
 import { verify } from 'crypto';
 import * as vscode from 'vscode';
+const yaml = require('js-yaml');
 var styles: any = require("./webview/styles.html");
 var stylesWorkbench: any = require("./webview/treeview-css.html");
 var script: string = require("./webview/scripts.html");
@@ -249,6 +250,14 @@ export class GenericWebView {
           a['uninstall'] = scriptUninstall;
         }
       }
+
+      // save form definition
+      var updated_definition = yaml.dump(this.formDefinition)
+      require('fs').writeFile(require('os').homedir() + '/updated-definition.yml', updated_definition, (err: any) => {
+        if (err) {
+            console.log(err);
+        }
+    });
     } catch (e) {
       vscode.window.showInformationMessage('EXCEPTION: ' + e);
     }
@@ -263,47 +272,53 @@ export class GenericWebView {
       }
 
       for (let a of actionList) {
-        const cp = require('child_process');
-        try {
-          var cmd = "";
-          if ('variables' in a) {
-            if (process.platform === "win32") {
-              for (let v in this.variables) {
-                if (a['variables'].includes(v)) {
-                  cmd += " $" + v + "='" + this.variables[v] + "';";
-                }
-              }
-            } else {
-              for (let v in this.variables) {
-                if (a['variables'].includes(v)) {
-                  cmd += v + "='" + this.variables[v] + "';";
-                }
-              }
-            }
-          }
-
-          cmd += a['verify'];
-          if (process.platform === "win32") {
-            cp.execSync(cmd, { shell: 'powershell' });
-          } else {
-            cp.execSync(cmd, { shell: '/bin/bash' });
-          }
-          a['status'] = 'verified';
-          this.postMessage({ command: 'set-action-status', id: a['id'], status: 'verified' });
-        } catch (e: any) {
-          var lines = e.toString().split(/\r?\n/);
-          this.terminalWriteLine("# ===========================================================");
-          for (var i = 0; i < lines.length; i++) {
-            this.terminalWriteLine("# " + lines[i]);
-          }
-          this.terminalWriteLine("# ===========================================================");
-
-          a['status'] = 'missing';
-          this.postMessage({ command: 'set-action-status', id: a['id'], status: 'failed' });
-        }
+        this.actionVerify(a, true);
       }
     } catch (e) {
       vscode.window.showInformationMessage('EXCEPTION: ' + e);
+    }
+  }
+
+  private actionVerify(action: any, printFailure: boolean) {
+    const cp = require('child_process');
+    try {
+      var cmd = "";
+      if ('variables' in action) {
+        if (process.platform === "win32") {
+          for (let v in this.variables) {
+            if (action['variables'].includes(v)) {
+              cmd += " $" + v + "='" + this.variables[v] + "';";
+            }
+          }
+        } else {
+          for (let v in this.variables) {
+            if (action['variables'].includes(v)) {
+              cmd += v + "='" + this.variables[v] + "';";
+            }
+          }
+        }
+      }
+
+      cmd += action['verify'];
+      if (process.platform === "win32") {
+        cp.execSync(cmd, { shell: 'powershell' });
+      } else {
+        cp.execSync(cmd, { shell: '/bin/bash' });
+      }
+      action['status'] = 'verified';
+      this.postMessage({ command: 'set-action-status', id: action['id'], status: 'verified' });
+    } catch (e: any) {
+      if (printFailure) {
+        var lines = e.toString().split(/\r?\n/);
+        this.terminalWriteLine("# ===========================================================");
+        for (var i = 0; i < lines.length; i++) {
+          this.terminalWriteLine("# " + lines[i]);
+        }
+        this.terminalWriteLine("# ===========================================================");
+      }
+
+      action['status'] = 'missing';
+      this.postMessage({ command: 'set-action-status', id: action['id'], status: 'failed' });
     }
   }
 
@@ -367,10 +382,12 @@ export class GenericWebView {
       this.terminalWriteLine("#------------------------------------------------------------");
     }
 
-    var lines: string[] = script.toString().split(/\r?\n/);
-    for (var i = 0; i < lines.length; i++) {
-      if (lines[i].trim() !== "") {
-        this.terminalWriteLine("#   " + lines[i]);
+    if (script) {
+      var lines: string[] = script.toString().split(/\r?\n/);
+      for (var i = 0; i < lines.length; i++) {
+        if (lines[i].trim() !== "") {
+          this.terminalWriteLine("#   " + lines[i]);
+        }
       }
     }
 
@@ -433,6 +450,7 @@ export class GenericWebView {
       this.terminalWriteLine(action['install']);
 
       await this.waitForCompletion(action);
+      this.actionVerify(action, true);
       return true;
     } catch (e) {
       action['status'] = 'missing';
@@ -447,7 +465,7 @@ export class GenericWebView {
 
       let filename = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
 
-      this.displayBannerStart("Unistalling", action['id'], undefined, action['uninstall']);
+      this.displayBannerStart("Uninstalling", action['id'], undefined, action['uninstall']);
 
       if ('variables' in action) {
         if (process.platform === "win32") {
@@ -465,9 +483,16 @@ export class GenericWebView {
         }
       }
 
-      this.terminalWriteLine(action['uninstall']);
+      if ('uninstall' in action) {
+        this.terminalWriteLine(action['uninstall']);
+      } else {
+        this.terminalWriteLine("# not implemented");
+      }
       
       await this.waitForCompletion(action);
+      this.terminalWriteLine("# verifying action after uninstallation");
+      this.actionVerify(action, false);
+      this.terminalWriteLine("# finished verification");
       return true;
 
     } catch (e) {
