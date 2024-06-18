@@ -37,8 +37,40 @@ export class GenericWebView {
 
   createPanel(formDefinition: any) {
 
+
     this.processFormDefinition(formDefinition);
     
+    var localDefinitionFilename = require('os').homedir() + '/updated-definition.yml';
+    if (require('fs').existsSync(localDefinitionFilename)) {
+      const overrideFormDefinition = yaml.load(require('fs').readFileSync(localDefinitionFilename, 'utf8'));
+
+      // XXX - try to merge local form definition with given form definition
+      var givenActionList = this.getActionList(formDefinition);
+      var overrideActionList = this.getActionList(overrideFormDefinition);
+
+      for (var i = 0; i < overrideActionList.length; i++) {
+        var id = overrideActionList[i]['id'];
+
+        for (var j = 0; j < givenActionList.length; j++) {
+          if (givenActionList[j]['id'] === id) {
+            if ('verify-override' in overrideActionList[i]) {
+              givenActionList[j]['verify-override'] = overrideActionList[i]['verify-override'];
+            }
+            if ('update-override' in overrideActionList[i]) {
+              givenActionList[j]['update-override'] = overrideActionList[i]['update-override'];
+            }
+            if ('install-override' in overrideActionList[i]) {
+              givenActionList[j]['install-override'] = overrideActionList[i]['install-override'];
+            }
+            if ('uninstall-override' in overrideActionList[i]) {
+              givenActionList[j]['uninstall-override'] = overrideActionList[i]['uninstall-override'];
+            }
+          }
+        }
+      }
+    }
+
+
     this.formDefinition = formDefinition;
     this.panel.iconPath = vscode.Uri.joinPath(
       this.context.extensionUri,
@@ -244,15 +276,24 @@ export class GenericWebView {
       this.terminalWriteLine("# SAVING SCRIPTS OF: " + stepId);
       for (let a of actionList) {
         if (a['id'] === stepId) {
-          a['verify'] = scriptVerify;
-          a['install'] = scriptInstall;
-          a['update'] = scriptUpdate;
-          a['uninstall'] = scriptUninstall;
+          // create overrides if necessary
+          if (a['verify'] !== scriptVerify) {
+            a['verify-override'] = scriptVerify;
+          }
+          if (a['install'] !== scriptInstall) {
+            a['install-override'] = scriptInstall;
+          }
+          if (a['update'] !== scriptUpdate) {
+            a['update-override'] = scriptUpdate;
+          }
+          if (a['uninstall'] != scriptUninstall) {
+            a['uninstall-override'] = scriptUninstall;
+          }
         }
       }
 
       // save form definition
-      var updated_definition = yaml.dump(this.formDefinition)
+      var updated_definition = yaml.dump(this.formDefinition);
       require('fs').writeFile(require('os').homedir() + '/updated-definition.yml', updated_definition, (err: any) => {
         if (err) {
             console.log(err);

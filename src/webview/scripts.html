@@ -2392,10 +2392,10 @@ function onActionRowSave(id) {
   var originalUninstallScript = ('uninstall' in data) ? data['uninstall'] : '';
   var originalUpdateScript = ('update' in data) ? data['udpate'] : '';
 
-  var savedVerifyScript = ('verify' in data) ? data['verify-override'] : '';
-  var savedInstallScript = ('install' in data) ? data['install-override'] : '';
-  var savedUninstallScript = ('uninstall' in data) ? data['uninstall-override'] : '';
-  var savedUpdateScript = ('update' in data) ? data['udpate-override'] : '';
+  var savedVerifyScript = ('verify' in data) ? data['verify-override'] : originalVerifyScript;
+  var savedInstallScript = ('install' in data) ? data['install-override'] : originalInstallScript;
+  var savedUninstallScript = ('uninstall' in data) ? data['uninstall-override'] : originalUninstallScript;
+  var savedUpdateScript = ('update' in data) ? data['udpate-override'] : originalUpdateScript;
 
   var changed = false;
 
@@ -2423,7 +2423,7 @@ function onActionRowSave(id) {
     vscode.postMessage({ command: 'action-scripts-save',
                         id: id,
                         script_verify: savedVerifyScript,
-                        script_install: curentInstallScript,
+                        script_install: savedInstallScript,
                         script_update: savedUpdateScript,
                         script_uninstall: savedUninstallScript
                       });
