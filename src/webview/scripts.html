@@ -2317,6 +2317,9 @@ function onActionRowExpand(id) {
   if (elExpand) elExpand.style.visibility = "hidden";
   if (elUpdate) elUpdate.style.visibility = "hidden";
   if (elUninstall) elUninstall.style.visibility = "hidden";
+
+  // make sure local changes indicators are updated
+  this.onActionRowEdited(id);
 }
 
 function onActionRowDiscard(id) {
