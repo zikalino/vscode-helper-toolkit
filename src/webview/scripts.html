@@ -2336,6 +2336,18 @@ function onActionRowDiscard(id) {
   if (elUpdate) elUpdate.style.visibility = "visible";
   if (elUninstall) elUninstall.style.visibility = "visible";
   if (elDiscard) elDiscard.style.visibility = "hidden";
+
+  var data = actionRows[id];
+  var savedVerifyScript = ('verify-override' in data) ? data['verify-override'] : (('verify' in data) ? data['verify'] :'');
+  var savedInstallScript = ('install-override' in data) ? data['install-override'] : (('install' in data) ? data['install'] :'');
+  var savedUninstallScript = ('uninstall-override' in data) ? data['uninstall-override'] : (('uninstall' in data) ? data['uninstall'] :'');
+  var savedUpdateScript = ('update-override' in data) ? data['update-override'] : (('update' in data) ? data['update'] :'');
+
+  document.getElementById(id + "-verify-edit").value = savedVerifyScript;
+  document.getElementById(id + "-install-edit").value = savedInstallScript;
+  document.getElementById(id + "-uninstall-edit").value = savedUninstallScript;
+  document.getElementById(id + "-update-edit").value = savedUpdateScript;
+
 }
 
 function onActionRowEdited(id) {

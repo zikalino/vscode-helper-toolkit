@@ -634,12 +634,12 @@ export class GenericWebView {
   }
 
   private terminalWriteLine(line: string): void {
-    if (this.terminal === undefined || this.terminal.exitStatus !== undefined) {
-      this.terminal = (process.platform === "win32") ? vscode.window.createTerminal("Installer", "powershell") :
-                                                       vscode.window.createTerminal("Installer");   
+    if (terminal === undefined || terminal.exitStatus !== undefined) {
+      terminal = (process.platform === "win32") ? vscode.window.createTerminal("Installer", "powershell") :
+                                                  vscode.window.createTerminal("Installer");   
     }
-    this.terminal.show();
-    this.terminal.sendText(line);
+    terminal.show();
+    terminal.sendText(line);
 }
 
   private context: vscode.ExtensionContext;
@@ -647,5 +647,6 @@ export class GenericWebView {
   private formDefinition: any;
   private variables: any = {};
   // what is actually created here?
-  private terminal: vscode.Terminal | undefined = undefined;
 }
+
+var terminal: vscode.Terminal | undefined = undefined;
