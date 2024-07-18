@@ -110,7 +110,7 @@ function formPopulate(data, parent_id) {
       formPopulate(entry['subitems'], entry['id']);
     } else if (entry['type'] === 'radio') {
       createRadio(parent_id, entry);
-    } else if (entry['type'] === 'radiogroup') {
+    } else if (entry['type'] === 'radio-group') {
       createRadioGroup(parent_id, entry);
       formPopulate(entry['subitems'], entry['id']);
     } else if (entry['type'] === 'textarea') {
@@ -525,7 +525,8 @@ function createRadio(parent_id, entry) {
 
 function createRadioGroup(parent_id, entry) {
   var html = `
-      <vscode-radio-group id="${entry['id']}"></vscode-radio-group>
+      <vscode-radio-group id="${entry['id']}" orientation="horizontal">
+      </vscode-radio-group>
       `;
       document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
 }

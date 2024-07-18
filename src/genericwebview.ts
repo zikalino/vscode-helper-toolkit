@@ -262,7 +262,7 @@ export class GenericWebView {
     this.actionsInstall(this.formDefinition);
   }
 
-  public runStepReRun(step_id: string) {
+  public runStepReRun(step_id: string): void {
     this.actionReRun(this.formDefinition, step_id);
   }
 
