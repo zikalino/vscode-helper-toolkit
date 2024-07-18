@@ -15,6 +15,9 @@
       case 'set-action-status':
         setActionStatus(message.id, message.status);
         break;
+      case 'set-items':
+        setDropdownItems(message.id, message.items);
+        break;
     }
   });
 
@@ -334,8 +337,33 @@ function setActionStatus(id, status) {
     document.getElementById(id + "-icon").setAttribute("class", "action-row-icon codicon codicon-circle-slash");
     document.getElementById(id + "-icon").setAttribute("style", "color: orange; font-size: 24px;");
   }
-
 }
+
+function setDropdownItems(id, items) {
+  var itemsHtml = "";
+
+  for (var i in items) {
+      var item_id = "undefined";
+      var item_label = "undefined";
+
+      if (typeof items[i] !== 'string') {
+        item_id = items[i]['id'];
+        item_label = items[i]['label'];
+      } else {
+        item_id = items[i];
+        item_label = items[i];
+      }
+      itemsHtml += `
+        <vscode-option value='${item_id}' label='${item_label}'>
+          ${item_label}
+        </vscode-option>
+      `;
+    }
+
+  document.getElementById(id).innerHTML = itemsHtml;
+}
+
+
 
 function createCheckBox(parent_id, data) {
   let align = 'left';
@@ -368,49 +396,49 @@ function createCheckBox(parent_id, data) {
 
 function createCombo(parent_id, data) {
   var html = "";
-  if (typeof data['items'][0] !== 'string') {
-    html = `
-      <div class="dropdown-select" id=${data['id']}>
-        <div class="dropdown-select-label">
-          <span class="dropdown-select-label-text">${data['name']}</span>
-        </div>
-        <div
-          id="create-project-${data['id']}"
-          class="dropdown-select-input"
-          aria-disabled="false"
-          onclick="comboOpenClose('${data['id']}');event.stopPropagation();"
-        >
-          <span id="${data['id']}-box" class="dropdown-select-input-text">
-            ESP-IDF
-          </span>
-          <span class="codicon codicon-chevron-down"></span>
-        </div>
+  //if (typeof data['items'][0] !== 'string') {
+  //  html = `
+  //    <div class="dropdown-select" id=${data['id']}>
+  //      <div class="dropdown-select-label">
+  //        <span class="dropdown-select-label-text">${data['name']}</span>
+  //      </div>
+  //      <div
+  //        id="create-project-${data['id']}"
+  //        class="dropdown-select-input"
+  //        aria-disabled="false"
+  //        onclick="comboOpenClose('${data['id']}');event.stopPropagation();"
+  //      >
+  //        <span id="${data['id']}-box" class="dropdown-select-input-text">
+  //          ESP-IDF
+  //        </span>
+  //        <span class="codicon codicon-chevron-down"></span>
+  //      </div>
 
-        <div class="dropdown-anchor">
-          <div id="${data['id']}-list"
-                class="dropdown-box dropdown-select-content templates-and-examples-dropdown"
-              hidden="true">
-            <ul>
-              `;
+  //      <div class="dropdown-anchor">
+  //        <div id="${data['id']}-list"
+  //              class="dropdown-box dropdown-select-content templates-and-examples-dropdown"
+  //            hidden="true">
+  //          <ul>
+  //            `;
 
-    for (var i in data['items']) {
-      html += `
-              <li onclick="dropdownClicked('${data['id']}', '${data['items'][i]['name']}');">
-              <section class="template-entry">
-                <header>${data['items'][i]['name']}</header>
-                <p>${data['items'][i]['description']}</p>
-              </section>
-              </li>
-      `;
-    }
+  //  for (var i in data['items']) {
+  //    html += `
+  //            <li onclick="dropdownClicked('${data['id']}', '${data['items'][i]['name']}');">
+  //            <section class="template-entry">
+  //              <header>${data['items'][i]['name']}</header>
+  //              <p>${data['items'][i]['description']}</p>
+  //            </section>
+  //            </li>
+  //    `;
+  //  }
   
-    html += `
-            </ul>
-          </div>
-        </div>
-      </div>
-    `;
-  } else {
+  //  html += `
+  //          </ul>
+  //        </div>
+  //      </div>
+  //    </div>
+  //  `;
+  //} else {
     html = `
     <div class="dropdown-select">
     <div class="dropdown-select-label">
@@ -422,10 +450,19 @@ function createCombo(parent_id, data) {
           `;
 
     for (var i in data['items']) {
-      var item_id = data['items'][i];
+      var item_id = "undefined";
+      var item_label = "undefined";
+
+      if (typeof data['items'][i] !== 'string') {
+        item_id = data['items'][i]['id'];
+        item_label = data['items'][i]['label'];
+      } else {
+        item_id = data['items'][i];
+        item_label = data['items'][i];
+      }
       html += `
-        <vscode-option value='${item_id}' label='${item_id}'>
-          ${item_id}
+        <vscode-option value='${item_id}' label='${item_label}'>
+          ${item_label}
         </vscode-option>
       `;
     }
@@ -434,7 +471,7 @@ function createCombo(parent_id, data) {
       </vscode-dropdown>
       </div>
     `;
-  }
+  //}
   document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);
 }
 

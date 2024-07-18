@@ -1,5 +1,6 @@
 import { verify } from 'crypto';
 import * as vscode from 'vscode';
+import { JSONPath } from 'jsonpath-plus';
 const yaml = require('js-yaml');
 var styles: any = require("./webview/styles.html");
 var stylesWorkbench: any = require("./webview/treeview-css.html");
@@ -114,6 +115,8 @@ export class GenericWebView {
             this.selectFolder(message.id);
             return;
           case 'dropdown-clicked':
+            vscode.window.showInformationMessage('DROPDOWN SELECTION: ' + message.id);
+
             this.handleVariable(this.formDefinition, message.combo_id, message.id);
             this.reconfigureVisibility(this.formDefinition);
             break;
@@ -755,13 +758,17 @@ export class GenericWebView {
         out = cp.execSync(cmd, { shell: '/bin/bash' });
       }
 
-      vscode.window.showInformationMessage('DATA SOURCE RESPONSE ' + out.toString());
+      out = JSON.parse(out.toString());
 
-      // XXX - get output
-      // XXX - parse
-      // XXX - transform
-      item['items'] = ['xxx'];
-      // XXX - finish implementing this
+      var ids = JSONPath({path: item['source']['path-id'], json: out});
+      var names = JSONPath({path: item['source']['path-name'], json: out});
+      vscode.window.showInformationMessage('DATA SOURCE RESPONSE ' + JSON.stringify(out));
+
+      item['items'] = [];
+      for (var idx in ids) {
+        item['items'].push({ id: ids[idx], label: names[idx]});
+      }
+
       this.postMessage({ command: 'set-items', id: item['id'], items: item['items'] });
     } catch (e: any) {
       if (printFailure) {
