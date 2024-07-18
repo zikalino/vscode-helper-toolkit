@@ -108,6 +108,7 @@ export class GenericWebView {
         switch (message.command) {
           case 'ready':
             this.panel.webview.postMessage(populateMsg);
+            this.queryDataSources(this.formDefinition);
             break;
           case 'select-folder':
             this.selectFolder(message.id);
@@ -547,7 +548,7 @@ export class GenericWebView {
     action['status'] = 'missing';
     this.postMessage({ command: 'set-action-status', id: action['id'], status: 'failed' });
     return true;
-}
+  }
 
   private getActionList(data: any): any[] {
     let ret : any[] = [];
@@ -568,6 +569,33 @@ export class GenericWebView {
           for (let key in data) {
             if (typeof data[key] === 'object' && data[key] instanceof Array) {
               ret = ret.concat(this.getActionList(data[key]));
+            }
+          }
+        }
+      }
+    }
+    return ret;
+  }
+
+  private getItemsWithDataSource(data: any): any[] {
+    let ret : any[] = [];
+    if (typeof data === 'object') {
+      if (data instanceof Array) {
+        for (let i of data.keys()) {
+          ret = ret.concat(this.getItemsWithDataSource(data[i]));
+        }
+      }
+      else {
+        if ('hidden' in data && data['hidden']) {
+          return [];
+        }
+
+        if ('source' in data) {
+          ret.push(data);
+        } else {
+          for (let key in data) {
+            if (typeof data[key] === 'object' && data[key] instanceof Array) {
+              ret = ret.concat(this.getItemsWithDataSource(data[key]));
             }
           }
         }
@@ -680,6 +708,74 @@ export class GenericWebView {
       }
     }
   }
+
+  private queryDataSources(data: any) {
+    try {
+      let itemList: any[] = this.getItemsWithDataSource(data);
+
+      for (let a of itemList) {
+        this.queryDataSource(a, true);
+      }
+    } catch (e) {
+      vscode.window.showInformationMessage('EXCEPTION: ' + e);
+    }
+  }
+
+  private queryDataSource(item: any, printFailure: boolean) {
+    const cp = require('child_process');
+    try {
+      vscode.window.showInformationMessage('EXECUTING QUERY A');
+      var cmd = "";
+      if ('source' in item) {
+        vscode.window.showInformationMessage('EXECUTING QUERY B');
+        //if (process.platform === "win32") {
+        //  for (let v in this.variables) {
+        //    if (item['variables'].includes(v)) {
+        //      cmd += " $" + v + "='" + this.variables[v] + "';";
+        //    }
+        //  }
+        //} else {
+        //  for (let v in this.variables) {
+        //    if (item['variables'].includes(v)) {
+        //      cmd += v + "='" + this.variables[v] + "';";
+        //    }
+        //  }
+        //}
+      }
+
+      vscode.window.showInformationMessage('EXECUTING QUERY A');
+
+      cmd += item['source']['cmd'];
+      vscode.window.showInformationMessage('EXECUTING QUERY B');
+
+      var out = "{}";
+      if (process.platform === "win32") {
+        out = cp.execSync(cmd, { shell: 'powershell' });
+      } else {
+        out = cp.execSync(cmd, { shell: '/bin/bash' });
+      }
+
+      vscode.window.showInformationMessage('DATA SOURCE RESPONSE ' + out.toString());
+
+      // XXX - get output
+      // XXX - parse
+      // XXX - transform
+      item['items'] = ['xxx'];
+      // XXX - finish implementing this
+      this.postMessage({ command: 'set-items', id: item['id'], items: item['items'] });
+    } catch (e: any) {
+      if (printFailure) {
+        vscode.window.showInformationMessage('QUERY EXCEPTION ' + e.toString());
+        var lines = e.toString().split(/\r?\n/);
+        this.terminalWriteLine("# ===========================================================");
+        for (var i = 0; i < lines.length; i++) {
+          this.terminalWriteLine("# " + lines[i]);
+        }
+        this.terminalWriteLine("# ===========================================================");
+      }
+    }
+  }
+
 
   private terminalWriteLine(line: string): void {
     if (terminal === undefined || terminal.exitStatus !== undefined) {
