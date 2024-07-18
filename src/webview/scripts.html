@@ -517,8 +517,9 @@ function createRadio(parent_id, entry) {
   var id = ('id' in entry) ? entry['id'] : 'unknown';
   var value = ('value' in entry) ? entry['value'] : id;
   var text = ('text' in entry) ? entry['text'] : value;
+  var variable = ('variable' in entry) ? entry['variable'] : '';
   var html = `
-        <vscode-radio value="${value}" onclick="onRadioClicked('${value}');">${text}</vscode-radio>
+        <vscode-radio value="${value}" onclick="onRadioClicked('${id}', '${value}', '${variable}');">${text}</vscode-radio>
       `;
       document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
 }
@@ -2458,8 +2459,8 @@ function onActionRowUninstall(id) {
   vscode.postMessage({ command: 'action-uninstall', id: id });
 }
 
-function onRadioClicked(id) {
-  vscode.postMessage({ command: 'radio-clicked', id: id })
+function onRadioClicked(id, value, variable) {
+  vscode.postMessage({ command: 'radio-clicked', id: id, value: value, variable: variable })
 }
 
 function onScrollableWheel(e, scrollbarId) {

@@ -114,6 +114,12 @@ export class GenericWebView {
             return;
           case 'dropdown-clicked':
             this.handleVariable(this.formDefinition, message.combo_id, message.id);
+            this.reconfigureVisibility(this.formDefinition);
+            break;
+          case 'radio-clicked':
+
+            this.handleVariable(this.formDefinition, message.id, message.value);
+            this.reconfigureVisibility(this.formDefinition);
             break;
           case 'action-scripts-save':
             this.saveStepScripts(message.id,
@@ -590,7 +596,9 @@ export class GenericWebView {
 
         // set initial value of all variables - now just assume we deal with combo
         if ('variable' in data) {
-          this.variables[data['variable']] = data['items'][0];
+          if ('items' in data) {
+            this.variables[data['variable']] = data['items'][0];
+          }
         }
 
         for (let key in data) {
@@ -603,12 +611,12 @@ export class GenericWebView {
     return false;
   }
 
-  private handleVariable(data: any, combo_id: string, value: string) {
+  private handleVariable(data: any, id: string, value: string) {
 
     if (typeof data === 'object') {
       if (Array.isArray(data)) {
         for (let i = data.length - 1; i >= 0; i--) {
-          this.handleVariable(data[i], combo_id, value);
+          this.handleVariable(data[i], id, value);
         }
       }
       else {
@@ -616,7 +624,7 @@ export class GenericWebView {
           return;
         }
 
-        if ('id' in data && data['id'] === combo_id) {
+        if ('id' in data && data['id'] === id) {
           if ('variable' in data) {
             this.variables[data['variable']] = value;
             this.runStepsVerification();
@@ -626,7 +634,47 @@ export class GenericWebView {
 
         for (let key in data) {
           if (typeof data[key] === 'object') {
-            this.handleVariable(data[key], combo_id, value);
+            this.handleVariable(data[key], id, value);
+          }
+        }
+      }
+    }
+  }
+
+  private reconfigureVisibility(data: any) {
+
+    if (typeof data === 'object') {
+      if (Array.isArray(data)) {
+        for (let i = data.length - 1; i >= 0; i--) {
+          this.reconfigureVisibility(data[i]);
+        }
+      }
+      else {
+
+        if ('show-if' in data) {
+
+          // get variable
+          let variable = data['show-if']['variable'];
+          let expected_value = data['show-if']['value'];
+          let value = this.variables[variable];
+
+          vscode.window.showInformationMessage('UPDATING show-if: '  + variable + " " + value + " " + expected_value);
+
+          if (value === expected_value) {
+            this.showElement(data['id']);
+          } else {
+            this.hideElement(data['id']);
+          }
+        }
+
+        // don't continue to children if hidden
+        if ('hidden' in data && data['hidden']) {
+          return;
+        }
+
+        for (let key in data) {
+          if (typeof data[key] === 'object') {
+            this.reconfigureVisibility(data[key]);
           }
         }
       }
