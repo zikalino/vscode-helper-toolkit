@@ -110,6 +110,7 @@ export class GenericWebView {
           case 'ready':
             this.panel.webview.postMessage(populateMsg);
             this.queryDataSources(this.formDefinition);
+            this.reconfigureVisibility(this.formDefinition);
             break;
           case 'select-folder':
             this.selectFolder(message.id);
@@ -631,6 +632,11 @@ export class GenericWebView {
             this.variables[data['variable']] = data['items'][0];
           }
         }
+
+        if (('variable' in data) && ('default' in data) && data['default']) {
+          this.variables[data['variable']] = data['value'];
+        }
+          
 
         for (let key in data) {
           if (typeof data[key] === 'object') {
