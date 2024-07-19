@@ -555,8 +555,9 @@ function createRadio(parent_id, entry) {
   var value = ('value' in entry) ? entry['value'] : id;
   var text = ('text' in entry) ? entry['text'] : value;
   var variable = ('variable' in entry) ? entry['variable'] : '';
+  var checked = (('default' in entry) && entry['default']) ? "checked " : "";
   var html = `
-        <vscode-radio value="${value}" onclick="onRadioClicked('${id}', '${value}', '${variable}');">${text}</vscode-radio>
+        <vscode-radio value="${value}" onclick="onRadioClicked('${id}', '${value}', '${variable}');" ${checked}>${text}</vscode-radio>
       `;
       document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
 }
