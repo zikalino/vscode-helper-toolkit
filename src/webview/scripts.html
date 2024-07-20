@@ -578,8 +578,9 @@ function createTextArea(parent_id, entry) {
 }
 
 function createTextField(parent_id, entry) {
+  var id = ('id' in entry) ? entry['id'] : 'unknown';
   var html = `
-        <vscode-text-field style='width: 100%;'>${entry['name']}</vscode-text-field>
+        <vscode-text-field style='width: 100%;' onfocusout="onInputChanged('${id}', this.value)">${entry['name']}</vscode-text-field>
       `;
       document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
 }
@@ -2511,6 +2512,10 @@ function onScrollableWheel(e, scrollbarId) {
     //document.getElementById('search-input-placeholder').innerText = "SETTING POSITION: " + (newPosition).toString() + "px";
     scrollable.style.top = (newPosition).toString() + "px";
   }
+}
+
+function onInputChanged(id, value) {
+  vscode.postMessage({ command: 'input-changed', id: id, value: value })
 }
 
 // returns pair [focusedIndex, nextIndex, focusedLevel]

@@ -130,6 +130,13 @@ export class GenericWebView {
             // XXX - only run when necessary
             //this.runStepsVerification();
             break;
+          case 'input-changed':
+
+            this.handleVariable(this.formDefinition, message.id, message.value);
+            this.reconfigureVisibility(this.formDefinition);
+            // XXX - only run when necessary
+            //this.runStepsVerification();
+            break;
           case 'action-scripts-save':
             this.saveStepScripts(message.id,
                                  message.script_verify,
@@ -633,7 +640,13 @@ export class GenericWebView {
         // set initial value of all variables - now just assume we deal with combo
         if ('variable' in data) {
           if ('items' in data) {
-            this.variables[data['variable']] = data['items'][0];
+            if (data.items.length > 0) {
+              this.variables[data['variable']] = data['items'][0];
+            } else {
+              this.variables[data['variable']] = "unknown";
+            }
+          } else {
+            this.variables[data['variable']] = "unknown";
           }
         }
 
