@@ -116,15 +116,19 @@ export class GenericWebView {
             this.selectFolder(message.id);
             return;
           case 'dropdown-clicked':
-            vscode.window.showInformationMessage('DROPDOWN SELECTION: ' + message.id);
+            // vscode.window.showInformationMessage('DROPDOWN SELECTION: ' + message.id);
 
             this.handleVariable(this.formDefinition, message.combo_id, message.id);
             this.reconfigureVisibility(this.formDefinition);
+            // XXX - only run when necessary
+            this.runStepsVerification();
             break;
           case 'radio-clicked':
 
             this.handleVariable(this.formDefinition, message.id, message.value);
             this.reconfigureVisibility(this.formDefinition);
+            // XXX - only run when necessary
+            //this.runStepsVerification();
             break;
           case 'action-scripts-save':
             this.saveStepScripts(message.id,
@@ -265,7 +269,7 @@ export class GenericWebView {
       `;
   }
 
-  public runStepsVerification() {
+  public async runStepsVerification() {
     this.actionsVerify(this.formDefinition);
   }
 
@@ -315,7 +319,7 @@ export class GenericWebView {
     }
   }
 
-  private actionsVerify(data: any) {
+  private async actionsVerify(data: any) {
     try {
       let actionList: any[] = this.getActionList(data);
 
@@ -664,7 +668,6 @@ export class GenericWebView {
         if ('id' in data && data['id'] === id) {
           if ('variable' in data) {
             this.variables[data['variable']] = value;
-            this.runStepsVerification();
           }
           return;
         }
@@ -695,7 +698,7 @@ export class GenericWebView {
           let expected_value = data['show-if']['value'];
           let value = this.variables[variable];
 
-          vscode.window.showInformationMessage('UPDATING show-if: '  + variable + " " + value + " " + expected_value);
+          //vscode.window.showInformationMessage('UPDATING show-if: '  + variable + " " + value + " " + expected_value);
 
           if (value === expected_value) {
             this.showElement(data['id']);
@@ -758,24 +761,28 @@ export class GenericWebView {
       vscode.window.showInformationMessage('EXECUTING QUERY B');
 
       var out = "{}";
+      var shell = "";
       if (process.platform === "win32") {
-        out = cp.execSync(cmd, { shell: 'powershell' });
+        shell = "powershell";
       } else {
-        out = cp.execSync(cmd, { shell: '/bin/bash' });
+        shell = "/bin/bash"
       }
 
-      out = JSON.parse(out.toString());
+      cp.exec(cmd, { shell: shell }, (error: Error, out: string, stderr: string) => {
+        out = JSON.parse(out.toString());
 
-      var ids = JSONPath({path: item['source']['path-id'], json: out});
-      var names = JSONPath({path: item['source']['path-name'], json: out});
-      vscode.window.showInformationMessage('DATA SOURCE RESPONSE ' + JSON.stringify(out));
+        var ids = JSONPath({path: item['source']['path-id'], json: out});
+        var names = JSONPath({path: item['source']['path-name'], json: out});
+        vscode.window.showInformationMessage('DATA SOURCE RESPONSE ' + JSON.stringify(out));
+  
+        item['items'] = [];
+        for (var idx in ids) {
+          item['items'].push({ id: ids[idx], label: names[idx]});
+        }
+  
+        this.postMessage({ command: 'set-items', id: item['id'], items: item['items'] });
+      });
 
-      item['items'] = [];
-      for (var idx in ids) {
-        item['items'].push({ id: ids[idx], label: names[idx]});
-      }
-
-      this.postMessage({ command: 'set-items', id: item['id'], items: item['items'] });
     } catch (e: any) {
       if (printFailure) {
         vscode.window.showInformationMessage('QUERY EXCEPTION ' + e.toString());
