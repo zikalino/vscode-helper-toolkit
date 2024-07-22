@@ -341,6 +341,7 @@ function setActionStatus(id, status) {
 
 function setDropdownItems(id, items) {
   var itemsHtml = "";
+  var selectedId = "undefinedx";
 
   for (var i in items) {
       var item_id = "undefined";
@@ -358,9 +359,16 @@ function setDropdownItems(id, items) {
           ${item_label}
         </vscode-option>
       `;
+      if (selectedId === "undefinedx") {
+        selectedId = item_id;
+      }
     }
 
   document.getElementById(id).innerHTML = itemsHtml;
+
+  // notify about selection
+  vscode.postMessage({ command: 'dropdown-clicked', combo_id: id, id: selectedId });
+
 }
 
 
