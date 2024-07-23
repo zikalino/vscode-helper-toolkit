@@ -21,27 +21,10 @@
     }
   });
 
-var id_idx = 0;
-var ids = new Set();
-function getNextAutoId() {
-  var auto_id = "";
-  do {
-    auto_id = "auto_" + (id_idx++).toString();
-  } while (auto_id in ids);
-  return auto_id;
-}
-
 function formPopulate(data, parent_id) {
   var entries = Array.isArray(data) ? data : [ data ];
 
   for (let entry of entries) {
-
-    if (!('id' in entry)) {
-      entry['id'] = getNextAutoId();
-    }
-    ids.add(entry['id']);
-    // XXX - fail if id already there?
-
     if (entry['type'] === 'layout-welcome') {
       // this layout will have 4 elements
       //  - header

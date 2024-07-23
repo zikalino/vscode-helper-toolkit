@@ -121,7 +121,7 @@ export class GenericWebView {
             this.handleVariable(this.formDefinition, message.combo_id, message.id);
             this.reconfigureVisibility(this.formDefinition);
             // XXX - only run when necessary
-            this.runStepsVerification();
+            //this.runStepsVerification();
             break;
           case 'radio-clicked':
 
@@ -619,6 +619,17 @@ export class GenericWebView {
     return ret;
   }
 
+  private id_idx: number = 1;
+  private ids = new Set();
+  private getNextAutoId() {
+    var auto_id = "";
+    do {
+      auto_id = "auto_" + (this.id_idx++).toString();
+    } while (auto_id in this.ids);
+    return auto_id;
+  }
+  
+
   private processFormDefinition(data: any): boolean {
 
     if (typeof data === 'object') {
@@ -635,6 +646,13 @@ export class GenericWebView {
             if (!platforms.includes(process.platform)) {
                 return true;
             }
+        }
+
+        if ('type' in data && !('id' in data)) {
+          if (!('id' in data)) {
+            data['id'] = this.getNextAutoId();
+          }
+          this.ids.add(data['id']);      
         }
 
         // set initial value of all variables - now just assume we deal with combo
