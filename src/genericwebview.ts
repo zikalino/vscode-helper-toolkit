@@ -700,6 +700,10 @@ export class GenericWebView {
           if ('variable' in data) {
             this.variables[data['variable']] = value;
           }
+
+          // requery relevant data sources
+          this.queryDataSources(this.formDefinition, data['variable'])
+
           return;
         }
 
@@ -752,44 +756,46 @@ export class GenericWebView {
     }
   }
 
-  private queryDataSources(data: any) {
+  private queryDataSources(data: any, variable: string="") {
     try {
       let itemList: any[] = this.getItemsWithDataSource(data);
 
       for (let a of itemList) {
-        this.queryDataSource(a, true);
+        this.queryDataSource(a, true, variable);
       }
     } catch (e) {
       vscode.window.showInformationMessage('EXCEPTION: ' + e);
     }
   }
 
-  private queryDataSource(item: any, printFailure: boolean) {
+  private queryDataSource(item: any, printFailure: boolean, variable: string="") {
     const cp = require('child_process');
+
+    if (variable !== "") {
+      if ('variables' in item) {
+        this.terminalWriteLine("################## " + variable + " -- " + JSON.stringify(item['variables']));
+      }
+    }
+
     try {
-      vscode.window.showInformationMessage('EXECUTING QUERY A');
       var cmd = "";
-      if ('source' in item) {
-        vscode.window.showInformationMessage('EXECUTING QUERY B');
-        //if (process.platform === "win32") {
-        //  for (let v in this.variables) {
-        //    if (item['variables'].includes(v)) {
-        //      cmd += " $" + v + "='" + this.variables[v] + "';";
-        //    }
-        //  }
-        //} else {
-        //  for (let v in this.variables) {
-        //    if (item['variables'].includes(v)) {
-        //      cmd += v + "='" + this.variables[v] + "';";
-        //    }
-        //  }
-        //}
+      if ('variables' in item) {
+        if (process.platform === "win32") {
+          for (let v in this.variables) {
+            if (item['variables'].includes(v)) {
+              cmd += " $" + v + "='" + this.variables[v] + "';";
+            }
+          }
+        } else {
+          for (let v in this.variables) {
+            if (item['variables'].includes(v)) {
+              cmd += v + "='" + this.variables[v] + "';";
+            }
+          }
+        }
       }
 
-      vscode.window.showInformationMessage('EXECUTING QUERY A');
-
       cmd += item['source']['cmd'];
-      vscode.window.showInformationMessage('EXECUTING QUERY B');
 
       var out = "{}";
       var shell = "";
@@ -799,21 +805,23 @@ export class GenericWebView {
         shell = "/bin/bash"
       }
 
-      cp.exec(cmd, { shell: shell }, (error: Error, out: string, stderr: string) => {
-        out = JSON.parse(out.toString());
+      if ((variable === '') || (('variables' in item) && (item['variables'].includes(variable)))) {
+        this.terminalWriteLine("################## " + variable + " -- REQUERY " + cmd);
+        cp.exec(cmd, { shell: shell }, (error: Error, out: string, stderr: string) => {
+          out = JSON.parse(out.toString());
 
-        var ids = JSONPath({path: item['source']['path-id'], json: out});
-        var names = JSONPath({path: item['source']['path-name'], json: out});
-        vscode.window.showInformationMessage('DATA SOURCE RESPONSE ' + JSON.stringify(out));
-  
-        item['items'] = [];
-        for (var idx in ids) {
-          item['items'].push({ id: ids[idx], label: names[idx]});
-        }
-  
-        this.postMessage({ command: 'set-items', id: item['id'], items: item['items'] });
-      });
-
+          var ids = JSONPath({path: item['source']['path-id'], json: out});
+          var names = JSONPath({path: item['source']['path-name'], json: out});
+          vscode.window.showInformationMessage('DATA SOURCE RESPONSE ' + JSON.stringify(out));
+    
+          item['items'] = [];
+          for (var idx in ids) {
+            item['items'].push({ id: ids[idx], label: names[idx]});
+          }
+    
+          this.postMessage({ command: 'set-items', id: item['id'], items: item['items'] });
+        });
+      }
     } catch (e: any) {
       if (printFailure) {
         vscode.window.showInformationMessage('QUERY EXCEPTION ' + e.toString());
