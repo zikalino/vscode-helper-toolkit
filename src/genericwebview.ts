@@ -701,6 +701,23 @@ export class GenericWebView {
             this.variables[data['variable']] = value;
           }
 
+          // setting additional variables based on selection
+          if ('selection' in data) {
+            for (var i = 0; i < data['selection'].length; i++) {
+              let variableName = data['selection'][i]['variable'];
+              let variablePath = data['selection'][i]['path'];
+              let itemData = undefined;
+              for (var j = 0; j < data['data'].length; j++) {
+                if (data['data'][j]['name'] === value) {
+                  itemData = data['data'][j];
+                  break;
+                }
+              }
+              let variableValue = JSONPath({path: variablePath, json: itemData});
+              this.variables[variableName] = variableValue;
+            }            
+          }
+
           // requery relevant data sources
           this.queryDataSources(this.formDefinition, data['variable'])
 
@@ -809,6 +826,9 @@ export class GenericWebView {
         this.terminalWriteLine("################## " + variable + " -- REQUERY " + cmd);
         cp.exec(cmd, { shell: shell }, (error: Error, out: string, stderr: string) => {
           out = JSON.parse(out.toString());
+
+          // store all the data for later use
+          item['data'] = out;
 
           var ids = JSONPath({path: item['source']['path-id'], json: out});
           var names = JSONPath({path: item['source']['path-name'], json: out});
