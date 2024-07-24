@@ -335,7 +335,8 @@ function setDropdownItems(id, items) {
   var itemsHtml = "";
   var selectedId = "undefinedx";
 
-  for (var i in items) {
+  if (items.length > 0) {
+    for (var i in items) {
       var item_id = "undefined";
       var item_label = "undefined";
 
@@ -355,12 +356,19 @@ function setDropdownItems(id, items) {
         selectedId = item_id;
       }
     }
+  } else {
+    itemsHtml += `
+        <vscode-option value='...' label='...'>
+          ...
+        </vscode-option>
+      `;
+  }
 
-  document.getElementById(id).innerHTML = itemsHtml;
+  var dropdownElement = document.getElementById(id);
+  dropdownElement.innerHTML = itemsHtml;
 
   // notify about selection
   vscode.postMessage({ command: 'dropdown-clicked', combo_id: id, id: selectedId });
-
 }
 
 

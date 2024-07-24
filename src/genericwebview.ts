@@ -823,7 +823,10 @@ export class GenericWebView {
       }
 
       if ((variable === '') || (('variables' in item) && (item['variables'].includes(variable)))) {
-        this.terminalWriteLine("################## " + variable + " -- REQUERY " + cmd);
+        
+        // clear items
+        this.postMessage({ command: 'set-items', id: item['id'], items: [] });
+
         cp.exec(cmd, { shell: shell }, (error: Error, out: string, stderr: string) => {
           out = JSON.parse(out.toString());
 
