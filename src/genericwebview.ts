@@ -346,16 +346,16 @@ export class GenericWebView {
     const cp = require('child_process');
     try {
       var cmd = "";
-      if ('variables' in action) {
+      if ('consumes' in action) {
         if (process.platform === "win32") {
           for (let v in this.variables) {
-            if (action['variables'].includes(v)) {
+            if (action['consumes'].includes(v)) {
               cmd += " $" + v + "='" + this.variables[v] + "';";
             }
           }
         } else {
           for (let v in this.variables) {
-            if (action['variables'].includes(v)) {
+            if (action['consumes'].includes(v)) {
               cmd += v + "='" + this.variables[v] + "';";
             }
           }
@@ -494,16 +494,16 @@ export class GenericWebView {
   
       this.displayBannerStart("Installing", action['id'], action['banner'], action['install']);
 
-      if ('variables' in action) {
+      if ('consumes' in action) {
         if (process.platform === "win32") {
           for (let v in this.variables) {
-            if (action['variables'].includes(v)) {
+            if (action['consumes'].includes(v)) {
               this.terminalWriteLine("$" + v + "='" + this.variables[v] + "'");
             }
           }
         } else {
           for (let v in this.variables) {
-            if (action['variables'].includes(v)) {
+            if (action['consumes'].includes(v)) {
               this.terminalWriteLine(v + "='" + this.variables[v] + "'");
             }
           }
@@ -530,16 +530,16 @@ export class GenericWebView {
 
       this.displayBannerStart("Uninstalling", action['id'], undefined, action['uninstall']);
 
-      if ('variables' in action) {
+      if ('consumes' in action) {
         if (process.platform === "win32") {
           for (let v in this.variables) {
-            if (action['variables'].includes(v)) {
+            if (action['consumes'].includes(v)) {
               this.terminalWriteLine("$" + v + "='" + this.variables[v] + "'");
             }
           }
         } else {
           for (let v in this.variables) {
-            if (action['variables'].includes(v)) {
+            if (action['consumes'].includes(v)) {
               this.terminalWriteLine(v + "='" + this.variables[v] + "'");
             }
           }
@@ -789,23 +789,23 @@ export class GenericWebView {
     const cp = require('child_process');
 
     if (variable !== "") {
-      if ('variables' in item) {
-        this.terminalWriteLine("################## " + variable + " -- " + JSON.stringify(item['variables']));
+      if ('consumes' in item) {
+        this.terminalWriteLine("################## " + variable + " -- " + JSON.stringify(item['consumes']));
       }
     }
 
     try {
       var cmd = "";
-      if ('variables' in item) {
+      if ('consumes' in item) {
         if (process.platform === "win32") {
           for (let v in this.variables) {
-            if (item['variables'].includes(v)) {
+            if (item['consumes'].includes(v)) {
               cmd += " $" + v + "='" + this.variables[v] + "';";
             }
           }
         } else {
           for (let v in this.variables) {
-            if (item['variables'].includes(v)) {
+            if (item['consumes'].includes(v)) {
               cmd += v + "='" + this.variables[v] + "';";
             }
           }
@@ -822,10 +822,10 @@ export class GenericWebView {
         shell = "/bin/bash"
       }
 
-      if ((variable === '') || (('variables' in item) && (item['variables'].includes(variable)))) {
+      if ((variable === '') || (('consumes' in item) && (item['consumes'].includes(variable)))) {
         
         // clear items
-        this.postMessage({ command: 'set-items', id: item['id'], items: [] });
+        this.postMessage({ command: 'set-items', id: item['id'], items:  });
 
         cp.exec(cmd, { shell: shell }, (error: Error, out: string, stderr: string) => {
           out = JSON.parse(out.toString());
