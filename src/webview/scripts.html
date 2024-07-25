@@ -333,7 +333,7 @@ function setActionStatus(id, status) {
 
 function setDropdownItems(id, items) {
   var itemsHtml = "";
-  var selectedId = "undefinedx";
+  var selectedId = undefined;
 
   if (items.length > 0) {
     for (var i in items) {
@@ -352,7 +352,7 @@ function setDropdownItems(id, items) {
           ${item_label}
         </vscode-option>
       `;
-      if (selectedId === "undefinedx") {
+      if (selectedId === undefined) {
         selectedId = item_id;
       }
     }
