@@ -825,7 +825,7 @@ export class GenericWebView {
       if ((variable === '') || (('consumes' in item) && (item['consumes'].includes(variable)))) {
         
         // clear items
-        this.postMessage({ command: 'set-items', id: item['id'], items:  });
+        this.postMessage({ command: 'set-items', id: item['id'], items: [] });
 
         cp.exec(cmd, { shell: shell }, (error: Error, out: string, stderr: string) => {
           out = JSON.parse(out.toString());
