@@ -347,17 +347,18 @@ export class GenericWebView {
     try {
       var cmd = "";
       if ('consumes' in action) {
-        if (process.platform === "win32") {
-          for (let v in this.variables) {
-            if (action['consumes'].includes(v)) {
-              cmd += " $" + v + "='" + this.variables[v] + "';";
-            }
+        // verify if all consumed variables are actually properly defined
+        for (let i = 0; i < action['consumes'].length; i++) {
+          let variableName = action['consumes'][i];
+
+          if (this.variables[variableName] === undefined) {
+            return;
           }
-        } else {
-          for (let v in this.variables) {
-            if (action['consumes'].includes(v)) {
-              cmd += v + "='" + this.variables[v] + "';";
-            }
+
+          if (process.platform === "win32") {
+              cmd += " $" + variableName + "='" + this.variables[variableName] + "';";
+          } else {
+              cmd += variableName + "='" + this.variables[variableName] + "';";
           }
         }
       }
@@ -489,26 +490,26 @@ export class GenericWebView {
 
   private async runAction(action: any): Promise<boolean> {
     try { 
-      this.postMessage({ command: 'set-action-status', id: action['id'], status: 'installing' });
-
   
       this.displayBannerStart("Installing", action['id'], action['banner'], action['install']);
 
       if ('consumes' in action) {
-        if (process.platform === "win32") {
-          for (let v in this.variables) {
-            if (action['consumes'].includes(v)) {
-              this.terminalWriteLine("$" + v + "='" + this.variables[v] + "'");
-            }
+        // verify if all consumed variables are actually properly defined
+        for (let i = 0; i < action['consumes'].length; i++) {
+          let variableName = action['consumes'][i];
+
+          if (this.variables[variableName] === undefined) {
+            return false;
           }
-        } else {
-          for (let v in this.variables) {
-            if (action['consumes'].includes(v)) {
-              this.terminalWriteLine(v + "='" + this.variables[v] + "'");
-            }
+
+          if (process.platform === "win32") {
+            this.terminalWriteLine("$" + variableName + "='" + this.variables[variableName] + "'");
+          } else {
+            this.terminalWriteLine(variableName + "='" + this.variables[variableName] + "'");
           }
         }
       }
+      this.postMessage({ command: 'set-action-status', id: action['id'], status: 'installing' });
 
       this.terminalWriteLine(action['install']);
 
@@ -661,10 +662,10 @@ export class GenericWebView {
             if (data.items.length > 0) {
               this.variables[data['variable']] = data['items'][0];
             } else {
-              this.variables[data['variable']] = "unknown";
+              this.variables[data['variable']] = undefined;
             }
           } else {
-            this.variables[data['variable']] = "unknown";
+            this.variables[data['variable']] = undefined;
           }
         }
 
@@ -788,26 +789,22 @@ export class GenericWebView {
   private queryDataSource(item: any, printFailure: boolean, variable: string="") {
     const cp = require('child_process');
 
-    if (variable !== "") {
-      if ('consumes' in item) {
-        this.terminalWriteLine("################## " + variable + " -- " + JSON.stringify(item['consumes']));
-      }
-    }
-
     try {
       var cmd = "";
       if ('consumes' in item) {
-        if (process.platform === "win32") {
-          for (let v in this.variables) {
-            if (item['consumes'].includes(v)) {
-              cmd += " $" + v + "='" + this.variables[v] + "';";
-            }
+
+        // verify if all consumed variables are actually properly defined
+        for (let i = 0; i < item['consumes'].length; i++) {
+          let variableName = item['consumes'][i];
+
+          if (this.variables[variableName] === undefined) {
+            return;
           }
-        } else {
-          for (let v in this.variables) {
-            if (item['consumes'].includes(v)) {
-              cmd += v + "='" + this.variables[v] + "';";
-            }
+
+          if (process.platform === "win32") {
+              cmd += " $" + variableName + "='" + this.variables[variableName] + "';";
+          } else {
+              cmd += variableName + "='" + this.variables[variableName] + "';";
           }
         }
       }
