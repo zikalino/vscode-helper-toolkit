@@ -117,7 +117,7 @@ export class GenericWebView {
             return;
           case 'dropdown-clicked':
             // vscode.window.showInformationMessage('DROPDOWN SELECTION: ' + message.id);
-
+            this.terminalWriteLine("# DROPDOWN CLICKED: " + message.combo_id + " " + message.id);
             this.handleVariable(this.formDefinition, message.combo_id, message.id);
             this.reconfigureVisibility(this.formDefinition);
             // XXX - only run when necessary
@@ -459,19 +459,19 @@ export class GenericWebView {
 }
 
   private async waitForCompletion(action: any): Promise<void> {
-    let filename = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
-
+    let filenameStatus = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
+    let filenameOutput = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
     if (process.platform === "win32") {
-      this.terminalWriteLine("$? | Out-File " + filename + " -Encoding ASCII");
+      this.terminalWriteLine("$? | Out-File " + filenameStatus + " -Encoding ASCII");
     } else {
-      this.terminalWriteLine("echo $? > " + filename);
+      this.terminalWriteLine("echo $? > " + filenameStatus);
     }
 
-    while (!require('fs').existsSync(filename)) {
+    while (!require('fs').existsSync(filenameStatus)) {
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
-    const data = require('fs').readFileSync(filename, 'utf8').toString();
-    require('fs').unlinkSync(filename);
+    const data = require('fs').readFileSync(filenameStatus, 'utf8').toString();
+    require('fs').unlinkSync(filenameStatus);
 
     this.terminalWriteLine("#============================================================");
 
@@ -499,6 +499,7 @@ export class GenericWebView {
           let variableName = action['consumes'][i];
 
           if (this.variables[variableName] === undefined) {
+            this.terminalWriteLine("# MISSING VALUE: " + variableName);
             return false;
           }
 
@@ -511,9 +512,21 @@ export class GenericWebView {
       }
       this.postMessage({ command: 'set-action-status', id: action['id'], status: 'installing' });
 
-      this.terminalWriteLine(action['install']);
+
+      let filenameOutput = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
+      if (process.platform === "win32") {
+        this.terminalWriteLine(action['install'] + " | Out-File " + filenameOutput + " -Encoding ASCII");
+      } else {
+        this.terminalWriteLine(action['install'] + " > " + filenameOutput);
+      }
 
       await this.waitForCompletion(action);
+
+      // Attempt to load JSON if we need to find some data from the command
+      if ('produces' in action) {
+
+      }
+
       this.actionVerify(action, true);
       return true;
     } catch (e) {
@@ -698,6 +711,7 @@ export class GenericWebView {
         }
 
         if ('id' in data && data['id'] === id) {
+          this.terminalWriteLine("# handling variable in: " + id + " " + value);
           if ('variable' in data) {
 
             // matching regex?
@@ -709,18 +723,24 @@ export class GenericWebView {
           }
 
           // setting additional variables based on selection
-          if ('selection' in data) {
-            for (var i = 0; i < data['selection'].length; i++) {
-              let variableName = data['selection'][i]['variable'];
-              let variablePath = data['selection'][i]['path'];
+          if ('produces' in data) {
+            for (var i = 0; i < data['produces'].length; i++) {
+              let variableName = data['produces'][i]['variable'];
+              let variablePath = data['produces'][i]['path'];
               let itemData = undefined;
-              for (var j = 0; j < data['data'].length; j++) {
-                if (data['data'][j]['name'] === value) {
-                  itemData = data['data'][j];
-                  break;
+              let variableValue = undefined;
+              if (value !== undefined) {
+                this.terminalWriteLine("# PRODUCES: " + variableName + " " + variablePath + " " + value);
+                for (var j = 0; j < data['data'].length; j++) {
+                  if (data['data'][j]['name'] === value) {
+                    itemData = data['data'][j];
+                    break;
+                  }
                 }
+                variableValue = JSONPath({path: variablePath, json: itemData});
+                this.terminalWriteLine("# VALUE: " + variableValue);
               }
-              let variableValue = JSONPath({path: variablePath, json: itemData});
+
               this.variables[variableName] = variableValue;
             }            
           }
@@ -838,7 +858,7 @@ export class GenericWebView {
 
           var ids = JSONPath({path: item['source']['path-id'], json: out});
           var names = JSONPath({path: item['source']['path-name'], json: out});
-          vscode.window.showInformationMessage('DATA SOURCE RESPONSE ' + JSON.stringify(out));
+          this.terminalWriteLine('DATA SOURCE RESPONSE ' + JSON.stringify(out));
     
           item['items'] = [];
           for (var idx in ids) {
