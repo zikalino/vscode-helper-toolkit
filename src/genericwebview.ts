@@ -524,7 +524,16 @@ export class GenericWebView {
 
       // Attempt to load JSON if we need to find some data from the command
       if ('produces' in action) {
+        var resultData = require('fs').readFileSync(filenameOutput, "utf8");
+        var resultData = JSON.parse(resultData);
 
+        for (var i = 0; i < action['produces'].length; i++) {
+          let variableName = action['produces'][i]['variable'];
+          let variablePath = action['produces'][i]['path'];
+          let variableValue = JSONPath({path: variablePath, json: resultData});
+          this.variables[variableName] = variableValue;
+          this.terminalWriteLine("# " + variableName + "=" + variableValue);
+        }            
       }
 
       this.actionVerify(action, true);
@@ -688,8 +697,10 @@ export class GenericWebView {
           
 
         for (let key in data) {
-          if (typeof data[key] === 'object') {
-            this.processFormDefinition(data[key]);
+          if (!key.startsWith("$")) {
+            if (typeof data[key] === 'object') {
+              this.processFormDefinition(data[key]);
+            }
           }
         }
       }
@@ -699,6 +710,7 @@ export class GenericWebView {
 
   private handleVariable(data: any, id: string, value: string) {
 
+    this.terminalWriteLine("# handling variable: " + id + " " + value + " --in-- " + data['id']);
     if (typeof data === 'object') {
       if (Array.isArray(data)) {
         for (let i = data.length - 1; i >= 0; i--) {
@@ -731,9 +743,9 @@ export class GenericWebView {
               let variableValue = undefined;
               if (value !== undefined) {
                 this.terminalWriteLine("# PRODUCES: " + variableName + " " + variablePath + " " + value);
-                for (var j = 0; j < data['data'].length; j++) {
-                  if (data['data'][j]['name'] === value) {
-                    itemData = data['data'][j];
+                for (var j = 0; j < data['$data'].length; j++) {
+                  if (data['$data'][j]['name'] === value) {
+                    itemData = data['$data'][j];
                     break;
                   }
                 }
@@ -752,8 +764,10 @@ export class GenericWebView {
         }
 
         for (let key in data) {
-          if (typeof data[key] === 'object') {
-            this.handleVariable(data[key], id, value);
+          if (!key.startsWith("$")) {
+            if (typeof data[key] === 'object') {
+              this.handleVariable(data[key], id, value);
+            }
           }
         }
       }
@@ -792,8 +806,10 @@ export class GenericWebView {
         }
 
         for (let key in data) {
-          if (typeof data[key] === 'object') {
-            this.reconfigureVisibility(data[key]);
+          if (!key.startsWith("$")) {
+            if (typeof data[key] === 'object') {
+              this.reconfigureVisibility(data[key]);
+            }
           }
         }
       }
@@ -854,11 +870,11 @@ export class GenericWebView {
           out = JSON.parse(out.toString());
 
           // store all the data for later use
-          item['data'] = out;
+          item['$data'] = out;
 
           var ids = JSONPath({path: item['source']['path-id'], json: out});
           var names = JSONPath({path: item['source']['path-name'], json: out});
-          this.terminalWriteLine('DATA SOURCE RESPONSE ' + JSON.stringify(out));
+          this.terminalWriteLine('# DATA SOURCE RESPONSE');
     
           item['items'] = [];
           for (var idx in ids) {
