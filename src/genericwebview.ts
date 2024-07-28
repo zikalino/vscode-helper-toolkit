@@ -117,22 +117,22 @@ export class GenericWebView {
             return;
           case 'dropdown-clicked':
             // vscode.window.showInformationMessage('DROPDOWN SELECTION: ' + message.id);
-            this.terminalWriteLine("# DROPDOWN CLICKED: " + message.combo_id + " " + message.id);
-            this.handleVariable(this.formDefinition, message.combo_id, message.id);
+            //this.terminalWriteLine("# DROPDOWN CLICKED: " + message.combo_id + " " + message.id);
+            this.handleFieldUpdate(message.combo_id, message.id);
             this.reconfigureVisibility(this.formDefinition);
             // XXX - only run when necessary
             //this.runStepsVerification();
             break;
           case 'radio-clicked':
 
-            this.handleVariable(this.formDefinition, message.id, message.value);
+            this.handleFieldUpdate(message.id, message.value);
             this.reconfigureVisibility(this.formDefinition);
             // XXX - only run when necessary
             //this.runStepsVerification();
             break;
           case 'input-changed':
 
-            this.handleVariable(this.formDefinition, message.id, message.value);
+            this.handleFieldUpdate(message.id, message.value);
             this.reconfigureVisibility(this.formDefinition);
             // XXX - only run when necessary
             //this.runStepsVerification();
@@ -708,70 +708,109 @@ export class GenericWebView {
     return false;
   }
 
-  private handleVariable(data: any, id: string, value: string) {
+  private handleFieldUpdate(field_id: string, value: any) {
+    let field = this.findField(this.formDefinition, field_id);
+    let variableName = undefined;
+    let variableValue = value;
 
-    this.terminalWriteLine("# handling variable: " + id + " " + value + " --in-- " + data['id']);
+    if (field !== undefined) {
+      //this.terminalWriteLine("# handling variable in: " + id + " " + value);
+      // XXX - this should be obsoleted
+      if ('variable' in field) {
+        if (('regex' in field) && !value.match(field['regex'])) {
+          variableValue = undefined;
+        }
+        variableName = field['variable'];
+        this.updateVariable(variableName, variableValue);
+      }
+
+      // setting additional variables based on selection
+      if ('produces' in field) {
+        for (var i = 0; i < field['produces'].length; i++) {
+          let curName = field['produces'][i]['variable'];
+          let curValue = value;
+          if (!('path' in field['produces'][i])) {
+            // there's no path given, meaning we are going to store main value
+            variableName = curName;
+            if (('regex' in field['produces'][i]) && !curValue.match(field['produces'][i]['regex'])) {
+              variableValue = undefined;
+            }
+          } else {
+            let variablePath = field['produces'][i]['path'];
+            let itemData = undefined;
+            if (variableValue !== undefined) {
+              //this.terminalWriteLine("# PRODUCES: " + variableName + " " + variablePath + " " + value);
+              for (var j = 0; j < field['$data'].length; j++) {
+                // XXX - this is wrong -- it doesn't have to be name
+                if (field['$data'][j]['name'] === variableValue) {
+                  itemData = field['$data'][j];
+                  break;
+                }
+              }
+              variableValue = JSONPath({path: variablePath, json: itemData});
+              //this.terminalWriteLine("# VALUE: " + variableValue);
+            }
+          }
+
+          this.updateVariable(curName, variableValue);
+        }        
+      }    
+    }
+  }
+
+  private updateVariable(name: string, value: any) {
+
+    if (this.variables[name] !== value) {
+      this.variables[name] = value;
+
+      // requery relevant data sources
+      if (value !== undefined) {
+        // XXX - probably should be called if undefined as well
+        this.queryDataSources(this.formDefinition, name);
+      }
+
+      // XXX - write to terminal as well
+      if (process.platform === "win32") {
+        this.terminalWriteLine("$" + name + "='" + this.variables[name] + "'");
+      } else {
+        this.terminalWriteLine(name + "='" + this.variables[name] + "'");
+      }
+    }
+  }
+
+  private findField(data: any, id: string): any {
+
     if (typeof data === 'object') {
       if (Array.isArray(data)) {
         for (let i = data.length - 1; i >= 0; i--) {
-          this.handleVariable(data[i], id, value);
+          var found: any = this.findField(data[i], id);
+          if (found !== undefined) {
+            return found;
+          }
         }
       }
       else {
         if ('hidden' in data && data['hidden']) {
-          return;
+          return undefined;
         }
 
         if ('id' in data && data['id'] === id) {
-          this.terminalWriteLine("# handling variable in: " + id + " " + value);
-          if ('variable' in data) {
-
-            // matching regex?
-            if (!('regex' in data) || value.match(data['regex'])) {
-              this.variables[data['variable']] = value;
-            } else {
-              this.variables[data['variable']] = undefined;
-            }
-          }
-
-          // setting additional variables based on selection
-          if ('produces' in data) {
-            for (var i = 0; i < data['produces'].length; i++) {
-              let variableName = data['produces'][i]['variable'];
-              let variablePath = data['produces'][i]['path'];
-              let itemData = undefined;
-              let variableValue = undefined;
-              if (value !== undefined) {
-                this.terminalWriteLine("# PRODUCES: " + variableName + " " + variablePath + " " + value);
-                for (var j = 0; j < data['$data'].length; j++) {
-                  if (data['$data'][j]['name'] === value) {
-                    itemData = data['$data'][j];
-                    break;
-                  }
-                }
-                variableValue = JSONPath({path: variablePath, json: itemData});
-                this.terminalWriteLine("# VALUE: " + variableValue);
-              }
-
-              this.variables[variableName] = variableValue;
-            }            
-          }
-
-          // requery relevant data sources
-          this.queryDataSources(this.formDefinition, data['variable'])
-
-          return;
+          return data;
         }
 
         for (let key in data) {
           if (!key.startsWith("$")) {
             if (typeof data[key] === 'object') {
-              this.handleVariable(data[key], id, value);
+              var found = this.findField(data[key], id);
+              if (found !== undefined) {
+                return found;
+              }
             }
           }
         }
       }
     }
+    return undefined;
   }
 
   private reconfigureVisibility(data: any) {
@@ -821,7 +860,11 @@ export class GenericWebView {
       let itemList: any[] = this.getItemsWithDataSource(data);
 
       for (let a of itemList) {
-        this.queryDataSource(a, true, variable);
+        if (this.queryCount < 2) {
+          this.queryDataSource(a, true, variable);
+        } else {
+          //this.terminalWriteLine("# ATTEMPT TO QUERY " + variable + " BUT " + this.queryCount.toString() + " PENDING");
+        }
       }
     } catch (e) {
       vscode.window.showInformationMessage('EXCEPTION: ' + e);
@@ -862,11 +905,14 @@ export class GenericWebView {
       }
 
       if ((variable === '') || (('consumes' in item) && (item['consumes'].includes(variable)))) {
+        //this.terminalWriteLine('# QUERY DATA SOURCE ' + variable + " ");
         
         // clear items
         this.postMessage({ command: 'set-items', id: item['id'], items: [] });
 
+        this.queryCount++;
         cp.exec(cmd, { shell: shell }, (error: Error, out: string, stderr: string) => {
+          this.queryCount--;
           out = JSON.parse(out.toString());
 
           // store all the data for later use
@@ -874,7 +920,7 @@ export class GenericWebView {
 
           var ids = JSONPath({path: item['source']['path-id'], json: out});
           var names = JSONPath({path: item['source']['path-name'], json: out});
-          this.terminalWriteLine('# DATA SOURCE RESPONSE');
+          //this.terminalWriteLine('# DATA SOURCE RESPONSE');
     
           item['items'] = [];
           for (var idx in ids) {
@@ -911,6 +957,7 @@ export class GenericWebView {
   private name: string;
   private formDefinition: any;
   private variables: any = {};
+  private queryCount = 0;
   // what is actually created here?
 }
 
