@@ -857,7 +857,7 @@ export class GenericWebView {
       let itemList: any[] = this.getItemsWithDataSource(data);
 
       for (let a of itemList) {
-        if (this.queryCount < 2) {
+        if (this.queryCount < 6) {
           this.queryDataSource(a, true, variable);
         } else {
           //this.terminalWriteLine("# ATTEMPT TO QUERY " + variable + " BUT " + this.queryCount.toString() + " PENDING");
