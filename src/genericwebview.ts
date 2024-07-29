@@ -679,18 +679,15 @@ export class GenericWebView {
         }
 
         // set initial value of all variables - now just assume we deal with combo
-        if ('variable' in data) {
-          if ('items' in data) {
-            if (data.items.length > 0) {
-              this.variables[data['variable']] = data['items'][0];
-            } else {
-              this.variables[data['variable']] = undefined;
+        if ('produces' in data) {
+          if ('items' in data && data['items'].length > 0) {
+            for (var i = 0; i < data['produces'].length; i++) {
+              this.updateVariable(data['produces'][i]['variable'], data['items'][0]);
             }
-          } else {
-            this.variables[data['variable']] = undefined;
           }
         }
 
+        // XXX - fix default
         if (('variable' in data) && ('default' in data) && data['default']) {
           this.variables[data['variable']] = data['value'];
         }
