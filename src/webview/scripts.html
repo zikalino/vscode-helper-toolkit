@@ -15,6 +15,9 @@
       case 'set-action-status':
         setActionStatus(message.id, message.status);
         break;
+      case 'set-action-disabled':
+        setActionDisabled(message.id, message.disabled);
+        break;
       case 'set-items':
         setDropdownItems(message.id, message.items);
         break;
@@ -328,6 +331,14 @@ function setActionStatus(id, status) {
     document.getElementById(id + "-ring").style.visibility = 'hidden';
     document.getElementById(id + "-icon").setAttribute("class", "action-row-icon codicon codicon-circle-slash");
     document.getElementById(id + "-icon").setAttribute("style", "color: orange; font-size: 24px;");
+  }
+}
+
+function setActionDisabled(id, disabled) {
+  if (disabled) {
+    document.getElementById(id + "-action-row-update").disabled = true;
+  } else {
+    document.getElementById(id + "-action-row-update").disabled = false;
   }
 }
 

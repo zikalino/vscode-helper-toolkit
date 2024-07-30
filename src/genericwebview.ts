@@ -326,6 +326,43 @@ export class GenericWebView {
     }
   }
 
+  //-------------------------------------------------------------------------------------------------------------------
+  // actionsVerify()
+  //
+  // This function run verification list on all the actions.
+  //
+  //-------------------------------------------------------------------------------------------------------------------
+  private async actionsValidateInput(data: any) {
+    let actionList: any[] = this.getActionList(data);
+    for (let a of actionList) {
+      this.actionValidateInput(a);
+    }
+  }
+
+  private actionValidateInput(action: any) {
+    if ('consumes' in action) {
+      // verify if all consumed variables are actually properly defined
+      for (let i = 0; i < action['consumes'].length; i++) {
+        let variableName = action['consumes'][i];
+
+        if (this.variables[variableName] === undefined) {
+          this.terminalWriteLine("# DISABLING ACTION" + action.id + ": " + variableName + " = " + this.variables[variableName]);
+          this.postMessage({ command: 'set-action-disabled', id: action['id'], disabled: true });
+          return;
+        }
+      }
+    }
+
+    this.terminalWriteLine("# ENABLING ACTION " + action.id);
+    this.postMessage({ command: 'set-action-disabled', id: action['id'], disabled: false });
+  }
+
+  //-------------------------------------------------------------------------------------------------------------------
+  // actionsVerify()
+  //
+  // This function run verification list on all the actions.
+  //
+  //-------------------------------------------------------------------------------------------------------------------
   private async actionsVerify(data: any) {
     try {
       let actionList: any[] = this.getActionList(data);
@@ -386,6 +423,12 @@ export class GenericWebView {
     }
   }
 
+  //-------------------------------------------------------------------------------------------------------------------
+  // actionsInstall()
+  //
+  // This function run installation on all the actions.
+  //
+  //-------------------------------------------------------------------------------------------------------------------
   private async actionsInstall(data: any) {
     try {
       let actionList: any[] = this.getActionList(data);
@@ -588,6 +631,12 @@ export class GenericWebView {
     return true;
   }
 
+  //-------------------------------------------------------------------------------------------------------------------
+  // getActionList()
+  //
+  // This function returns list of all actions that are not hidden from the form
+  //
+  //-------------------------------------------------------------------------------------------------------------------
   private getActionList(data: any): any[] {
     let ret : any[] = [];
     if (typeof data === 'object') {
@@ -615,6 +664,14 @@ export class GenericWebView {
     return ret;
   }
 
+  //-------------------------------------------------------------------------------------------------------------------
+  // getItemsWithDataSource()
+  //
+  // This function returns list of all items that require date query.
+  // Currently these are:
+  //  - dropdowns
+  //
+  //-------------------------------------------------------------------------------------------------------------------
   private getItemsWithDataSource(data: any): any[] {
     let ret : any[] = [];
     if (typeof data === 'object') {
@@ -732,6 +789,10 @@ export class GenericWebView {
             if (('regex' in field['produces'][i]) && !curValue.match(field['produces'][i]['regex'])) {
               variableValue = undefined;
             }
+
+            if (variableValue == "") {
+              variableValue = undefined;
+            }
           } else {
             let variablePath = field['produces'][i]['path'];
             let itemData = undefined;
@@ -765,6 +826,9 @@ export class GenericWebView {
         // XXX - probably should be called if undefined as well
         this.queryDataSources(this.formDefinition, name);
       }
+
+      // revalidate input in any case
+      this.actionsValidateInput(this.formDefinition);
 
       // XXX - write to terminal as well
       if (process.platform === "win32") {
