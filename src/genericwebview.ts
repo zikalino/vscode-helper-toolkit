@@ -974,8 +974,11 @@ export class GenericWebView {
         this.postMessage({ command: 'set-items', id: item['id'], items: [] });
 
         this.queryCount++;
+        this.postMessage({ command: 'set-field-busy', id: item['id'], busy: true });    
+
         cp.exec(cmd, { shell: shell }, (error: Error, out: string, stderr: string) => {
           this.queryCount--;
+          this.postMessage({ command: 'set-field-busy', id: item['id'], busy: false });    
           out = JSON.parse(out.toString());
 
           // store all the data for later use

@@ -23,6 +23,10 @@
         setInputInvalid(message.id, message.invalid);
         break;
 
+      case 'set-field-busy':
+        setFieldBusy(message.id, message.busy);
+        break;
+
       case 'set-items':
         setDropdownItems(message.id, message.items);
         break;
@@ -359,6 +363,18 @@ function setInputInvalid(id, invalid) {
   }
 }
 
+function setFieldBusy(id, busy) {
+  var el = document.getElementById(id);
+  var elBusy = document.getElementById(id + "-busy");
+
+  if (busy && !elBusy) {
+    el.insertAdjacentHTML("beforeend", '<span id="' + id + '-busy" slot="start" class="codicon codicon-cloud-download" style="color: blue;"></span>');
+  }
+  if (!busy && elBusy) {
+    el.removeChild(elBusy);
+  }
+}
+
 function setDropdownItems(id, items) {
   var itemsHtml = "";
   var selectedId = undefined;
@@ -385,11 +401,11 @@ function setDropdownItems(id, items) {
       }
     }
   } else {
-    itemsHtml += `
-        <vscode-option value='...' label='...'>
-          ...
-        </vscode-option>
-      `;
+    //itemsHtml += `
+    //    <vscode-option value='...' label='...'>
+    //      ...
+    //    </vscode-option>
+    //  `;
   }
 
   var dropdownElement = document.getElementById(id);
