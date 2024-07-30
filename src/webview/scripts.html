@@ -599,7 +599,9 @@ function createTextArea(parent_id, entry) {
 function createTextField(parent_id, entry) {
   var id = ('id' in entry) ? entry['id'] : 'unknown';
   var html = `
-        <vscode-text-field style='width: 100%;' onfocusout="onInputChanged('${id}', this.value)">${entry['name']}</vscode-text-field>
+        <vscode-text-field style='width: 100%; color: red;' onfocusout="onInputChanged('${id}', this.value)">${entry['name']}
+          <span slot="end" class="codicon codicon-warning" style="color: red; display: none;"></span>
+        </vscode-text-field>
       `;
       document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
 }
