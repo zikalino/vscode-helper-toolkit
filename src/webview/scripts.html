@@ -18,6 +18,11 @@
       case 'set-action-disabled':
         setActionDisabled(message.id, message.disabled);
         break;
+
+      case 'set-input-invalid':
+        setInputInvalid(message.id, message.invalid);
+        break;
+
       case 'set-items':
         setDropdownItems(message.id, message.items);
         break;
@@ -342,6 +347,18 @@ function setActionDisabled(id, disabled) {
   }
 }
 
+function setInputInvalid(id, invalid) {
+  var el = document.getElementById(id + "-input");
+  var elWarning = document.getElementById(id + "-input-warning");
+
+  if (invalid && !elWarning) {
+    el.insertAdjacentHTML("beforeend", '<span id="' + id + '-input-warning" slot="end" class="codicon codicon-warning" style="color: red;"></span>');
+  }
+  if (!invalid && elWarning) {
+    el.removeChild(elWarning);
+  }
+}
+
 function setDropdownItems(id, items) {
   var itemsHtml = "";
   var selectedId = undefined;
@@ -599,8 +616,7 @@ function createTextArea(parent_id, entry) {
 function createTextField(parent_id, entry) {
   var id = ('id' in entry) ? entry['id'] : 'unknown';
   var html = `
-        <vscode-text-field style='width: 100%; color: red;' onfocusout="onInputChanged('${id}', this.value)">${entry['name']}
-          <span slot="end" class="codicon codicon-warning" style="color: red; display: none;"></span>
+        <vscode-text-field id='${id}-input' style='width: 100%; color: red;' onfocusout="onTextFocusOut('${id}', this.value)" oninput="onTextInput('${id}', this.value)">${entry['name']}
         </vscode-text-field>
       `;
       document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
@@ -2535,7 +2551,11 @@ function onScrollableWheel(e, scrollbarId) {
   }
 }
 
-function onInputChanged(id, value) {
+function onTextInput(id, value) {
+
+}
+
+function onTextFocusOut(id, value) {
   vscode.postMessage({ command: 'input-changed', id: id, value: value })
 }
 

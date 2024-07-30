@@ -793,6 +793,8 @@ export class GenericWebView {
             if (variableValue == "") {
               variableValue = undefined;
             }
+            this.postMessage({ command: 'set-input-invalid', id: field_id, invalid: (variableValue === undefined) });    
+            this.updateVariable(variableName, variableValue);    
           } else {
             let variablePath = field['produces'][i]['path'];
             let itemData = undefined;
