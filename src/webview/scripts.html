@@ -368,7 +368,7 @@ function setFieldBusy(id, busy) {
   var elBusy = document.getElementById(id + "-busy");
 
   if (busy && !elBusy) {
-    el.insertAdjacentHTML("beforeend", '<span id="' + id + '-busy" slot="start" class="codicon codicon-cloud-download" style="color: blue;"></span>');
+    el.insertAdjacentHTML("beforeend", '<span id="' + id + '-busy" slot="start" class="codicon codicon-clock" style="color: blue;"></span>');
   }
   if (!busy && elBusy) {
     el.removeChild(elBusy);
