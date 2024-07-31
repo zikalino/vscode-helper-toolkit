@@ -344,11 +344,12 @@ export class GenericWebView {
       // verify if all consumed variables are actually properly defined
       for (let i = 0; i < action['consumes'].length; i++) {
         let variableName = action['consumes'][i];
-
-        if (this.variables[variableName] === undefined) {
-          this.terminalWriteLine("# DISABLING ACTION" + action.id + ": " + variableName + " = " + this.variables[variableName]);
-          this.postMessage({ command: 'set-action-disabled', id: action['id'], disabled: true });
-          return;
+        if (typeof variableName === 'string') {
+          if (this.variables[variableName] === undefined) {
+            this.terminalWriteLine("# DISABLING ACTION" + action.id + ": " + variableName + " = " + this.variables[variableName]);
+            this.postMessage({ command: 'set-action-disabled', id: action['id'], disabled: true });
+            return;
+          }
         }
       }
     }
@@ -387,15 +388,17 @@ export class GenericWebView {
         // verify if all consumed variables are actually properly defined
         for (let i = 0; i < action['consumes'].length; i++) {
           let variableName = action['consumes'][i];
+          if (typeof variableName === 'string') {
 
-          if (this.variables[variableName] === undefined) {
-            return;
-          }
+            if (this.variables[variableName] === undefined) {
+              return;
+            }
 
-          if (process.platform === "win32") {
-              cmd += " $" + variableName + "='" + this.variables[variableName] + "';";
-          } else {
-              cmd += variableName + "='" + this.variables[variableName] + "';";
+            if (process.platform === "win32") {
+                cmd += " $" + variableName + "='" + this.variables[variableName] + "';";
+            } else {
+                cmd += variableName + "='" + this.variables[variableName] + "';";
+            }
           }
         }
       }
@@ -540,16 +543,17 @@ export class GenericWebView {
         // verify if all consumed variables are actually properly defined
         for (let i = 0; i < action['consumes'].length; i++) {
           let variableName = action['consumes'][i];
+          if (typeof variableName === 'string') {
+            if (this.variables[variableName] === undefined) {
+              this.terminalWriteLine("# MISSING VALUE: " + variableName);
+              return false;
+            }
 
-          if (this.variables[variableName] === undefined) {
-            this.terminalWriteLine("# MISSING VALUE: " + variableName);
-            return false;
-          }
-
-          if (process.platform === "win32") {
-            this.terminalWriteLine("$" + variableName + "='" + this.variables[variableName] + "'");
-          } else {
-            this.terminalWriteLine(variableName + "='" + this.variables[variableName] + "'");
+            if (process.platform === "win32") {
+              this.terminalWriteLine("$" + variableName + "='" + this.variables[variableName] + "'");
+            } else {
+              this.terminalWriteLine(variableName + "='" + this.variables[variableName] + "'");
+            }
           }
         }
       }
@@ -945,14 +949,16 @@ export class GenericWebView {
         for (let i = 0; i < item['consumes'].length; i++) {
           let variableName = item['consumes'][i];
 
-          if (this.variables[variableName] === undefined) {
-            return;
-          }
+          if (typeof variableName === 'string') {
+            if (this.variables[variableName] === undefined) {
+              return;
+            }
 
-          if (process.platform === "win32") {
-              cmd += " $" + variableName + "='" + this.variables[variableName] + "';";
-          } else {
-              cmd += variableName + "='" + this.variables[variableName] + "';";
+            if (process.platform === "win32") {
+                cmd += " $" + variableName + "='" + this.variables[variableName] + "';";
+            } else {
+                cmd += variableName + "='" + this.variables[variableName] + "';";
+            }
           }
         }
       }
