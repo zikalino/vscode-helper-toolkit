@@ -343,13 +343,11 @@ export class GenericWebView {
     if ('consumes' in action) {
       // verify if all consumed variables are actually properly defined
       for (let i = 0; i < action['consumes'].length; i++) {
-        let variableName = action['consumes'][i];
-        if (typeof variableName === 'string') {
-          if (this.variables[variableName] === undefined) {
-            this.terminalWriteLine("# DISABLING ACTION" + action.id + ": " + variableName + " = " + this.variables[variableName]);
-            this.postMessage({ command: 'set-action-disabled', id: action['id'], disabled: true });
-            return;
-          }
+        let variableName = action['consumes'][i]['variable'];
+        if (this.variables[variableName] === undefined) {
+          this.terminalWriteLine("# DISABLING ACTION" + action.id + ": " + variableName + " = " + this.variables[variableName]);
+          this.postMessage({ command: 'set-action-disabled', id: action['id'], disabled: true });
+          return;
         }
       }
     }
@@ -387,18 +385,15 @@ export class GenericWebView {
       if ('consumes' in action) {
         // verify if all consumed variables are actually properly defined
         for (let i = 0; i < action['consumes'].length; i++) {
-          let variableName = action['consumes'][i];
-          if (typeof variableName === 'string') {
+          let variableName = action['consumes'][i]['variable'];
+          if (this.variables[variableName] === undefined) {
+            return;
+          }
 
-            if (this.variables[variableName] === undefined) {
-              return;
-            }
-
-            if (process.platform === "win32") {
-                cmd += " $" + variableName + "='" + this.variables[variableName] + "';";
-            } else {
-                cmd += variableName + "='" + this.variables[variableName] + "';";
-            }
+          if (process.platform === "win32") {
+              cmd += " $" + variableName + "='" + this.variables[variableName] + "';";
+          } else {
+              cmd += variableName + "='" + this.variables[variableName] + "';";
           }
         }
       }
@@ -542,18 +537,16 @@ export class GenericWebView {
       if ('consumes' in action) {
         // verify if all consumed variables are actually properly defined
         for (let i = 0; i < action['consumes'].length; i++) {
-          let variableName = action['consumes'][i];
-          if (typeof variableName === 'string') {
-            if (this.variables[variableName] === undefined) {
-              this.terminalWriteLine("# MISSING VALUE: " + variableName);
-              return false;
-            }
+          let variableName = action['consumes'][i]['variable'];
+          if (this.variables[variableName] === undefined) {
+            this.terminalWriteLine("# MISSING VALUE: " + variableName);
+            return false;
+          }
 
-            if (process.platform === "win32") {
-              this.terminalWriteLine("$" + variableName + "='" + this.variables[variableName] + "'");
-            } else {
-              this.terminalWriteLine(variableName + "='" + this.variables[variableName] + "'");
-            }
+          if (process.platform === "win32") {
+            this.terminalWriteLine("$" + variableName + "='" + this.variables[variableName] + "'");
+          } else {
+            this.terminalWriteLine(variableName + "='" + this.variables[variableName] + "'");
           }
         }
       }
@@ -603,13 +596,13 @@ export class GenericWebView {
       if ('consumes' in action) {
         if (process.platform === "win32") {
           for (let v in this.variables) {
-            if (action['consumes'].includes(v)) {
+            if (this.consumesIncludes(action['consumes'], v)) {
               this.terminalWriteLine("$" + v + "='" + this.variables[v] + "'");
             }
           }
         } else {
           for (let v in this.variables) {
-            if (action['consumes'].includes(v)) {
+            if (this.consumesIncludes(action['consumes'], v)) {
               this.terminalWriteLine(v + "='" + this.variables[v] + "'");
             }
           }
@@ -947,18 +940,15 @@ export class GenericWebView {
 
         // verify if all consumed variables are actually properly defined
         for (let i = 0; i < item['consumes'].length; i++) {
-          let variableName = item['consumes'][i];
+          let variableName = item['consumes'][i]['variable'];
+          if (this.variables[variableName] === undefined) {
+            return;
+          }
 
-          if (typeof variableName === 'string') {
-            if (this.variables[variableName] === undefined) {
-              return;
-            }
-
-            if (process.platform === "win32") {
-                cmd += " $" + variableName + "='" + this.variables[variableName] + "';";
-            } else {
-                cmd += variableName + "='" + this.variables[variableName] + "';";
-            }
+          if (process.platform === "win32") {
+              cmd += " $" + variableName + "='" + this.variables[variableName] + "';";
+          } else {
+              cmd += variableName + "='" + this.variables[variableName] + "';";
           }
         }
       }
@@ -973,7 +963,7 @@ export class GenericWebView {
         shell = "/bin/bash"
       }
 
-      if ((variable === '') || (('consumes' in item) && (item['consumes'].includes(variable)))) {
+      if ((variable === '') || (('consumes' in item) && this.consumesIncludes(item['consumes'], variable))) {
         //this.terminalWriteLine('# QUERY DATA SOURCE ' + variable + " ");
         
         // clear items
@@ -1015,6 +1005,14 @@ export class GenericWebView {
     }
   }
 
+  private consumesIncludes(consumes: any[], v: string) : boolean {
+    for (var i = 0; i < consumes.length; i++) {
+      if (consumes[i]['variable'] === v) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   private terminalWriteLine(line: string): void {
     if (terminal === undefined || terminal.exitStatus !== undefined) {
