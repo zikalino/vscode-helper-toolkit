@@ -345,7 +345,7 @@ export class GenericWebView {
       for (let i = 0; i < action['consumes'].length; i++) {
         let variableName = action['consumes'][i]['variable'];
         if (this.variables[variableName] === undefined) {
-          this.terminalWriteLine("# DISABLING ACTION" + action.id + ": " + variableName + " = " + this.variables[variableName]);
+          //this.terminalWriteLine("# DISABLING ACTION" + action.id + ": " + variableName + " = " + this.variables[variableName]);
           this.postMessage({ command: 'set-action-disabled', id: action['id'], disabled: true });
           return;
         }
@@ -900,6 +900,7 @@ export class GenericWebView {
 
           if (value === expected_value) {
             this.showElement(data['id']);
+            this.syncVariables(data, true);
           } else {
             this.hideElement(data['id']);
             this.syncVariables(data, false);
@@ -933,7 +934,14 @@ export class GenericWebView {
         if ('produces' in data) {
           for (var i = 0; i < data['produces'].length; i++) {
             if (!visible) {
+              if (data['produces'][i]['variable'] in this.variables) {
+                data['produces'][i]['$cached-value'] = this.variables[data['produces'][i]['variable']];
+              }
               this.updateVariable(data['produces'][i]['variable'], undefined);
+            } else {
+              if ('$cached-value' in data['produces'][i]) {
+                this.updateVariable(data['produces'][i]['variable'], data['produces'][i]['$cached-value']);
+              }
             }
           }
         }
