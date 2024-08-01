@@ -531,14 +531,16 @@ export class GenericWebView {
 
   private async runAction(action: any): Promise<boolean> {
     try { 
-  
       this.displayBannerStart("Installing", action['id'], action['banner'], action['install']);
+
+      var cmd = action['install'];
 
       if ('consumes' in action) {
         // verify if all consumed variables are actually properly defined
         for (let i = 0; i < action['consumes'].length; i++) {
-          let variableName = action['consumes'][i]['variable'];
-          if (this.variables[variableName] === undefined) {
+          let v = action['consumes'][i];
+          let variableName = v['variable'];
+          if ((this.variables[variableName] === undefined) && (!('required' in v) || v['required'])) {
             this.terminalWriteLine("# MISSING VALUE: " + variableName);
             return false;
           }
@@ -548,6 +550,10 @@ export class GenericWebView {
           } else {
             this.terminalWriteLine(variableName + "='" + this.variables[variableName] + "'");
           }
+
+          if ('parameter' in v) {
+            cmd += " " + v['parameter'];
+          }
         }
       }
       this.postMessage({ command: 'set-action-status', id: action['id'], status: 'installing' });
@@ -555,9 +561,9 @@ export class GenericWebView {
 
       let filenameOutput = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
       if (process.platform === "win32") {
-        this.terminalWriteLine(action['install'] + " | Out-File " + filenameOutput + " -Encoding ASCII");
+        this.terminalWriteLine(cmd + " | Out-File " + filenameOutput + " -Encoding ASCII");
       } else {
-        this.terminalWriteLine(action['install'] + " > " + filenameOutput);
+        this.terminalWriteLine(cmd + " > " + filenameOutput);
       }
 
       await this.waitForCompletion(action);
