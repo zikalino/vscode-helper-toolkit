@@ -902,6 +902,7 @@ export class GenericWebView {
             this.showElement(data['id']);
           } else {
             this.hideElement(data['id']);
+            this.syncVariables(data, false);
           }
         }
 
@@ -914,6 +915,33 @@ export class GenericWebView {
           if (!key.startsWith("$")) {
             if (typeof data[key] === 'object') {
               this.reconfigureVisibility(data[key]);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  private syncVariables(data: any, visible: boolean) {
+    if (typeof data === 'object') {
+      if (Array.isArray(data)) {
+        for (let i = data.length - 1; i >= 0; i--) {
+          this.syncVariables(data[i], visible);
+        }
+      }
+      else {
+        if ('produces' in data) {
+          for (var i = 0; i < data['produces'].length; i++) {
+            if (!visible) {
+              this.updateVariable(data['produces'][i]['variable'], undefined);
+            }
+          }
+        }
+
+        for (let key in data) {
+          if (!key.startsWith("$")) {
+            if (typeof data[key] === 'object') {
+              this.syncVariables(data[key], visible);
             }
           }
         }
