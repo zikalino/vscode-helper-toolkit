@@ -766,9 +766,14 @@ export class GenericWebView {
   }
 
   private handleFieldUpdate(field_id: string, value: any) {
-    let field = this.findField(this.formDefinition, field_id);
     let variableName = undefined;
     let variableValue = value;
+    let field = this.findField(this.formDefinition, field_id);
+    let hidden = false;
+    if (field === undefined) {
+      field = this.findField(this.formDefinition, field_id, true);
+      hidden = true;
+    }
 
     if (field !== undefined) {
       //this.terminalWriteLine("# handling variable in: " + id + " " + value);
@@ -778,7 +783,9 @@ export class GenericWebView {
           variableValue = undefined;
         }
         variableName = field['variable'];
-        this.updateVariable(variableName, variableValue);
+        if (!hidden) {
+          this.updateVariable(variableName, variableValue);
+        }
       }
 
       // setting additional variables based on selection
@@ -797,7 +804,11 @@ export class GenericWebView {
               variableValue = undefined;
             }
             this.postMessage({ command: 'set-input-invalid', id: field_id, invalid: (variableValue === undefined) });    
-            this.updateVariable(variableName, variableValue);    
+            if (!hidden) {
+              this.updateVariable(variableName, variableValue);
+            } else {
+              field['produces'][i]['$cached-value'] = variableValue;
+            }
           } else {
             let variablePath = field['produces'][i]['path'];
             let itemData = undefined;
@@ -815,7 +826,11 @@ export class GenericWebView {
             }
           }
 
-          this.updateVariable(curName, variableValue);
+          if (!hidden) {
+            this.updateVariable(curName, variableValue);
+          } else {
+            field['produces'][i]['$cached-value'] = variableValue;
+          }
         }        
       }    
     }
@@ -844,7 +859,7 @@ export class GenericWebView {
     }
   }
 
-  private findField(data: any, id: string): any {
+  private findField(data: any, id: string, hidden: boolean = false): any {
 
     if (typeof data === 'object') {
       if (Array.isArray(data)) {
@@ -856,7 +871,7 @@ export class GenericWebView {
         }
       }
       else {
-        if ('hidden' in data && data['hidden']) {
+        if (!hidden && ('hidden' in data) && data['hidden']) {
           return undefined;
         }
 
@@ -895,15 +910,19 @@ export class GenericWebView {
           let variable = data['show-if']['variable'];
           let expected_value = data['show-if']['value'];
           let value = this.variables[variable];
-
+          let hidden = ('hidden' in data) && data['hidden'];
           //vscode.window.showInformationMessage('UPDATING show-if: '  + variable + " " + value + " " + expected_value);
 
           if (value === expected_value) {
-            this.showElement(data['id']);
-            this.syncVariables(data, true);
+            if (hidden) {
+              this.showElement(data['id']);
+              this.syncVariables(data, true);
+            }
           } else {
-            this.hideElement(data['id']);
-            this.syncVariables(data, false);
+            if (!hidden) {
+              this.hideElement(data['id']);
+              this.syncVariables(data, false);
+            }
           }
         }
 
