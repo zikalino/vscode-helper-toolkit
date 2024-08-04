@@ -327,7 +327,7 @@ export class GenericWebView {
   }
 
   //-------------------------------------------------------------------------------------------------------------------
-  // actionsVerify()
+  // actionsValidateInput()
   //
   // This function run verification list on all the actions.
   //
@@ -343,9 +343,22 @@ export class GenericWebView {
     if ('consumes' in action) {
       // verify if all consumed variables are actually properly defined
       for (let i = 0; i < action['consumes'].length; i++) {
-        let variableName = action['consumes'][i]['variable'];
+        let v = action['consumes'][i];
+        let variableName = v['variable'];
         if (this.variables[variableName] === undefined) {
-          //this.terminalWriteLine("# DISABLING ACTION" + action.id + ": " + variableName + " = " + this.variables[variableName]);
+
+          if (('required' in v) && !v['required'])
+            continue;
+
+          if ('required-if' in v) {
+            let variable = v['required-if']['variable'];
+            let expected_value = v['required-if']['value'];
+            let value = this.variables[variable];
+            if (value !== expected_value)
+              continue;
+          }
+
+          this.terminalWriteLine("# DISABLING ACTION" + action.id + ": " + variableName + " = " + this.variables[variableName]);
           this.postMessage({ command: 'set-action-disabled', id: action['id'], disabled: true });
           return;
         }
@@ -562,7 +575,7 @@ export class GenericWebView {
             this.terminalWriteLine(variableName + "='" + this.variables[variableName] + "'");
           }
 
-          if ('parameter' in v) {
+          if (('parameter' in v) && (this.variables[variableName] !== undefined)) {
             cmd += " " + v['parameter'];
           }
         }
