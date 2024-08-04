@@ -540,9 +540,20 @@ export class GenericWebView {
         for (let i = 0; i < action['consumes'].length; i++) {
           let v = action['consumes'][i];
           let variableName = v['variable'];
-          if ((this.variables[variableName] === undefined) && (!('required' in v) || v['required'])) {
-            this.terminalWriteLine("# MISSING VALUE: " + variableName);
-            return false;
+          if (this.variables[variableName] === undefined) {
+            if ('required-if' in v) {
+              // XXX - check condition
+              let variable = v['required-if']['variable'];
+              let expected_value = v['required-if']['value'];
+              let value = this.variables[variable];
+              if (value === expected_value) {
+                this.terminalWriteLine("# MISSING VALUE: " + variableName);
+                return false;
+              }
+            } else if (!('required' in v) || v['required']) {
+              this.terminalWriteLine("# MISSING VALUE: " + variableName);
+              return false;
+            }
           }
 
           if (process.platform === "win32") {
