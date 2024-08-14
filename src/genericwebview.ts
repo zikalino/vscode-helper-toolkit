@@ -576,7 +576,16 @@ export class GenericWebView {
           }
 
           if (('parameter' in v) && (this.variables[variableName] !== undefined)) {
-            cmd += " " + v['parameter'];
+            if ('include-if' in v) {
+              let variable = v['include-if']['variable'];
+              let expected_value = v['include-if']['value'];
+              let value = this.variables[variable];
+              if (value === expected_value) {
+                cmd += " " + v['parameter'];
+              }
+            } else {
+              cmd += " " + v['parameter'];
+            }
           }
         }
       }
@@ -1005,7 +1014,7 @@ export class GenericWebView {
       let itemList: any[] = this.getItemsWithDataSource(data);
 
       for (let a of itemList) {
-        if (this.queryCount < 6) {
+        if (this.queryCount < 10) {
           this.queryDataSource(a, true, variable);
         } else {
           //this.terminalWriteLine("# ATTEMPT TO QUERY " + variable + " BUT " + this.queryCount.toString() + " PENDING");
