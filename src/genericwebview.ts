@@ -36,7 +36,7 @@ export class GenericWebView {
 
   private panel: vscode.WebviewPanel;
 
-  createPanel(formDefinition: any) {
+  createPanel(formDefinition: any, iconPath: string|null = null) {
 
 
     this.processFormDefinition(formDefinition);
@@ -73,11 +73,12 @@ export class GenericWebView {
 
 
     this.formDefinition = formDefinition;
-    this.panel.iconPath = vscode.Uri.joinPath(
-      this.context.extensionUri,
-      'media',
-      'espressif.svg'
-    );
+    if (iconPath !== null) {
+      this.panel.iconPath = vscode.Uri.joinPath(
+        this.context.extensionUri,
+        iconPath
+      );
+    }
 
     const codiconsUri = this.panel.webview
       .asWebviewUri(
@@ -1069,6 +1070,11 @@ export class GenericWebView {
         cp.exec(cmd, { shell: shell }, (error: Error, out: string, stderr: string) => {
           this.queryCount--;
           this.postMessage({ command: 'set-field-busy', id: item['id'], busy: false });    
+
+          //this.terminalWriteLine('# DATA SOURCE RESPONSE' + out.toString());
+          //this.terminalWriteLine('# ERROR' + error.toString());
+          //this.terminalWriteLine('# stderr' + stderr.toString());
+
           out = JSON.parse(out.toString());
 
           // store all the data for later use
@@ -1076,7 +1082,6 @@ export class GenericWebView {
 
           var ids = JSONPath({path: item['source']['path-id'], json: out});
           var names = JSONPath({path: item['source']['path-name'], json: out});
-          //this.terminalWriteLine('# DATA SOURCE RESPONSE');
     
           item['items'] = [];
           for (var idx in ids) {
