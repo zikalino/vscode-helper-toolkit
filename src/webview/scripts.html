@@ -1968,17 +1968,17 @@ function setDetailsActions(actions) {
 
   document.getElementById('search-input-placeholder').innerText = "SET DETAILS ACTIONS - A";
   for (let i = 0; i < actions.length; i++) {
-    //document.getElementById('search-input-placeholder').innerText = "SET DETAILS ACTIONS- X";
+    document.getElementById('search-input-placeholder').innerText = "SET DETAILS ACTIONS- X-" + i;
 
     let action = actions[i];
+    let actionId = action['action'];
     let html = `
-      <a style="font-size: 25px; padding-right: 10px;" href="https://devportal.espressif.com"
+      <a style="font-size: 25px; padding-right: 10px;" onclick="document.getElementById('search-input-placeholder').innerText = 'MOOOO';onActionClicked('${actionId}')"
         id="espressif-action-${i}" class="codicon ${action['codicon']} action-link" title="${action['description']}">
       </a>   
     `;
     header.insertAdjacentHTML("beforeend", html);
     //document.getElementById('search-input-placeholder').innerText = "SET DETAILS ACTIONS- Y";
-
   }
 }
 
@@ -2397,6 +2397,10 @@ function onButtonClicked(id) {
   vscode.postMessage({ command: 'button-clicked', id: id })
 }
 
+function onActionClicked(id) {
+  vscode.postMessage({ command: 'action-clicked', id: id })
+}
+
 function onActionRowExpand(id) {
   var el = document.getElementById(id + "-edit-area");
   var elExpand = document.getElementById(id + "-action-row-expand");
@@ -2565,6 +2569,7 @@ function onScrollableWheel(e, scrollbarId) {
     //document.getElementById('search-input-placeholder').innerText = "SETTING POSITION: " + (newPosition).toString() + "px";
     scrollable.style.top = (newPosition).toString() + "px";
   }
+  adjustScrollbar(scrollbarId);
 }
 
 function onTextInput(id, value) {
@@ -2894,6 +2899,7 @@ document.addEventListener('mousemove', function(event) {
       //document.getElementById('search-input-placeholder').innerText = "SETTING POSITION: " + (newPosition).toString() + "px";
       scrollable.style.top = (newPosition).toString() + "px";
     }
+    adjustScrollbar(activeScrollable);
   }
 }, true);
 
@@ -2978,6 +2984,9 @@ function layout() {
   document.getElementById('split-view').style.height = (visualViewport.height - document.getElementById('split-view').getBoundingClientRect().top - 14).toString() + "px";
   document.getElementById('split-view').style.width = (visualViewport.width - 2 * 14 ).toString() + "px";
   document.getElementById('container-details').style.width = (visualViewport.width - document.getElementById('container-details').getBoundingClientRect().left - 14 - 14).toString() + "px";
+
+  adjustScrollbar('toc');
+  adjustScrollbar('details');
 
   // document.getElementById('sticky-header-1').innerText = visualViewport.width.toString() + " " + visualViewport.height.toString();
 }
