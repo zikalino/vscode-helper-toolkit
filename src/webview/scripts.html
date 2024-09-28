@@ -2944,7 +2944,12 @@ window.addEventListener('message', event => {
           adjustScrollbar('toc');
           break;
       case 'details':
-        document.getElementById('scrollable-details').innerHTML = message.data;
+        if (typeof message.data === 'string') {
+          document.getElementById('scrollable-details').innerHTML = message.data;
+        } else {
+          document.getElementById('scrollable-details').innerHTML = "";
+          formPopulate(message.data, 'scrollable-details');
+        }
         document.getElementById('scrollable-details').style.top = "0px";
         adjustScrollbar('details');
         //document.getElementById('sticky-header-1').innerText = "XX " + document.getElementById('container-details').offsetWidth.toString() + " " + document.getElementById('scrollable-details').offsetWidth.toString() + " " + document.getElementById('scrollbar-details').offsetLeft.toString();;
