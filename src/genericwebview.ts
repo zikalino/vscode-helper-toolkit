@@ -278,19 +278,19 @@ export class GenericWebView {
   }
 
   public async runStepsVerification() {
-    this.actionsVerify(this.formDefinition);
+    this.actionsVerify();
   }
 
   public runStepsInstallation() {
-    this.actionsInstall(this.formDefinition);
+    this.actionsInstall();
   }
 
   public runStepReRun(step_id: string): void {
-    this.actionReRun(this.formDefinition, step_id);
+    this.actionReRun(step_id);
   }
 
   public runStepUninstall(step_id: string) {
-    this.actionUninstall(this.formDefinition, step_id);
+    this.actionUninstall(step_id);
   }
 
   public updateTreeViewItems(items: any) {
@@ -307,6 +307,7 @@ export class GenericWebView {
       data: layout
     };
     this.postMessage(populateMsg);
+    this.treeViewDetailsDefinition = layout;
   }
 
   private saveStepScripts(stepId: string, scriptVerify: string, scriptInstall: string, scriptUpdate: string, scriptUninstall: string) {
@@ -392,9 +393,10 @@ export class GenericWebView {
   // This function run verification list on all the actions.
   //
   //-------------------------------------------------------------------------------------------------------------------
-  private async actionsVerify(data: any) {
+  private async actionsVerify() {
     try {
-      let actionList: any[] = this.getActionList(data);
+      let actionList: any[] = this.getActionList(this.formDefinition);
+      actionList = actionList.concat(this.getActionList(this.treeViewDetailsDefinition));
 
       for (let a of actionList) {
         this.postMessage({ command: 'set-action-status', id: a['id'], status: 'waiting' });
@@ -457,9 +459,10 @@ export class GenericWebView {
   // This function run installation on all the actions.
   //
   //-------------------------------------------------------------------------------------------------------------------
-  private async actionsInstall(data: any) {
+  private async actionsInstall() {
     try {
-      let actionList: any[] = this.getActionList(data);
+      let actionList: any[] = this.getActionList(this.formDefinition);
+      actionList = actionList.concat(this.getActionList(this.treeViewDetailsDefinition));
 
       for (let a of actionList) {
         if (!('status' in a) || a['status'] !== 'verified') {
@@ -471,10 +474,10 @@ export class GenericWebView {
     }
   }
 
-  private async actionReRun(data: any, id: string) {
+  private async actionReRun(id: string) {
     try {
-        
-      let actionList: any[] = this.getActionList(data);
+      let actionList: any[] = this.getActionList(this.formDefinition);
+      actionList = actionList.concat(this.getActionList(this.treeViewDetailsDefinition));
 
       for (let a of actionList) {
         if (a['id'] === id) {
@@ -486,10 +489,11 @@ export class GenericWebView {
     }
   }
 
-  private async actionUninstall(data: any, id: string) {
+  private async actionUninstall(id: string) {
     try {
         
-      let actionList: any[] = this.getActionList(data);
+      let actionList: any[] = this.getActionList(this.formDefinition);
+      actionList = actionList.concat(this.getActionList(this.treeViewDetailsDefinition));
 
       for (let a of actionList) {
         if (a['id'] === id) {
@@ -1141,6 +1145,7 @@ export class GenericWebView {
   private context: vscode.ExtensionContext;
   private name: string;
   private formDefinition: any;
+  private treeViewDetailsDefinition: any = {};
   private variables: any = {};
   private queryCount = 0;
   // what is actually created here?
