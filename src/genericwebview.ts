@@ -293,6 +293,22 @@ export class GenericWebView {
     this.actionUninstall(this.formDefinition, step_id);
   }
 
+  public updateTreeViewItems(items: any) {
+    let populateMsg = {
+      command: 'populate',
+      data: items
+    };
+    this.postMessage(populateMsg);
+  }
+
+  public updateTreeViewDetails(layout: any) {
+    let populateMsg = {
+      command: 'details',
+      data: layout
+    };
+    this.postMessage(populateMsg);
+  }
+
   private saveStepScripts(stepId: string, scriptVerify: string, scriptInstall: string, scriptUpdate: string, scriptUninstall: string) {
     try {        
       let actionList: any[] = this.getActionList(this.formDefinition);
@@ -1120,7 +1136,7 @@ export class GenericWebView {
     }
     terminal.show();
     terminal.sendText(line);
-}
+  }
 
   private context: vscode.ExtensionContext;
   private name: string;
