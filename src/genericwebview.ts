@@ -724,7 +724,7 @@ export class GenericWebView {
   //-------------------------------------------------------------------------------------------------------------------
   // getItemsWithDataSource()
   //
-  // This function returns list of all items that require date query.
+  // This function returns list of all items that require data query.
   // Currently these are:
   //  - dropdowns
   //
@@ -1107,6 +1107,9 @@ export class GenericWebView {
           for (var idx in ids) {
             item['items'].push({ id: ids[idx], label: names[idx]});
           }
+
+          // just sort items by label
+          item['items'].sort((a: any, b: any) => a['label'].localeCompare(b['label']));
     
           this.postMessage({ command: 'set-items', id: item['id'], items: item['items'] });
         });

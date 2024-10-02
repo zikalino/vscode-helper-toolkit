@@ -129,6 +129,8 @@ function formPopulate(data, parent_id) {
       createBadge(parent_id, entry);
     } else if (entry['type'] === 'text-block') {
       createTextBlock(parent_id, entry);
+    } else if (entry['type'] === 'code-block') {
+      createCodeBlock(parent_id, entry);
     } else if (entry['type'] === 'tile') {
       createTile(parent_id, entry);
     } else if (entry['type'] === 'two-column-layout') {
@@ -721,6 +723,34 @@ function createTextBlock(parent_id, entry) {
 
 
   var font = entry['font'];
+  var width = '';
+  entry['width'];
+
+  var html = `
+        <div style="height: ${padding};"></div>
+        <vscode-text-block style='${style}'>${entry['content']}</vscode-textblock>
+        <div style="height: ${padding};"></div>
+      `;
+      document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    
+}
+
+function createCodeBlock(parent_id, entry) {
+  var style = "";
+  var padding = "0px"
+  
+  if ('padding-bottom' in entry) {
+    padding = entry['padding-bottom'];
+  }
+
+  switch (entry['width']) {
+    case 'narrow':
+      style += 'max-width: 440px;';
+      break;
+    case 'wide':
+      style += 'max-width: 650px;';
+      break;
+  }
+
   var width = '';
   entry['width'];
 
