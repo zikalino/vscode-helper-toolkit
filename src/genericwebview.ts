@@ -302,6 +302,10 @@ export class GenericWebView {
   }
 
   public updateTreeViewDetails(layout: any) {
+    
+    // process layout definition
+    this.processFormDefinition(layout);
+
     let populateMsg = {
       command: 'details',
       data: layout
@@ -773,6 +777,7 @@ export class GenericWebView {
       if (Array.isArray(data)) {
         for (let i = data.length - 1; i >= 0; i--) {
           if (this.processFormDefinition(data[i])) {
+            // element is removed from array
             data.splice(i, 1);
           }
         }
