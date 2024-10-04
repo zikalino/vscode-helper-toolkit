@@ -735,7 +735,7 @@ function createTextBlock(parent_id, entry) {
 }
 
 function createCodeBlock(parent_id, entry) {
-  var style = "";
+  var style = "font-family: Consolas;";
   var padding = "0px"
   
   if ('padding-bottom' in entry) {
@@ -756,7 +756,9 @@ function createCodeBlock(parent_id, entry) {
 
   var html = `
         <div style="height: ${padding};"></div>
-        <vscode-text-block style='${style}'>${entry['content']}</vscode-textblock>
+        <vscode-text-block style='${style}'><pre>
+${entry['content']}
+        </pre></vscode-textblock>
         <div style="height: ${padding};"></div>
       `;
       document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);    

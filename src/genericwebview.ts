@@ -118,7 +118,6 @@ export class GenericWebView {
             return;
           case 'dropdown-clicked':
             // vscode.window.showInformationMessage('DROPDOWN SELECTION: ' + message.id);
-            //this.terminalWriteLine("# DROPDOWN CLICKED: " + message.combo_id + " " + message.id);
             this.handleFieldUpdate(message.combo_id, message.id);
             this.reconfigureVisibility(this.formDefinition);
             // XXX - only run when necessary
@@ -317,7 +316,6 @@ export class GenericWebView {
   private saveStepScripts(stepId: string, scriptVerify: string, scriptInstall: string, scriptUpdate: string, scriptUninstall: string) {
     try {        
       let actionList: any[] = this.getActionList(this.formDefinition);
-      this.terminalWriteLine("# SAVING SCRIPTS OF: " + stepId);
       for (let a of actionList) {
         if (a['id'] === stepId) {
           // create overrides if necessary
@@ -380,14 +378,12 @@ export class GenericWebView {
               continue;
           }
 
-          this.terminalWriteLine("# DISABLING ACTION" + action.id + ": " + variableName + " = " + this.variables[variableName]);
           this.postMessage({ command: 'set-action-disabled', id: action['id'], disabled: true });
           return;
         }
       }
     }
 
-    this.terminalWriteLine("# ENABLING ACTION " + action.id);
     this.postMessage({ command: 'set-action-disabled', id: action['id'], disabled: false });
   }
 
@@ -445,11 +441,10 @@ export class GenericWebView {
     } catch (e: any) {
       if (printFailure) {
         var lines = e.toString().split(/\r?\n/);
-        this.terminalWriteLine("# ===========================================================");
-        for (var i = 0; i < lines.length; i++) {
-          this.terminalWriteLine("# " + lines[i]);
-        }
-        this.terminalWriteLine("# ===========================================================");
+        //for (var i = 0; i < lines.length; i++) {
+        //  this.terminalWriteLine("# " + lines[i]);
+        //}
+        //this.terminalWriteLine("# ===========================================================");
       }
 
       action['status'] = 'missing';
@@ -510,31 +505,31 @@ export class GenericWebView {
   }
 
   private displayBannerStart(operation: string, action: string, banner: string | undefined, script: string) : void {
-    this.terminalWriteLine("#============================================================");
-    this.terminalWriteLine("# " + operation + ": " + action);
-    this.terminalWriteLine("#------------------------------------------------------------");
+    //this.terminalWriteLine("#============================================================");
+    //this.terminalWriteLine("# " + operation + ": " + action);
+    //this.terminalWriteLine("#------------------------------------------------------------");
 
-    if (banner) {
-      var lines: string[] = banner.toString().split(/\r?\n/);
-      for (var i = 0; i < lines.length; i++) {
-        if (lines[i].trim() !== "") {
-          this.terminalWriteLine("# " + lines[i]);
-        }
-      }
+    //if (banner) {
+    //  var lines: string[] = banner.toString().split(/\r?\n/);
+    //  for (var i = 0; i < lines.length; i++) {
+    //    if (lines[i].trim() !== "") {
+    //      this.terminalWriteLine("# " + lines[i]);
+    //    }
+    //  }
 
-      this.terminalWriteLine("#------------------------------------------------------------");
-    }
+    //  this.terminalWriteLine("#------------------------------------------------------------");
+    //}
 
-    if (script) {
-      var lines: string[] = script.toString().split(/\r?\n/);
-      for (var i = 0; i < lines.length; i++) {
-        if (lines[i].trim() !== "") {
-          this.terminalWriteLine("#   " + lines[i]);
-        }
-      }
-    }
+    //if (script) {
+    //  var lines: string[] = script.toString().split(/\r?\n/);
+    //  for (var i = 0; i < lines.length; i++) {
+    //    if (lines[i].trim() !== "") {
+    //      this.terminalWriteLine("#   " + lines[i]);
+    //    }
+    //  }
+    //}
 
-    this.terminalWriteLine("#============================================================");
+    //this.terminalWriteLine("#============================================================");
 }
 
   private async waitForCompletion(action: any): Promise<void> {
@@ -552,18 +547,18 @@ export class GenericWebView {
     const data = require('fs').readFileSync(filenameStatus, 'utf8').toString();
     require('fs').unlinkSync(filenameStatus);
 
-    this.terminalWriteLine("#============================================================");
+    //this.terminalWriteLine("#============================================================");
 
     if (data.startsWith('True') || data.startsWith("0")) {
       action['status'] = 'verified';
       this.postMessage({ command: 'set-action-status', id: action['id'], status: 'verified' });
-      this.terminalWriteLine("# Result: SUCCESS");
+      //this.terminalWriteLine("# Result: SUCCESS");
     } else {
       action['status'] = 'failed';
       this.postMessage({ command: 'set-action-status', id: action['id'], status: 'failed' });
-      this.terminalWriteLine("# Result: FAILED");
+      //this.terminalWriteLine("# Result: FAILED");
     }
-    this.terminalWriteLine("#============================================================");
+    //this.terminalWriteLine("#============================================================");
 
   }
 
@@ -585,11 +580,11 @@ export class GenericWebView {
               let expected_value = v['required-if']['value'];
               let value = this.variables[variable];
               if (value === expected_value) {
-                this.terminalWriteLine("# MISSING VALUE: " + variableName);
+                //this.terminalWriteLine("# MISSING VALUE: " + variableName);
                 return false;
               }
             } else if (!('required' in v) || v['required']) {
-              this.terminalWriteLine("# MISSING VALUE: " + variableName);
+              //this.terminalWriteLine("# MISSING VALUE: " + variableName);
               return false;
             }
           }
@@ -619,6 +614,7 @@ export class GenericWebView {
 
       let filenameOutput = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
       if (process.platform === "win32") {
+        cmd = cmd.replace(/[\r\n]+$/, "");
         this.terminalWriteLine(cmd + " | Out-File " + filenameOutput + " -Encoding ASCII");
       } else {
         this.terminalWriteLine(cmd + " > " + filenameOutput);
@@ -636,7 +632,7 @@ export class GenericWebView {
           let variablePath = action['produces'][i]['path'];
           let variableValue = JSONPath({path: variablePath, json: resultData});
           this.variables[variableName] = variableValue;
-          this.terminalWriteLine("# " + variableName + "=" + variableValue);
+          //this.terminalWriteLine("# " + variableName + "=" + variableValue);
         }            
       }
 
@@ -676,13 +672,13 @@ export class GenericWebView {
       if ('uninstall' in action) {
         this.terminalWriteLine(action['uninstall']);
       } else {
-        this.terminalWriteLine("# not implemented");
+        //this.terminalWriteLine("# not implemented");
       }
       
       await this.waitForCompletion(action);
-      this.terminalWriteLine("# verifying action after uninstallation");
+      //this.terminalWriteLine("# verifying action after uninstallation");
       this.actionVerify(action, false);
-      this.terminalWriteLine("# finished verification");
+      //this.terminalWriteLine("# finished verification");
       return true;
 
     } catch (e) {
@@ -1123,11 +1119,11 @@ export class GenericWebView {
       if (printFailure) {
         vscode.window.showInformationMessage('QUERY EXCEPTION ' + e.toString());
         var lines = e.toString().split(/\r?\n/);
-        this.terminalWriteLine("# ===========================================================");
+        //this.terminalWriteLine("# ===========================================================");
         for (var i = 0; i < lines.length; i++) {
-          this.terminalWriteLine("# " + lines[i]);
+          //this.terminalWriteLine("# " + lines[i]);
         }
-        this.terminalWriteLine("# ===========================================================");
+        //this.terminalWriteLine("# ===========================================================");
       }
     }
   }
