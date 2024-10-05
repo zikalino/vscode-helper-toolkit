@@ -55,7 +55,9 @@ function formPopulate(data, parent_id) {
       //  - form
       //  - footer
       createLayoutForm(parent_id, entry);
-      formPopulate(entry['header'], entry['id'] + "-header");
+      if ('header' in entry) {
+        formPopulate(entry['header'], entry['id'] + "-header");
+      }
       formPopulate(entry['form'], entry['id'] + "-form");
       formPopulate(entry['footer'], entry['id'] + "-footer");
     } else if (entry['type'] === 'layout-canvas') {
@@ -1508,7 +1510,10 @@ function createLayoutTreeWithDetails(parent_id, entry) {
                         style="left: 200px; width: 664px;"
                         id="container-details"
                       >
-                        <div class="settings-tree-container" style="width: 100%">
+                        <div class="settings-tree-container" style="width: 100%"
+                              id="details-scrollable-element"
+                        
+                        >
                           <div
                             class="monaco-list list_id_2 mouse-support settings-editor-tree element-focused selection-single"
                             tabindex="0"
@@ -1991,6 +1996,9 @@ function setHeader(level, text) {
 function setDetailsActions(actions) {
   //document.getElementById('search-input-placeholder').innerText = "SET DETAILS ACTIONS";
 
+  let splitView = document.getElementById('split-view');
+  let containerDetails = document.getElementById('container-details');
+  let scrollableElement = document.getElementById('details-scrollable-element');
   let header = document.getElementById('sticky-header-row-x-' + (headerLevel).toString());
 
   var elements = header.getElementsByClassName("action-link");
@@ -1998,10 +2006,7 @@ function setDetailsActions(actions) {
       elements[0].parentNode.removeChild(elements[0]);
   }
 
-  document.getElementById('search-input-placeholder').innerText = "SET DETAILS ACTIONS - A";
   for (let i = 0; i < actions.length; i++) {
-    document.getElementById('search-input-placeholder').innerText = "SET DETAILS ACTIONS- X-" + i;
-
     let action = actions[i];
     let actionId = action['action'];
     let html = `
@@ -2010,7 +2015,10 @@ function setDetailsActions(actions) {
       </a>   
     `;
     header.insertAdjacentHTML("beforeend", html);
-    //document.getElementById('search-input-placeholder').innerText = "SET DETAILS ACTIONS- Y";
+    //header.style.border = "4px solid blue";
+    //scrollableElement.style.border = "4px solid green";
+    //containerDetails.style.border = "4px solid red";
+    //splitView.style.border = "4px solid orange";
   }
 }
 
@@ -3018,9 +3026,17 @@ visualViewport.addEventListener("resize", () => {
 });
 
 function layout() {
+
+  // XXX - this is proably not the best approach - fix it
+  let splitViewWidth = (visualViewport.width - 2 * 14 );
+  if (splitViewWidth > 1200) {
+    splitViewWidth = 1200;
+  }
+
   document.getElementById('split-view').style.height = (visualViewport.height - document.getElementById('split-view').getBoundingClientRect().top - 14).toString() + "px";
-  document.getElementById('split-view').style.width = (visualViewport.width - 2 * 14 ).toString() + "px";
-  document.getElementById('container-details').style.width = (visualViewport.width - document.getElementById('container-details').getBoundingClientRect().left - 14 - 14).toString() + "px";
+  document.getElementById('split-view').style.width = splitViewWidth.toString() + "px";
+  // XXX - this is wrong when marging appears
+  document.getElementById('container-details').style.width = (splitViewWidth - document.getElementById('container-details').getBoundingClientRect().left).toString() + "px";
 
   adjustScrollbar('toc');
   adjustScrollbar('details');
