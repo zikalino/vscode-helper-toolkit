@@ -1986,10 +1986,14 @@ function setHeaderCount(count) {
   }
 }
 
-function setHeader(level, text) {
+function setHeader(level, text, icon) {
   let header = document.getElementById('sticky-header-' + (level + 1).toString());
   if (header !== null) {
-    header.innerText = text;
+    if (icon) {
+      header.innerHTML = `<img src="${mediaFolder}/${icon}" width="40px" height="40px" style="padding-right: 16px;" />` + text;
+    } else {
+      header.innerHTML = text;
+    }
   }
 }
 
@@ -2039,10 +2043,10 @@ function toggleTreeItem(entries, id, headers) {
       if (headers.length > 0) {
         setHeaderCount(2);
         setHeader(0, headers[0]);
-        setHeader(1, entry['name']);
+        setHeader(1, entry['name'], entry['icon']);
       } else {
         setHeaderCount(1);
-        setHeader(0, entry['name']);
+        setHeader(0, entry['name'], entry['icon']);
       }
     } else {
       entry['focused'] = false;
@@ -2671,7 +2675,7 @@ function treeSelectPrevNode() {
     treeCalculateIndexes(formData, indexes, 0);
 
     setHeaderCount(indexes[2] + 1);
-    setHeader(indexes[2], next['name']);
+    setHeader(indexes[2], next['name'], next['icon']);
   }
 }
 
@@ -2691,7 +2695,7 @@ function treeSelectNextNode() {
     treeCalculateIndexes(formData, indexes, 0);
 
     setHeaderCount(indexes[2] + 1);
-    setHeader(indexes[2], next['name']);
+    setHeader(indexes[2], next['name'], next['icon']);
   }
 }
 
@@ -2749,7 +2753,7 @@ function treeArrowLeftInternal(entries, level) {
       } else if (result === 'leave') {
         entry['focused'] = true;
         entry['selected'] = true;
-        setHeader(level, entry['name']);
+        setHeader(level, entry['name'], entry['icon']);
         return 'handled';
       }
     }
