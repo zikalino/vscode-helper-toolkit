@@ -1990,7 +1990,7 @@ function setHeader(level, text, icon) {
   let header = document.getElementById('sticky-header-' + (level + 1).toString());
   if (header !== null) {
     if (icon) {
-      header.innerHTML = `<img src="${mediaFolder}/${icon}" width="40px" height="40px" style="padding-right: 16px;" />` + text;
+      header.innerHTML = `<div style="display: flex; align-items: center;"><img src="${mediaFolder}/${icon}" width="32" height="32" />` + text + '</div>';
     } else {
       header.innerHTML = text;
     }
