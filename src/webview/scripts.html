@@ -1302,16 +1302,7 @@ function createLayoutTreeWithDetails(parent_id, entry) {
                               aria-label="Local"
                               tabindex="0"
                               aria-checked="true"
-                              >Local</a
-                            >
-                          </li>
-                          <li class="action-item" role="presentation">
-                            <a
-                              class="action-label"
-                              role="checkbox"
-                              aria-label="Component Manager"
-                              aria-checked="false"
-                              >Component Manager</a
+                              >All</a
                             >
                           </li>
                           <li class="action-item disabled" role="presentation">
@@ -2014,7 +2005,7 @@ function setDetailsActions(actions) {
     let action = actions[i];
     let actionId = action['action'];
     let html = `
-      <a style="font-size: 25px; padding-right: 10px;" onclick="document.getElementById('search-input-placeholder').innerText = 'MOOOO';onActionClicked('${actionId}')"
+      <a style="font-size: 25px; padding-right: 10px;" onclick="onActionClicked('${actionId}')"
         id="espressif-action-${i}" class="codicon ${action['codicon']} action-link" title="${action['description']}">
       </a>   
     `;
@@ -2998,6 +2989,8 @@ window.addEventListener('message', event => {
         adjustScrollbar('details');
         //document.getElementById('sticky-header-1').innerText = "XX " + document.getElementById('container-details').offsetWidth.toString() + " " + document.getElementById('scrollable-details').offsetWidth.toString() + " " + document.getElementById('scrollbar-details').offsetLeft.toString();;
         //document.getElementById('sticky-header-1').innerText = "split view width: " + document.getElementById('split-view-container').offsetWidth.toString() + " left=" + document.getElementById('container-details').style.left.toString() + " width=" + document.getElementById('container-details').offsetWidth.toString() + "vpv=" + visualViewport.width.toString();
+
+        vscode.postMessage({ command: 'details-ready' });
         break;
       case 'config':
         for (var key in message.data) {

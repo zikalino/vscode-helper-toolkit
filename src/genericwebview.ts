@@ -113,6 +113,9 @@ export class GenericWebView {
             this.queryDataSources(this.formDefinition);
             this.reconfigureVisibility(this.formDefinition);
             break;
+          case 'details-ready':
+            this.runStepsVerification();
+            break;
           case 'select-folder':
             this.selectFolder(message.id);
             return;
