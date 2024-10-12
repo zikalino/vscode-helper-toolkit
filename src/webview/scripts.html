@@ -2006,7 +2006,7 @@ function setDetailsActions(actions) {
     let actionId = action['action'];
     let html = `
       <a style="font-size: 25px; padding-right: 10px;" onclick="onActionClicked('${actionId}')"
-        id="espressif-action-${i}" class="codicon ${action['codicon']} action-link" title="${action['description']}">
+        id="details-action-${i}" class="codicon ${action['codicon']} action-link" title="${action['description']}">
       </a>   
     `;
     header.insertAdjacentHTML("beforeend", html);
