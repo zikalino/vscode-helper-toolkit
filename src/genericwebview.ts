@@ -772,6 +772,8 @@ export class GenericWebView {
 
   private processFormDefinition(data: any): boolean {
 
+    if (!data) return true;
+    
     if (typeof data === 'object') {
       if (Array.isArray(data)) {
         for (let i = data.length - 1; i >= 0; i--) {
