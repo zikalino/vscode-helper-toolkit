@@ -18,6 +18,9 @@
       case 'set-action-disabled':
         setActionDisabled(message.id, message.disabled);
         break;
+      case 'set-output-data':
+        setOutputData(message.id, message.data);
+        break;
 
       case 'set-input-invalid':
         setInputInvalid(message.id, message.invalid);
@@ -81,6 +84,8 @@ function formPopulate(data, parent_id) {
       formPopulate(entry['subitems'], entry['id']);
     } else if (entry['type'] === 'action-row') {
       createActionRow(parent_id, entry);
+    } else if (entry['type'] === 'output-row') {
+      createOutputRow(parent_id, entry);
     } else if (entry['type'] === 'checkbox') {
       createCheckBox(parent_id, entry);
     } else if (entry['type'] === 'combo') {
@@ -419,7 +424,25 @@ function setDropdownItems(id, items) {
   vscode.postMessage({ command: 'dropdown-clicked', combo_id: id, id: selectedId });
 }
 
+function createOutputRow(parent_id, data) {
 
+  var style = "font-family: Consolas;";
+  
+  var html = `
+    <div class="form-row" id="${data['id']}-wrapper">
+        <vscode-text-block id="${data['id']}" style='${style}'>
+          <pre>
+${data['content']}
+          </pre>
+        </vscode-textblock>
+  </div>
+  `;
+  document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);
+}
+
+function setOutputData(id, output) {
+  document.getElementById(id).innerText = output;
+}
 
 function createCheckBox(parent_id, data) {
   let align = 'left';

@@ -406,7 +406,9 @@ export class GenericWebView {
       }
 
       for (let a of actionList) {
-        this.actionVerify(a, true);
+        if ("verify" in a) {
+          this.actionVerify(a, true);
+        }
       }
     } catch (e) {
       vscode.window.showInformationMessage('EXCEPTION: ' + e);
@@ -586,7 +588,7 @@ export class GenericWebView {
                 //this.terminalWriteLine("# MISSING VALUE: " + variableName);
                 return false;
               }
-            } else if (!('required' in v) || v['required']) {
+            } else if (('required' in v) && v['required']) {
               //this.terminalWriteLine("# MISSING VALUE: " + variableName);
               return false;
             }
@@ -628,18 +630,44 @@ export class GenericWebView {
       // Attempt to load JSON if we need to find some data from the command
       if ('produces' in action) {
         var resultData = require('fs').readFileSync(filenameOutput, "utf8");
-        var resultData = JSON.parse(resultData);
 
-        for (var i = 0; i < action['produces'].length; i++) {
-          let variableName = action['produces'][i]['variable'];
-          let variablePath = action['produces'][i]['path'];
-          let variableValue = JSONPath({path: variablePath, json: resultData});
-          this.variables[variableName] = variableValue;
-          //this.terminalWriteLine("# " + variableName + "=" + variableValue);
-        }            
+        // try to patse it as json
+        try {
+          resultData = JSON.parse(resultData);
+
+          for (var i = 0; i < action['produces'].length; i++) {
+            let variableName = action['produces'][i]['variable'];
+            // if no path assume entire response is value
+            let variableValue = resultData;
+            if ('path' in action['produces'][i]) {
+              let variablePath = action['produces'][i]['path'];
+              variableValue = JSONPath({path: variablePath, json: resultData});
+            }
+            this.variables[variableName] = variableValue;
+            //this.terminalWriteLine("# " + variableName + "=" + variableValue);
+
+            // XXX - this should be moved out
+            // XXX - find variable consumers
+            // XXX - now this is just simplified
+            var outputList: any[] = this.getOutputList(this.formDefinition);
+            // var overrideActionList = this.getActionList(overrideFormDefinition);
+            for (var i = 0; i < outputList.length; i++) {
+              this.postMessage({ command: 'set-output-data', id: outputList[i]['id'], data: resultData });
+            }
+          }            
+        } catch (e) {
+          // do nothing, just keep value as it is
+          var outputList: any[] = this.getOutputList(this.formDefinition);
+          for (var i = 0; i < outputList.length; i++) {
+            this.postMessage({ command: 'set-output-data', id: outputList[i]['id'], data: resultData });
+          }
+        }
       }
 
-      this.actionVerify(action, true);
+      // verify only if such action is defined
+      if ("verify" in action) {
+        this.actionVerify(action, true);
+      }
       return true;
     } catch (e) {
       action['status'] = 'missing';
@@ -680,7 +708,9 @@ export class GenericWebView {
       
       await this.waitForCompletion(action);
       //this.terminalWriteLine("# verifying action after uninstallation");
-      this.actionVerify(action, false);
+      if ("verify" in action) {
+        this.actionVerify(action, false);
+      }
       //this.terminalWriteLine("# finished verification");
       return true;
 
@@ -716,6 +746,39 @@ export class GenericWebView {
           for (let key in data) {
             if (typeof data[key] === 'object' && data[key] instanceof Array) {
               ret = ret.concat(this.getActionList(data[key]));
+            }
+          }
+        }
+      }
+    }
+    return ret;
+  }
+
+  //-------------------------------------------------------------------------------------------------------------------
+  // getOutputList()
+  //
+  // This function returns list of all actions that are not hidden from the form
+  //
+  //-------------------------------------------------------------------------------------------------------------------
+  private getOutputList(data: any): any[] {
+    let ret : any[] = [];
+    if (typeof data === 'object') {
+      if (data instanceof Array) {
+        for (let i of data.keys()) {
+          ret = ret.concat(this.getOutputList(data[i]));
+        }
+      }
+      else {
+        if ('hidden' in data && data['hidden']) {
+          return [];
+        }
+
+        if ('type' in data && data['type'] === 'output-row') {
+          ret.push(data);
+        } else {
+          for (let key in data) {
+            if (typeof data[key] === 'object' && data[key] instanceof Array) {
+              ret = ret.concat(this.getOutputList(data[key]));
             }
           }
         }
