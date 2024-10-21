@@ -541,7 +541,7 @@ export class GenericWebView {
     let filenameStatus = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
     let filenameOutput = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
     if (process.platform === "win32") {
-      this.terminalWriteLine("$? | Out-File " + filenameStatus + " -Encoding ASCII");
+      this.terminalWriteLine("$? | Out-File " + filenameStatus + " -Encoding oem");
     } else {
       this.terminalWriteLine("echo $? > " + filenameStatus);
     }
@@ -620,7 +620,7 @@ export class GenericWebView {
       let filenameOutput = require('path').join(require("os").homedir(), Math.random().toString(36).substring(2, 15) + Math.random().toString(23).substring(2, 5));
       if (process.platform === "win32") {
         cmd = cmd.replace(/[\r\n]+$/, "");
-        this.terminalWriteLine(cmd + " | Out-File " + filenameOutput + " -Encoding ASCII");
+        this.terminalWriteLine(cmd + " | Out-File " + filenameOutput + " -Encoding oem");
       } else {
         this.terminalWriteLine(cmd + " > " + filenameOutput);
       }
