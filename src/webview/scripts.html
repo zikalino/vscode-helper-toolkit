@@ -441,7 +441,9 @@ ${data['content']}
 }
 
 function setOutputData(id, output) {
-  document.getElementById(id).innerText = output;
+  document.getElementById(id).innerHTML = `<pre>
+${output}
+  </pre>`;
 }
 
 function createCheckBox(parent_id, data) {
