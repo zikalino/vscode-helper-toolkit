@@ -233,6 +233,8 @@ function createActionRow(parent_id, data) {
   // store this action row for future use
   actionRows[data['id']] = data;
 
+  var expandable = false;
+  if (('expandable' in data) && !data['expandable']) expandable = false;
   var scriptVerify = ('verify' in data) ? data['verify'] : "";
   var scriptInstall = ('install' in data) ? data['install'] : "";
   var scriptUpdate = ('update' in data) ? data['update'] : "";
@@ -269,36 +271,50 @@ function createActionRow(parent_id, data) {
       <div class="action-row-icon codicon codicon-circle-large" id="${data['id']}-icon" style="color: lightgrey; font-size: 24px;">
         <vscode-progress-ring id="${data['id']}-ring" style="visibility: hidden;"></vscode-progress-ring>
       </div>
-      <div class="action-row-text">${data['name']}</div>
-      <vscode-button id="${data['id']}-action-row-expand" class="action-row-button-1" onclick="onActionRowExpand('${data['id']}');"><div class="codicon codicon-edit" ></div></vscode-button>
-      <vscode-button id="${data['id']}-action-row-update" class="action-row-button-2" onclick="onActionRowUpdate('${data['id']}');"><div class="codicon codicon-refresh" ></div></vscode-button>
-      <vscode-button id="${data['id']}-action-row-uninstall" class="action-row-button-3" onclick="onActionRowUninstall('${data['id']}');"><div class="codicon codicon-clear-all" ></div></vscode-button>
+      <div class="action-row-text">${data['name']}</div>`;
 
-      <vscode-button id="${data['id']}-action-row-save" style="visibility: hidden;" class="action-row-button-2" onclick="onActionRowSave('${data['id']}');"><div class="codicon codicon-save" ></div></vscode-button>
-      <vscode-button id="${data['id']}-action-row-discard" style="visibility: hidden;" class="action-row-button-3" onclick="onActionRowDiscard('${data['id']}');"><div class="codicon codicon-discard" ></div></vscode-button>
+      if (expandable) {
+        html += `<vscode-button id="${data['id']}-action-row-expand" class="action-row-button-1" onclick="onActionRowExpand('${data['id']}');"><div class="codicon codicon-edit" ></div></vscode-button>`;
+      }
 
-    </div>
-    <div class="action-row-edit-area" id="${data['id']}-edit-area">
+      if (scriptUpdate !== '') {
+        html += `<vscode-button id="${data['id']}-action-row-update" class="action-row-button-2" onclick="onActionRowUpdate('${data['id']}');"><div class="codicon codicon-refresh" ></div></vscode-button>`;
+      } else {
+        html += `<vscode-button id="${data['id']}-action-row-update" class="action-row-button-2" onclick="onActionRowUpdate('${data['id']}');"><div class="codicon codicon-play" ></div></vscode-button>`;
+      }
 
-      <div class="action-row-verify-edit-icon codicon" id="${data['id']}-verify-icon" style="color: lightgrey; font-size: 24px;"></div>
-      <vscode-label class="action-row-verify-edit-label">Verify</vscode-label>
-      <vscode-text-area class="action-row-verify-edit-edit" style="${scriptVerifyOverrideStyle}" id="${data['id']}-verify-edit" value="${scriptVerify}" oninput="onActionRowEdited('${data['id']}')" ></vscode-text-area>
+      if (scriptUninstall !== '') {
+        html += `<vscode-button id="${data['id']}-action-row-uninstall" class="action-row-button-3" onclick="onActionRowUninstall('${data['id']}');"><div class="codicon codicon-clear-all" ></div></vscode-button>`;
+      }
 
-      <div class="action-row-install-edit-icon codicon" id="${data['id']}-install-icon" style="color: lightgrey; font-size: 24px;"></div>
-      <vscode-label class="action-row-install-edit-label">Install</vscode-label>
-      <vscode-text-area class="action-row-install-edit-edit" style="${scriptInstallOverrideStyle}" id="${data['id']}-install-edit" value="${scriptInstall}" oninput="onActionRowEdited('${data['id']}')"></vscode-text-area>
+      if (expandable) {
+        html += `<vscode-button id="${data['id']}-action-row-save" style="visibility: hidden;" class="action-row-button-2" onclick="onActionRowSave('${data['id']}');"><div class="codicon codicon-save" ></div></vscode-button>`;
+        html += `<vscode-button id="${data['id']}-action-row-discard" style="visibility: hidden;" class="action-row-button-3" onclick="onActionRowDiscard('${data['id']}');"><div class="codicon codicon-discard" ></div></vscode-button>`;
 
-      <div class="action-row-update-edit-icon codicon" id="${data['id']}-update-icon" style="color: lightgrey; font-size: 24px;"></div>
-      <vscode-label class="action-row-update-edit-label">Update</vscode-label>
-      <vscode-text-area class="action-row-update-edit-edit" style="${scriptUpdateOverrideStyle}" id="${data['id']}-update-edit" value="${scriptUpdate}" oninput="onActionRowEdited('${data['id']}')"></vscode-text-area>
+        html += `
+        </div>
+        <div class="action-row-edit-area" id="${data['id']}-edit-area">
 
-      <div class="action-row-uninstall-edit-icon codicon" id="${data['id']}-uninstall-icon" style="color: lightgrey; font-size: 24px;"></div>
-      <vscode-label class="action-row-uninstall-edit-label">Unistall</vscode-label>
-      <vscode-text-area class="action-row-uninstall-edit-edit" style="${scriptUninstallOverrideStyle}" id="${data['id']}-uninstall-edit" value="${scriptUninstall}" oninput="onActionRowEdited('${data['id']}')"></vscode-text-area>
-    </div>
+          <div class="action-row-verify-edit-icon codicon" id="${data['id']}-verify-icon" style="color: lightgrey; font-size: 24px;"></div>
+          <vscode-label class="action-row-verify-edit-label">Verify</vscode-label>
+          <vscode-text-area class="action-row-verify-edit-edit" style="${scriptVerifyOverrideStyle}" id="${data['id']}-verify-edit" value="${scriptVerify}" oninput="onActionRowEdited('${data['id']}')" ></vscode-text-area>
 
-  </div>
-  `;
+          <div class="action-row-install-edit-icon codicon" id="${data['id']}-install-icon" style="color: lightgrey; font-size: 24px;"></div>
+          <vscode-label class="action-row-install-edit-label">Install</vscode-label>
+          <vscode-text-area class="action-row-install-edit-edit" style="${scriptInstallOverrideStyle}" id="${data['id']}-install-edit" value="${scriptInstall}" oninput="onActionRowEdited('${data['id']}')"></vscode-text-area>
+
+          <div class="action-row-update-edit-icon codicon" id="${data['id']}-update-icon" style="color: lightgrey; font-size: 24px;"></div>
+          <vscode-label class="action-row-update-edit-label">Update</vscode-label>
+          <vscode-text-area class="action-row-update-edit-edit" style="${scriptUpdateOverrideStyle}" id="${data['id']}-update-edit" value="${scriptUpdate}" oninput="onActionRowEdited('${data['id']}')"></vscode-text-area>
+
+          <div class="action-row-uninstall-edit-icon codicon" id="${data['id']}-uninstall-icon" style="color: lightgrey; font-size: 24px;"></div>
+          <vscode-label class="action-row-uninstall-edit-label">Unistall</vscode-label>
+          <vscode-text-area class="action-row-uninstall-edit-edit" style="${scriptUninstallOverrideStyle}" id="${data['id']}-uninstall-edit" value="${scriptUninstall}" oninput="onActionRowEdited('${data['id']}')"></vscode-text-area>
+        </div>
+
+      </div>
+      `;
+    }
   document.getElementById(parent_id).insertAdjacentHTML('beforeend', html);
 }
 
