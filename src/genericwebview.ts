@@ -604,10 +604,10 @@ export class GenericWebView {
               let expected_value = v['include-if']['value'];
               let value = this.variables[variable];
               if (value === expected_value) {
-                cmd += " " + v['parameter'];
+                cmd += " " + v['parameter'] + " ${" + v['variable'] + "}";
               }
             } else {
-              cmd += " " + v['parameter'];
+              cmd += " " + v['parameter'] + " ${" + v['variable'] + "}";
             }
           }
         }
